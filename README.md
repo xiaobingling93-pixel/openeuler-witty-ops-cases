@@ -1,0 +1,3 @@
+# witty-ops-cases
+
+This repository archives real-world fault cases across community testing, AI computing (e.g., Ascend platform errors), and general computing (e.g., service failures, Python exceptions). The curated case library serves as foundational documentation and data for developing an OS intelligent diagnostic agent.
