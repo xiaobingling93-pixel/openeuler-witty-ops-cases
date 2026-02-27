@@ -1,0 +1,16 @@
+#标题  
+XDP零拷贝用户态程序触发NOHZ tick-stop错误
+
+#内核版本  
+5.10.0-182.0.0.95.oe2203sp3
+
+#问题现象  
+在XDP零拷贝（AFXDP_ZEROCOPY）用户态程序启动时，dmesg中出现以下内核告警日志：  
+"NOHZ tick-stop error: Non-RCU local softirq work is pending, handler #08!!!"  
+该错误发生在.ndo_xsk_wakeup钩子函数调用napi_schedule时。
+
+#问题根因  
+napi_schedule被用户态程序直接调用，而非由硬中断触发。调用路径未关闭本地中断，导致CPU节能机制（NOHZ）与中断处理发生冲突，从而触发NOHZ tick-stop错误。
+
+#解决方案  
+在调用napi_schedule时，临时关闭本地中断并禁用底半部（BH）可规避该问题。但此方法会导致性能下降。由于该告警对系统功能无实际影响，建议维持现状，不进行处理。

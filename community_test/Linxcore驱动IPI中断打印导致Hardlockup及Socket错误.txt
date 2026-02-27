@@ -1,0 +1,17 @@
+#标题  
+Linxcore驱动IPI中断打印导致Hardlockup及Socket错误
+
+#内核版本  
+2203sp4
+
+#问题现象  
+- 应用层报错：Socket error Event: 32 Error: 10053（连接被本地主机强行关闭）  
+- 系统触发 hardlockup 告警  
+- 故障时抓取到 call trace，指向 linxcore_cfg_reg 驱动模块  
+- 问题在啄木鸟压测中曾多次复现但未定位  
+
+#问题根因  
+linxcore_cfg_reg 驱动在 IPI 中断处理函数中添加了打印语句，导致中断响应超时，进而触发 hardlockup；该驱动存在已知问题。
+
+#解决方案  
+移除 linxcore_cfg_reg 驱动中 IPI 中断处理路径上的打印语句，避免中断延迟；建议同步更新至修复该已知问题的驱动版本。

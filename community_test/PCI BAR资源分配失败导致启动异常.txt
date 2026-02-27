@@ -1,0 +1,18 @@
+#标题  
+PCI BAR资源分配失败导致启动异常  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+系统启动过程中出现以下PCI错误日志：  
+- pci 0000:1a:00.0: BAR 9: failed to assign [mem size 0x001f8000 64bit pref]  
+- pci 0000:1a:00.0: BAR 7: failed to assign [mem size 0x000fc000 64bit pref]  
+- pci 0000:1a:00.0: BAR 11: failed to assign [mem size 0x000fc000 64bit pref]  
+该问题发生在“启动安装”阶段，影响系统正常启动流程。  
+
+#问题根因  
+BIOS版本存在兼容性问题，导致PCI设备的BAR（Base Address Register）资源无法正确分配。更换BIOS版本后问题不再复现，确认为BIOS侧问题。  
+
+#解决方案  
+升级或更换为经过验证的兼容BIOS版本。建议在类似硬件平台上部署前，验证BIOS与操作系统内核的兼容性，尤其是涉及PCI资源分配的关键功能。

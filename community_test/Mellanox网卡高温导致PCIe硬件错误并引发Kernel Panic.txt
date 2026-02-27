@@ -1,0 +1,22 @@
+#标题
+Mellanox网卡高温导致PCIe硬件错误并引发Kernel Panic
+
+#内核版本
+5.4.241-30_1020_host+
+
+#问题现象
+- 在使用MobaX传输OS镜像过程中，系统于11月11日22:35:56发生意外重启。
+- 系统日志中出现多次mlx5_core驱动报错，提示“device's health compromised - reached miss count”。
+- mlx5_core健康信息显示synd 0x10: High temperature（高温）。
+- 后续出现APEI报告的PCIe硬件错误，其中一处错误事件严重性为“fatal”，错误类型为PCIe error，关联设备为0000:20:10.0，secondary_bus为0x2a。
+- 最终触发“Kernel panic - not syncing: Fatal hardware error!”，系统崩溃并启动kdump。
+
+#问题根因
+Mellanox ConnectX系列网卡（设备0000:2a:00.0和0000:2a:00.1）因高温（synd 0x10: High temperature）导致设备健康状态异常，进而引发PCIe链路故障。该硬件错误被APEI捕获并上报为致命错误（fatal），最终触发内核panic。
+
+#解决方案
+1. 检查服务器散热环境，确保Mellanox网卡所在区域通风良好，无遮挡或气流不畅。
+2. 监控网卡温度（可通过mlxreg或厂商工具如mlxdump、ibqueryerrors等），确认是否持续处于高温状态。
+3. 若环境温度正常但仍频繁高温，考虑更换可能存在散热缺陷的网卡硬件。
+4. 升级Mellanox固件至最新稳定版本（当前为22.37.1014），以修复已知的热管理或健康监测问题。
+5. 在系统层面配置更严格的硬件健康告警机制，提前预警高温或PCIe链路异常，避免直接触发panic。

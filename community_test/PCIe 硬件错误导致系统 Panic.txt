@@ -1,0 +1,23 @@
+#标题  
+PCIe 硬件错误导致系统 Panic
+
+#内核版本  
+6.6.0-98.0.0.103.oe2403sp2.aarch64
+
+#问题现象  
+- 系统日志中出现 mlx5_core 驱动 probe 失败，错误码 -22（EINVAL）  
+- 触发硬件错误事件：[Hardware Error]: Error O, type: fatal，section type 为 PCIe error  
+- AER（Advanced Error Reporting）记录 uncorrectable error 状态：aer uncor status: 0x00044000  
+- 内核触发 panic：Kernel panic - not syncing: GHES: Fatal hardware error  
+- 相关设备地址为 0000:61:00.0 和 0000:61:00.1，其中 0000:61:00.1 报告“Missing registers BAR, aborting”  
+- 最终系统无法继续运行，进入 panic 状态  
+
+#问题根因  
+网卡 PCIe 错误（fatal 类型）导致操作系统内核通过 GHES（Generic Hardware Error Source）机制触发 panic。具体表现为 PCIe AER 报告不可纠正错误（uncorrectable error），且 mlx5 网卡设备在 probe 过程中因硬件异常（如 BAR 映射失败）无法完成初始化。
+
+#解决方案  
+1. 检查并更换存在故障的 PCIe 网卡硬件（设备 ID: 0x19e5:0xa120，位于 0000:61:00.0/1）。  
+2. 确认主板 PCIe 插槽及链路稳定性，排查信号完整性或供电问题。  
+3. 更新 BIOS 至最新版本（当前为 10.53，发布于 2025/10/16），以确保 PCIe AER 和 GHES 处理逻辑兼容性。  
+4. 若需临时规避 panic，可在内核启动参数中添加 `ghes.disable=1` 或调整 AER 行为（不推荐用于生产环境，仅用于诊断）。  
+5. 建议在硬件修复后重新验证 mlx5 驱动加载及网络功能是否正常。

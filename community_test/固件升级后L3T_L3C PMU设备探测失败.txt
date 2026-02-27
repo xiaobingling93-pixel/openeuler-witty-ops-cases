@@ -1,0 +1,23 @@
+#标题  
+固件升级后L3T/L3C PMU设备探测失败
+
+#内核版本  
+2203sp4
+
+#问题现象  
+全量固件升级后，dmesg日志中出现以下错误信息：  
+- megaraid_sas 0000:ab:00.0: FW provided TM TaskAbort/Reset timeout : 6 secs/60 secs  
+- hisi_l3t: probe of HISI0501:00 failed with error -16  
+- hisi_l3t: probe of HISI0501:0a failed with error -16  
+- hisi_l3c_pmu HISI0214:0b: ioremap failed for l3c_pmu resource  
+- hisi_l3c_pmu: probe of HISI0214:0b failed with error -16  
+- hisi_l3t: probe of HISI0501:0f failed with error -16  
+- hisi_l3c_pmu HISI0214:0c: ioremap failed for l3c_pmu resource  
+- hisi_l3c_pmu: probe of HISI0214:0c failed with error -16  
+- hisi_l3t: probe of HISI0501:10 failed with error -16  
+
+#问题根因  
+BIOS更新了L3T上报的需求，但内核未配套支持，导致L3T和L3C PMU设备探测失败（probe error -16）及ioremap资源映射失败。
+
+#解决方案  
+方案已变更，不再需要内核修改；BIOS最新版本已回退相关代码，问题通过BIOS版本回退解决。

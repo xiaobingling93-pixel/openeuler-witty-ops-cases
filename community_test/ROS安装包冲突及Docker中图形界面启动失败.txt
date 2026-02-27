@@ -1,0 +1,18 @@
+#标题  
+ROS安装包冲突及Docker中图形界面启动失败
+
+#内核版本  
+22.03 LTS SPC4
+
+#问题现象  
+1）执行 `yum install ros-humble-turtlesim` 时报错：文件 `/usr/lib/udev/hwdb.d/65-libwacom.hwdb` 在 `libwacom-1.12-2.oe2203sp4.aarch64` 与 `libwacom-data-2.2.0-1.noarch` 之间存在冲突。  
+2）执行 `ros2 run turtlesim turtle_teleop_key` 启动失败，无图形界面响应。
+
+#问题根因  
+1）配置了 oepkg 的 repo 源后，与操作系统自带的 repo 源发生冲突，导致软件包版本不兼容。  
+2）在 Docker 容器中运行 ROS2 图形应用时未挂载显示器，缺少虚拟显示支持。
+
+#解决方案  
+1）将 oepkg repo 源修改为官方指定地址：`https://dl-cdn.openeuler.openatom.cn/openEuler-22.03-LTS-SP2/EPOL/multi_version/ROS/humble/aarch64/`，以避免与系统 repo 冲突。  
+2）在 Docker 容器中安装 Xvfb（X Virtual Framebuffer）以提供虚拟显示环境，从而支持图形界面应用正常运行。  
+参考文档：https://docs.openeuler.openatom.cn/zh/docs/22.03_LTS_SP4/edge_computing/ros/installation_and_deployment.html

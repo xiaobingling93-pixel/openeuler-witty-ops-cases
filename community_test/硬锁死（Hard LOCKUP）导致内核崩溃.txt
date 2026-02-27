@@ -1,0 +1,17 @@
+#标题
+硬锁死（Hard LOCKUP）导致内核崩溃
+
+#内核版本
+2403sp2
+
+#问题现象
+- 系统日志中出现 "watchdog: Watchdog detected hard LOCKUP on cpu 1" 警告；
+- 随后触发 "Kernel panic - not syncing: Hard LOCKUP"，系统崩溃；
+- 崩溃时 CPU 1 处于 idle 状态（swapper/1），调用栈显示在执行 load_balance → __memcpy 过程中发生长时间无响应；
+- 最终系统通过 PSCI 触发 reset，但提示 "should not return!"，表明异常终止流程。
+
+#问题根因
+内核在负载均衡（load_balance）过程中执行 __memcpy 时发生硬锁死（Hard LOCKUP），疑似已知内核问题，存在相关补丁。初步判断为内核调度器或内存拷贝路径中的死循环或长时间关中断操作，导致看门狗超时。
+
+#解决方案
+升级至包含相关修复的最新内核版本；若问题仍可复现，需进一步收集完整崩溃现场信息（如 kdump、完整 dmesg）进行深入分析。

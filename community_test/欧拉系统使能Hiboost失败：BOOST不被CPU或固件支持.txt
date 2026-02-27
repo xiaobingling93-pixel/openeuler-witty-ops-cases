@@ -1,0 +1,20 @@
+#标题
+欧拉系统使能Hiboost失败：BOOST不被CPU或固件支持
+
+#内核版本
+2203sp3
+
+#问题现象
+在欧拉系统中执行命令 echo 1 > /sys/devices/system/cpu/cpufreq/boost 启用CPU频率提升（boost）功能时，系统报错：
+- 内核日志显示 "[CPPC Cpufreq] BOOST not supported by CPU or firmware"
+- 进一步提示 "cpufreq: cpufreq_boost_trigger_state: Cannot enable BOOST!"
+- 最终返回 "-bash: echo: write error: Invalid argument"
+
+#问题根因
+目标CPU或固件不支持BOOST功能。需通过 lscpu 查看具体CPU型号，并由海思接口人确认该硬件是否具备BOOST能力。
+
+#解决方案
+1. 执行 lscpu 命令确认当前系统的CPU型号；
+2. 将CPU型号信息提交给海思硬件接口人，核实该处理器是否支持BOOST功能；
+3. 若硬件本身不支持BOOST，则不应尝试启用该功能，避免无效操作和错误日志；
+4. 如业务依赖性能提升，可考虑使用其他调频策略（如performance模式）替代BOOST。

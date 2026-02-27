@@ -1,0 +1,17 @@
+#标题  
+GROMACS多线程频繁访问kernfs导致系统卡死
+
+#内核版本  
+5.10-285
+
+#问题现象  
+- 板载网卡与DPC（Device Power Control）运行GROMACS业务时，系统卡在readlink操作网卡地址；  
+- 使用strace可观察到进程卡在netlink系统调用；  
+- 卡死期间，执行ls命令无响应，perf工具无法采集性能数据；  
+- 系统整体响应停滞，需依赖自愈流程恢复。
+
+#问题根因  
+老版本GROMACS在正式计算前会获取CPU核心总数，并为每个核心创建一个线程，所有线程并发访问kernfs，导致kernfs内部锁竞争严重甚至死锁，进而引发DPC访问卡住。新版本GROMACS已修复此问题。
+
+#解决方案  
+升级至新版GROMACS，避免在初始化阶段为每个CPU核心创建大量线程并发访问kernfs；若无法立即升级，可限制GROMACS启动时的线程数或通过cgroup隔离其对/sys等kernfs路径的高频访问，以缓解kernfs压力。

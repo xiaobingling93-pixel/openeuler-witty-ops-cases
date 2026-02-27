@@ -1,0 +1,19 @@
+#标题
+安装OS失败：缺少kernel包
+
+#内核版本
+5.10.0-250
+
+#问题现象
+在安装操作系统时失败，报错提示“missing packages: kernel”，无法完成系统安装。
+
+#问题根因
+制作安装镜像过程中遗漏了关键步骤：未正确复制 repodata 目录下的 normal.xml 文件，且未使用 createrepo 命令重新生成仓库元数据。具体缺失操作为：
+cp /local repo/repodata/normal.xml /local repo_1/repodata  
+createrepo /local repo_1
+
+#解决方案
+在制作安装镜像时，需确保完整执行以下步骤：
+1. 将源仓库中的 repodata/normal.xml 文件复制到目标仓库的 repodata 目录下；
+2. 使用 createrepo 命令对目标仓库目录（如 /local repo_1）重新生成元数据，确保包索引完整；
+3. 验证仓库中包含 kernel 等必需软件包及其元数据，再用于系统安装。

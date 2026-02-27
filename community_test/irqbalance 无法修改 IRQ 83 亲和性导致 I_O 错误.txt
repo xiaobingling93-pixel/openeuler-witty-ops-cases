@@ -1,0 +1,19 @@
+#标题  
+irqbalance 无法修改 IRQ 83 亲和性导致 I/O 错误
+
+#内核版本  
+openEuler-22.03-LTS-SP4
+
+#问题现象  
+系统日志中反复出现以下错误信息：  
+Sep 30 17:03:09 localhost /usr/sbin/irqbalance[1978]: Cannot change IRQ 83 affinity: Input/output error  
+该错误表明 irqbalance 服务在尝试设置中断 IRQ 83 的 CPU 亲和性时失败，返回“Input/output error”。
+
+#问题根因  
+irqbalance 无法修改 IRQ 83 的亲和性，该中断对应的硬件设备可能不支持动态调整亲和性，或底层驱动/固件存在限制。需通过 cat /proc/interrupts | column -t 确认 IRQ 83 所属硬件，并由对应设备责任人进一步分析。
+
+#解决方案  
+1. 执行命令 `cat /proc/interrupts | column -t`，定位 IRQ 83 对应的硬件设备。  
+2. 联系该硬件模块的责任人，确认设备是否支持中断亲和性调整。  
+3. 若设备不支持，可考虑将该 IRQ 从 irqbalance 管理中排除（例如通过配置文件 /etc/irqbalance/irqbalance.conf 或使用 --banirq 参数）。  
+4. 如为已知重复问题，参考历史跟踪记录统一处理。

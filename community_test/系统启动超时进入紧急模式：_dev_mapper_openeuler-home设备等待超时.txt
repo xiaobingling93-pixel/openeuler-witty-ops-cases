@@ -1,0 +1,17 @@
+#标题
+系统启动超时进入紧急模式：/dev/mapper/openeuler-home设备等待超时
+
+#内核版本
+2203sp4
+
+#问题现象
+OS上下电重启后无法正常启动，进入紧急模式（emergency mode），系统日志中报错“Timed out waiting for device /dev/mapper/openeuler-home”。
+
+#问题根因
+系统在启动过程中等待逻辑卷 /dev/mapper/openeuler-home 设备超时，导致 systemd 无法完成依赖该设备的挂载单元，从而触发紧急模式。
+
+#解决方案
+1. 检查 /etc/fstab 中是否配置了 /dev/mapper/openeuler-home 的挂载项，若该设备非必需或已不存在，应注释或删除对应行。
+2. 若设备应存在但未激活，进入救援模式后执行 vgscan、vgchange -ay 激活卷组，并确认逻辑卷状态。
+3. 验证 LVM 配置及底层存储设备（如磁盘）是否正常，修复可能的硬件或元数据损坏问题。
+4. 重新生成 initramfs 以确保包含必要的 LVM 模块：dracut -f。

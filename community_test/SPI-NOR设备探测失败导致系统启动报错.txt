@@ -1,0 +1,15 @@
+#标题  
+SPI-NOR设备探测失败导致系统启动报错
+
+#内核版本  
+2203sp3
+
+#问题现象  
+系统AC上电进入OS后，dmesg日志中出现以下错误信息：  
+spi-nor: probe of spi-PRP0001:00 failed with error -2
+
+#问题根因  
+BIOS上报了错误的Flash信息，具体为上报了NA（Non-Applicable）区域的Flash设备，但该区域实际并不存在Flash硬件，导致SPI-NOR驱动在probe阶段失败。
+
+#解决方案  
+修改BIOS固件，停止上报NA区域的Flash信息，改为正确上报NB（Normal Boot）区域的Flash设备信息，从而避免驱动探测失败。

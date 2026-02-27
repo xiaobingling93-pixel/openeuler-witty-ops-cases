@@ -1,0 +1,14 @@
+#标题  
+virsh通过qemu+tcp连接触发SASL digestmd5与OpenSSL 3.x兼容性导致段错误
+
+#内核版本  
+2403sp2
+
+#问题现象  
+使用virsh通过qemu+tcp方式连接时，触发SASL digestmd5认证机制，在OpenSSL 3.x环境下发生段错误（SIGSEGV），导致服务异常终止。
+
+#问题根因  
+cyrus-sasl未适配OpenSSL 3.x，digestmd5模块在与OpenSSL 3.x交互时存在兼容性问题，导致内存访问违规引发段错误。
+
+#解决方案  
+应用补丁 https://src.fedoraproject.org/rpms/cyrus-sasl/blob/rawhide/f/cyrus-sasl-2.1.27-cumulative-digestmd5.patch，以修复cyrus-sasl对OpenSSL 3.x的兼容性问题。相关更新已于2025年12月15日发布。

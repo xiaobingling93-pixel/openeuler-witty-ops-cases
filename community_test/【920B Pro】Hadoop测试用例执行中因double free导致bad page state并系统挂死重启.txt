@@ -1,0 +1,17 @@
+#标题  
+【920B Pro】Hadoop测试用例执行中因double free导致bad page state并系统挂死重启  
+
+#内核版本  
+5.10.0-182.0.0.95.oe2203sp3  
+
+#问题现象  
+在CI执行重点行业Hadoop测试用例过程中，系统报call trace后挂死并重启；日志中出现“bad page state”错误，具体栈回溯如下：  
+[ 1847.156291] kfree+0x48c/0x67c  
+[ 1847.156293] sched_grid_qos_free+0x24/0x40  
+[ 1847.156296] free_task+0x54/0x9c  
+
+#问题根因  
+自研特性相关代码中存在竞态条件（race condition），导致对同一内存对象发生double free，使引用计数（refcount）变为-1；后续新分配page时检查到refcount非0，触发“bad page state”错误。  
+
+#解决方案  
+升级内核至修复版本 5.10.0-236.0.0 或更高；相关修复补丁见：https://gitee.com/openeuler/kernel/pulls/13173。

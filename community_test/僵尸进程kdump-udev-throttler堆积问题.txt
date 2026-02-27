@@ -1,0 +1,14 @@
+#标题  
+僵尸进程kdump-udev-throttler堆积问题
+
+#内核版本  
+2403sp3
+
+#问题现象  
+在运行多个ham迁移用例后，系统中出现僵尸进程kdump-udev-throttler；该现象在频繁热拔插内存与CPU操作后触发。
+
+#问题根因  
+频繁热拔插内存与CPU会触发/usr/lib/udev/rules.d/98-kexec.rules规则，导致kdump-udev-throttler进程被创建，但回收不及时造成僵尸进程堆积（最终可被成功回收）。
+
+#解决方案  
+移除或禁用/usr/lib/udev/rules.d/98-kexec.rules规则文件，以避免在热拔插场景下触发相关udev规则，从而防止僵尸进程产生。

@@ -1,0 +1,15 @@
+#标题
+驱动模块未签名导致内核污染
+
+#内核版本
+2203sp4
+
+#问题现象
+运行AC测试时，dmesg日志中出现以下报错信息：  
+aes_ce_cipher: module verification failed: signature and/or required key missing - tainting kernel
+
+#问题根因
+驱动没有签名导致模块加载时验证失败，从而污染内核（tainting kernel）
+
+#解决方案
+为相关驱动模块（如aes_ce_cipher）添加符合系统安全策略的数字签名，确保其可通过内核模块签名验证机制。建议在构建驱动时启用CONFIG_MODULE_SIG并使用受信任的密钥进行签名。

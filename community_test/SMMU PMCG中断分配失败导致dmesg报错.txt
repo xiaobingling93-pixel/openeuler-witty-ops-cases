@@ -1,0 +1,18 @@
+#标题  
+SMMU PMCG中断分配失败导致dmesg报错
+
+#内核版本  
+22.03 LTS SPC4
+
+#问题现象  
+在执行AC/DC/reboot压力测试时，dmesg中出现以下新增日志：  
+- hub 2-0:1.0: config failed, hub doesn't have any ports! (err -19)  
+- hub 6-0:1.0: config failed, hub doesn't have any ports! (err -19)  
+- arm-smmu-v3-pmcg arm-smmu-v3-pmcg.4.auto: failed to allocate MSIs  
+- arm-smmu-v3-pmcg arm-smmu-v3-pmcg.4.auto: Setup irq failed, PMU @0x0000008300120000  
+
+#问题根因  
+问题由BIOS版本从30.36升级至30.37引入，导致SMMU PMCG模块在绑定中断时失败。中断资源由BIOS解析并上报，新版本BIOS存在配置异常，致使内核无法正确分配MSI中断。
+
+#解决方案  
+回退至BIOS版本30.36，或等待BIOS团队修复并合入新版本（参考DTS工单：DTS2026011307952）。建议在新BIOS版本发布前，避免使用30.37版本进行相关测试。

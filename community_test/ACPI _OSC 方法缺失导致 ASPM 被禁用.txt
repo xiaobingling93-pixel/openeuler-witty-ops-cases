@@ -1,0 +1,15 @@
+#标题  
+ACPI _OSC 方法缺失导致 ASPM 被禁用
+
+#内核版本  
+2203sp4
+
+#问题现象  
+在 openEuler 22.03 LTS SP4 64k 页面大小场景下执行 reboot 后，dmesg 日志中出现如下打印：  
+“acpi PNP0A08:XX: _OSC failed (AE_NOT_FOUND); disabling ASPM”
+
+#问题根因  
+内核在 ACPI 表中找不到设备对应的 _OSC 方法（_OSC failed (AE_NOT_FOUND)），导致 ASPM（Active State Power Management）被禁用。根本原因为 BIOS 未提供 _OSC 方法。
+
+#解决方案  
+该问题属于 BIOS 层面缺失 _OSC 方法所致，不影响操作系统其他功能正常使用，无需修复。建议确认 BIOS 是否需更新以支持完整 ACPI 功能，但当前可视为非问题（Non-issue）并关闭。

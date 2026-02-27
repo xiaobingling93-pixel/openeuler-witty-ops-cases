@@ -1,0 +1,22 @@
+#标题  
+EXT4文件系统块位图校验失败导致系统盘损坏
+
+#内核版本  
+2203sp4
+
+#问题现象  
+- 系统日志中反复出现 EXT4-fs (dm-2) 错误信息：  
+  - "error count since last fsck: 1"  
+  - "initial error at time 1764002017: ext4_validate_block_bitmap:420"  
+  - "last error at time 1764002017: ext4_validate_block_bitmap:420"  
+- 故障发生后环境被破坏，原始日志丢失，无法进一步分析当时运行状态  
+- 问题与运行 fio 压力测试脚本相关，疑似作用于系统盘
+
+#问题根因  
+fio 压力测试脚本错误地运行在系统盘（dm-2）上，导致 EXT4 文件系统块位图损坏，触发 ext4_validate_block_bitmap 校验失败。
+
+#解决方案  
+1. 优化用户脚本，确保 fio 等压力测试工具仅作用于非系统盘的测试目标设备，避免误操作写入系统盘。  
+2. 在执行高风险 I/O 操作前增加设备路径校验和人工确认机制。  
+3. 定期对系统盘执行 fsck 检查，及时发现并修复文件系统潜在错误。  
+4. 建议在测试环境中对系统盘设置只读保护或挂载选项（如 noatime, nodiratime），降低意外写入风险。

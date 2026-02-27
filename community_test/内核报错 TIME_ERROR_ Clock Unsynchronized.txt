@@ -1,0 +1,14 @@
+#标题
+内核报错 TIME_ERROR: Clock Unsynchronized
+
+#内核版本
+2203sp4
+
+#问题现象
+系统日志中出现内核报错信息：“TIME_ERROR: 0x41: Clock Unsynchronized”。该现象发生在服务刚启动阶段，此时网络时间服务尚未完成同步。
+
+#问题根因
+服务刚启动时，时钟服务器未设置同步，导致系统时钟处于未同步状态，从而触发内核 TIME_ERROR 报错。后续日志显示“Started Network Time Service.”，表明时间服务随后已正常就绪。
+
+#解决方案
+确保在关键服务启动前，网络时间协议（NTP）或 chrony 等时间同步服务已完成初始化并成功同步系统时钟。可通过配置 systemd 依赖关系，使业务服务依赖于 time-sync.target 或显式依赖 ntp/chronyd 服务，避免在时钟未同步状态下启动对时间敏感的服务。

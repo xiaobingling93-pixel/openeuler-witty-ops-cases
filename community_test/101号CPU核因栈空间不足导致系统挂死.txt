@@ -1,0 +1,17 @@
+#标题
+101号CPU核因栈空间不足导致系统挂死
+
+#内核版本
+2203sp4
+
+#问题现象
+- 系统在运行过程中挂死，日志显示“Insufficient stack space to handle exception!”
+- 每次故障均发生在101号CPU核（C101）
+- 内核日志中出现“SMP: stopping secondary CPUs”及后续内存/偏移信息
+- 故障可稳定复现于101核
+
+#问题根因
+101号CPU核在处理异常时栈空间不足，触发“Insufficient stack space to handle exception!”错误；enter_from_kernel_mode退出时的栈溢出检查失败，导致系统挂死。
+
+#解决方案
+隔离故障CPU核（101核）后系统恢复正常；建议在BIOS或内核启动参数中通过cpu_isolate或maxcpus等方式禁用该异常核心，同时对硬件进行进一步检测以确认是否存在物理缺陷。

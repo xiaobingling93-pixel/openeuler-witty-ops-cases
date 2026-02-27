@@ -1,0 +1,16 @@
+#标题  
+谐振压测触发Asynchronous SError导致内核崩溃
+
+#内核版本  
+6.6.0-115.0.0.121.oe2403sp2
+
+#问题现象  
+在执行谐振压测脚本过程中，操作系统发生宕机。系统日志显示“Kernel panic - not syncing: Asynchronous SError Interrupt”，并伴随完整的内核调用栈回溯，最终触发Kdump机制启动崩溃转储。CPU 295 上运行的进程 os_serdestool_9 与故障相关。
+
+#问题根因  
+硬件上报 Asynchronous SError（系统错误）中断，被内核识别为致命 RAS（Reliability, Availability, and Serviceability）错误，触发 arm64_serror_panic 流程，导致系统 panic。同时，FDM（Fault Diagnosis Module）记录了对应的硬件报错，确认为硬件层面异常。
+
+#解决方案  
+1. 转交硬件团队对主板及相关硬件组件进行深入分析，排查物理层或信号完整性问题（如电源噪声、时钟抖动、内存通道异常等）；
+2. 在硬件修复前，可考虑在 BIOS 或内核启动参数中临时屏蔽非致命 SError（仅限调试环境，不建议生产使用）；
+3. 建议硬件团队结合 FDM 报错信息定位具体故障器件，并进行替换或设计优化。

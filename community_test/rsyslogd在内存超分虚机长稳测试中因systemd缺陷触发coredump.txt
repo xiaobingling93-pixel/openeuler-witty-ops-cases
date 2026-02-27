@@ -1,0 +1,14 @@
+#标题  
+rsyslogd在内存超分虚机长稳测试中因systemd缺陷触发coredump  
+
+#内核版本  
+2403sp1  
+
+#问题现象  
+在内存超分虚机超分长稳用例执行期间，rsyslogd进程发生coredump；日志显示ntcld向journald发送大量消息，导致journald消息队列阻塞，rsyslogd在调用journald接口时出错并崩溃。  
+
+#问题根因  
+根本原因为系统使用的systemd版本（225-34）存在已知缺陷，该缺陷在高负载下（如journald消息队列阻塞时）会导致rsyslogd异常coredump；该问题已在systemd-255-38版本中修复（参考Gitee issue: https://gitee.com/src-openeuler/systemd/issues/IBGQUW?from=project-issue）。  
+
+#解决方案  
+升级systemd至255-38或更高版本以包含该问题的修复补丁；在无法立即升级的情况下，可临时限制ntcld向journald发送日志的频率或速率，缓解消息队列阻塞风险。

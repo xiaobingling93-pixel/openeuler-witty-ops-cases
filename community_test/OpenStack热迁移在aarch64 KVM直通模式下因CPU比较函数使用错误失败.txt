@@ -1,0 +1,14 @@
+#标题  
+OpenStack热迁移在aarch64 KVM直通模式下因CPU比较函数使用错误失败  
+
+#内核版本  
+2403sp2  
+
+#问题现象  
+在openEuler 24.03 SP3系统上，通过yum安装的OpenStack执行热迁移操作时出现报错；具体表现为在aarch64架构下采用KVM直通模式时，hypervisor-cpu-compare函数无法获取模拟CPU信息，导致热迁移失败。  
+
+#问题根因  
+在aarch64架构下采用KVM直通模式时，OpenStack错误地使用了hypervisor-cpu-compare函数而非cpu-compare函数，导致无法正确获取模拟CPU信息。此外，OpenStack相关组件当前处于无人维护状态，加剧了问题的持续存在。  
+
+#解决方案  
+应修改OpenStack配置或代码，将aarch64 KVM直通模式下的CPU比较函数从hypervisor-cpu-compare替换为cpu-compare函数，以确保能正确获取模拟CPU信息并支持热迁移功能。建议在社区或内部维护分支中提交修复补丁，并对相关外围包进行适配验证。

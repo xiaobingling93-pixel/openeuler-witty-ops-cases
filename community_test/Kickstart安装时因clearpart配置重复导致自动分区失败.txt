@@ -1,0 +1,14 @@
+#标题
+Kickstart安装时因clearpart配置重复导致自动分区失败
+
+#内核版本
+5.10.0-60.18.0.50.oe2203
+
+#问题现象
+在openEuler 22.03-LTS系统上，使用kickstart在已有LVM分区的qcow2镜像上执行覆盖安装时，即使已配置clearpart指令，仍无法自动分区，并报错“insufficient kickstart”。
+
+#问题根因
+pxe安装时的ks.cfg配置文件中clearpart指令重复了两次，导致kickstart解析异常。
+
+#解决方案
+检查并修正ks.cfg配置文件，注释或删除其中一个重复的clearpart指令后，安装可正常进行。

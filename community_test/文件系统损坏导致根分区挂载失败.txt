@@ -1,0 +1,23 @@
+#标题  
+文件系统损坏导致根分区挂载失败  
+
+#内核版本  
+2203sp3  
+
+#问题现象  
+系统启动过程中报错：  
+"FAILED] Failed to start File System on /dev/mapper/openeuler-root."  
+执行 'systemctl status systemd-fsck-root.service' 可查看详细错误。  
+日志显示："/dev/mapper/openeuler-root contains a file system with errors, check forced." 以及 "Superblock needs recovery flag clear, but journal has data."  
+
+#问题根因  
+文件系统损坏，具体表现为根分区（/dev/mapper/openeuler-root）的 superblock 需要清除恢复标志，但日志（journal）中仍存在未处理的数据。  
+
+#解决方案  
+1. 使用 fsck 工具对 /dev/mapper/openeuler-root 分区进行强制文件系统检查与修复：  
+   ```bash
+   fsck -f /dev/mapper/openeuler-root
+   ```  
+2. 若提示 journal 中有数据且需手动干预，可根据 fsck 提示选择是否清空 journal 或尝试恢复一致性。  
+3. 修复完成后重启系统，验证是否能正常挂载根文件系统并完成启动。  
+4. 建议后续加强异常断电或硬件故障场景下的文件系统保护机制，如启用更健壮的日志模式或定期校验。

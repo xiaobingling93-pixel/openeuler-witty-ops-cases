@@ -1,0 +1,18 @@
+#标题
+多CPU软锁定（soft lockup）故障
+
+#内核版本
+2403sp2
+
+#问题现象
+系统启动过程中出现多个CPU核心的软锁定（soft lockup）错误，具体表现为：
+- 日志中反复出现 "watchdog: BUG: soft lockup - CPU#X stuck for 26s! [(udev-worker):PID]"，涉及CPU#18、#118、#312等多个核心；
+- 故障发生在 udev-worker 进程执行期间；
+- 调用栈显示卡在 smp_call_function_many_cond → kick_all_cpus_sync → flush_module_icache → load_module 路径；
+- 同时伴随 IPMI BT 接口初始化超时（"IPMI BT: timeout in RD_WAIT"），但随后成功完成初始化。
+
+#问题根因
+已知问题：当前使用的内核版本（6.6.0-121.0.0.124.oe2403sp2.aarch64）已支持 ub（可能指 unified boot 或特定硬件抽象），但 BIOS 版本（10.67，发布于2025-11-05）尚未支持该特性，导致在模块加载过程中触发多核同步操作异常，引发 soft lockup。
+
+#解决方案
+通过在系统启动参数中添加特定内核参数以规避该兼容性问题（文档指出“增加启动参数规避”）。建议联系 BIOS 团队升级固件以完整支持新内核特性，或在内核侧临时禁用相关功能直至 BIOS 支持就绪。

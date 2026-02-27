@@ -1,0 +1,20 @@
+#标题  
+DNF元数据缓存更新失败：仓库连接超时
+
+#内核版本  
+22.03-LTS-SP4
+
+#问题现象  
+系统启动后，通过定时器触发 dnf-makecache.service 自动执行 DNF 软件仓库元数据缓存更新时失败。日志显示以下关键错误：  
+- Curl error (28): Timeout was reached for http://71.41.15.160/.../repomd.xml [Connection timeout after 30000 ms]  
+- Failed to download metadata for repo 'core-0'  
+- dnf-makecache.service 主进程退出，状态码为 1/FAILURE  
+
+#问题根因  
+系统在执行 dnf-makecache.service 时无法访问配置的软件仓库地址（http://71.41.15.160），导致连接超时，无法下载 repomd.xml 元数据文件。
+
+#解决方案  
+1. 检查系统网络连通性，确保可访问指定的软件仓库地址（http://71.41.15.160）。  
+2. 验证仓库 URL 是否有效且未被防火墙或安全策略阻断。  
+3. 若该仓库地址已下线或不可用，应更新 DNF 配置文件（如 /etc/yum.repos.d/ 下对应 repo 文件），替换为有效的镜像源或官方仓库地址。  
+4. 对于内网环境，建议配置本地可用的软件源或代理缓存服务，避免依赖外部不可达地址。

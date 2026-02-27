@@ -1,0 +1,20 @@
+#标题  
+内核启动失败：无法挂载根文件系统
+
+#内核版本  
+2203sp4
+
+#问题现象  
+- 多台产线设备在启动过程中失败，无法进入操作系统。  
+- 内核日志显示关键错误信息：“No filesystem could mount root, tried:” 和 “Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)”。  
+- 系统在执行 mount_root 阶段崩溃，调用栈显示最终触发 panic 的函数为 mount_block_root。  
+- 该问题在多台设备上复现，表现为一致的启动失败行为。
+
+#问题根因  
+网络问题导致 initrd 下载不完整，进而造成根文件系统无法挂载。文档明确指出：“已确认是网络导致的initrd下载不全”。
+
+#解决方案  
+1. 排查并修复产线网络环境，确保 PXE 或网络引导过程中 initrd 文件能够完整、可靠地下载。  
+2. 验证 TFTP/NFS/HTTP 等网络引导服务的稳定性与带宽，避免传输中断或数据损坏。  
+3. 在部署流程中增加 initrd 完整性校验机制（如 checksum 校验），防止使用损坏的 initrd 启动系统。  
+4. 建议用户对网络链路进行端到端测试，包括交换机、网线、DHCP/TFTP 服务器配置等环节。

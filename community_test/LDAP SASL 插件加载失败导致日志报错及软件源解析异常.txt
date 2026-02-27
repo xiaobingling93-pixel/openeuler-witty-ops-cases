@@ -1,0 +1,29 @@
+#标题  
+LDAP SASL 插件加载失败导致日志报错及软件源解析异常
+
+#内核版本  
+2203sp4
+
+#问题现象  
+- 系统日志中反复出现错误信息：  
+  `ldapdb_canonuser_plug_init() failed in sasl_canonuser_add_plugin(): invalid parameter supplied`  
+- 执行 dnf 命令时无法下载仓库元数据，报错：  
+  `Curl error (6): Couldn't resolve host name for https://mirrors.openeuler.org/...` 和 `http://repo.openeuler.org/...`  
+- dnf-makecache.service 启动失败，状态为 exit-code 1  
+- 错误集中在 python3 和 dnf 进程中，涉及 libldap.so 库调用
+
+#问题根因  
+系统中 libldap.so 启用了 cyrus-sasl 支持，在初始化时尝试加载 /usr/lib64/sasl2/ 下的 ldapdb 插件（libldapdb.so）。由于该插件需要 LDAP 配置参数，而系统默认未提供相关配置，导致插件加载失败并记录日志。根据 Cyrus SASL 官方说明，此为预期行为：插件加载失败后会跳过，不影响主服务功能。  
+同时，dnf 报错“无法解析主机名”是由于网络或 DNS 配置问题导致无法访问 openEuler 软件源，与 SASL 插件错误无直接关联，但出现在同一故障上下文中。
+
+#解决方案  
+1. **针对 SASL 插件报错**：  
+   - 此为非功能性问题，官方已确认属于正常行为（参考 issue #I472VA 和 Cyrus SASL 文档），无需修复。  
+   - 若需消除日志噪音，可选择以下任一方式：  
+     a) 移除 /usr/lib64/sasl2/libldapdb.so 插件（若确认系统无需 LDAPDB 认证）；  
+     b) 为 SASL 提供有效的 ldapdb 配置（仅在确实需要该插件时配置）。  
+
+2. **针对 dnf 无法解析软件源域名**：  
+   - 检查系统网络连通性及 DNS 配置（如 /etc/resolv.conf）；  
+   - 确保能正常解析 mirrors.openeuler.org 和 repo.openeuler.org；  
+   - 可临时使用 IP 或更换为可用镜像源以恢复软件包管理功能。

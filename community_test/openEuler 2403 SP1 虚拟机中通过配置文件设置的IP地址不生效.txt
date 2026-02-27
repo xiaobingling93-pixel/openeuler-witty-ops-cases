@@ -1,0 +1,16 @@
+#标题  
+openEuler 2403 SP1 虚拟机中通过配置文件设置的IP地址不生效  
+
+#内核版本  
+2403 LTS SP1  
+
+#问题现象  
+在 FusionComputer 8.8.0 虚拟化平台上创建的 openEuler 2403 SP1 虚拟机（已安装 vmtools 3.0.0.061），通过配置文件方式配置的静态 IP 地址无法生效；必须使用以下 nmcli 命令手动配置并激活连接后，IP 才能正常工作：  
+nmcli connection modify "$net_dev" ipv4.address "$address/$g_cdr" ipv4.gateway "$gateway" ipv4.method manual  
+nmcli connection up "$net_dev"  
+
+#问题根因  
+环境内的库文件被改动，经 rpm -qV 验证确认文件完整性异常，导致 NetworkManager 无法正确读取或应用配置文件中的网络设置。  
+
+#解决方案  
+重装 NetworkManager 软件包以恢复被篡改或损坏的库文件，确保其配置解析功能正常。建议在类似环境中定期校验关键系统包的完整性（如使用 rpm -qV），并在发现异常时及时修复。

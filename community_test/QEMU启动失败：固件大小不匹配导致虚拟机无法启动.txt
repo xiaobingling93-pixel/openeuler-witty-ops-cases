@@ -1,0 +1,21 @@
+#标题  
+QEMU启动失败：固件大小不匹配导致虚拟机无法启动  
+
+#内核版本  
+2203sp3  
+
+#问题现象  
+执行 `virsh start 76-53-23-132-ubuntu22.04-002` 命令失败，报错信息显示 QEMU monitor 意外关闭。日志中包含以下关键内容：  
+- 多条关于 `-chardev socket` 使用短格式布尔选项（如 `server`、`nowait`）的弃用警告；  
+- 关键错误信息：“device requires 67108864 bytes, block backend provides 67112960 bytes”，表明设备所需固件大小与后端提供的大小不一致；  
+- 虚拟机启动流程在“machine init start”阶段中断。  
+
+#问题根因  
+虚拟机固件（QEMU_EFI.fd）大小与设备预期不匹配，导致 QEMU 在初始化过程中因块设备后端提供的字节数（67112960 bytes）与设备要求的字节数（67108864 bytes）不一致而异常退出。  
+
+#解决方案  
+重新生成符合设备要求大小的固件镜像，执行以下命令调整固件大小：  
+```bash
+qemu-img resize -f raw QEMU_EFI.fd 64M
+```  
+确保固件文件精确为 64MB（即 67108864 字节），以匹配虚拟设备的预期容量。

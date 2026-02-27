@@ -1,0 +1,17 @@
+#标题  
+hns3网卡驱动配置CNP优先级参数失败导致IO错误
+
+#内核版本  
+2203sp4
+
+#问题现象  
+系统日志中出现以下错误信息：  
+- hns3 0000:39:00.0: Cmdq IO error, opcode = 0x8514, return = 0x5  
+- hns3 0000:39:00.0 roceroh0: failed to configure cnp pri param, opcode: 0x8514, ret = -15  
+该问题发生在天工HPC项目环境中，涉及hns3驱动模块，在启动安装阶段触发。
+
+#问题根因  
+hns3驱动在尝试通过命令队列（Cmdq）配置CNP（Congestion Notification Packet）优先级参数时，因opcode 0x8514返回错误码0x5（对应-EIO），导致配置失败。问题已转交1823网卡hns3接口人处理，表明为驱动与特定硬件（1823网卡）交互异常所致。
+
+#解决方案  
+将问题转交至1823网卡hns3驱动接口人进行专项分析与修复；建议在相关硬件平台上验证hns3驱动对CNP参数配置的兼容性，并在必要时更新驱动或固件以解决Cmdq IO错误。

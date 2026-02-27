@@ -1,0 +1,17 @@
+#标题  
+ntpd 启动时绑定 IPv6 链路本地地址失败
+
+#内核版本  
+2203sp4
+
+#问题现象  
+系统日志中出现以下错误信息：  
+Jan 1 02:34:30 localhost ntpd[9888]: bind(23) AF_INET6 fe80::200:ff:fe66:eead%4#123 flags 0x11 failed: Cannot assign requested address  
+Jan 1 02:34:30 localhost ntpd[9888]: failed to init interface for address fe80::200:ff:fe66:eead%4  
+该问题在 ntpd 启动时发生，表现为无法绑定指定的 IPv6 链路本地地址。
+
+#问题根因  
+ntpd 在启动时尝试绑定 IPv6 链路本地地址 fe80::200:ff:fe66:eead%4，但此时对应网络接口（roh4）处于 down 状态或正在进行 up/down 操作，导致地址不可用，从而绑定失败。
+
+#解决方案  
+确保 ntpd 启动前相关网络接口（如 roh4）已处于稳定 UP 状态；或配置 ntpd 服务依赖于网络接口就绪（例如通过 systemd 的 network-online.target 或接口状态监听机制），避免在接口未激活时尝试绑定链路本地地址。

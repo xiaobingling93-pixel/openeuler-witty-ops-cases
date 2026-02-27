@@ -1,0 +1,14 @@
+#标题  
+hisi-kunpeng-spi驱动注册失败导致OS启动报错
+
+#内核版本  
+2403sp2
+
+#问题现象  
+OS重启时dmesg日志中出现错误信息：hisi-kunpeng-spi HISI03E1:00: failed to register spi host, ret = -517，该报错阻塞测试用例执行。
+
+#问题根因  
+OS启动过程中，hisi-kunpeng-spi驱动依赖gpio_hisi驱动，但驱动加载顺序随机。当gpio_hisi驱动尚未加载时，hisi-kunpeng-spi尝试注册SPI host失败并打印上述错误；待gpio_hisi驱动加载成功后，会触发hisi-kunpeng-spi重试，最终注册成功。此为社区通用问题，非实际功能故障。
+
+#解决方案  
+该问题属于驱动加载顺序导致的临时性报错，不影响系统最终功能。建议在测试用例中忽略该特定dmesg报错（ret = -517），或通过调整驱动依赖关系（如使用module_init优先级或device tree依赖声明）确保gpio_hisi先于hisi-kunpeng-spi加载，以避免日志干扰。

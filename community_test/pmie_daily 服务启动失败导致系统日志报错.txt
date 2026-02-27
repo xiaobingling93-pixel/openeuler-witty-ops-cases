@@ -1,0 +1,21 @@
+#标题  
+pmie_daily 服务启动失败导致系统日志报错
+
+#内核版本  
+2203sp4
+
+#问题现象  
+在920B SD5005环境进行AC100次测试时，系统日志中反复出现以下错误信息：  
+- Nov 20 00:08:15 localhost pcp[7691]: pmie_daily failed - see /var/log/pcp/pmie/pmie_daily.log  
+- Nov 20 00:08:15 localhost systemd[1]: pmie_daily.service: Main process exited, code=exited, status=1/FAILURE  
+- Nov 20 00:08:15 localhost systemd[1]: pmie_daily.service: Failed with result 'exit-code'  
+
+该问题仅在用户手动配置 pmie 服务开机自启后触发，系统默认未安装或启用该服务。
+
+#问题根因  
+pmie_daily 服务启动失败的直接原因是无法读取文件 /var/log/pcp/pmie/localhost.localdomain/pmie.log。由于该服务在 OS 默认配置中未安装且不自启，因此该问题仅在用户主动启用后暴露。当前无法确定该日志文件缺失的具体原因。
+
+#解决方案  
+1. 若用户无需使用 PCP（Performance Co-Pilot）相关监控功能，建议禁用 pmie_daily 服务的开机自启，避免无效报错。  
+2. 如需启用 pmie 服务，应确保 PCP 相关组件完整安装，并验证 /var/log/pcp/pmie/ 目录结构及权限配置正确，必要时手动创建缺失的日志路径。  
+3. 建议在正式环境中避免启用非必要或未充分验证的系统服务，以减少潜在稳定性风险。

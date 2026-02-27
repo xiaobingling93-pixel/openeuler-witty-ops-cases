@@ -1,0 +1,19 @@
+#标题
+XHCI驱动因USB3.0端口数为0导致Hub配置失败
+
+#内核版本
+2203sp2
+
+#问题现象
+系统日志中反复出现如下错误信息：  
+hub 2-0:1.0: config failed, hub doesn't have any ports! (err -19)  
+hub 6-0:1.0: config failed, hub doesn't have any ports! (err -19)  
+hub 10-0:1.0: config failed, hub doesn't have any ports! (err -19)  
+hub 14-0:1.0: config failed, hub doesn't have any ports! (err -19)  
+表现为多个USB hub在初始化时报告无端口，配置失败。
+
+#问题根因
+由于XHCI是为USB3.0设计的接口标准，开源驱动默认认为XHCI支持USB2.0和USB3.0，因此只要使用xhci驱动，就会尝试进行USB3.0（U3）部分的初始化。但当前硬件设计中U3部分的port数量为0，导致驱动在初始化过程中检测到无端口，打印config failed错误并退出U3初始化流程。
+
+#解决方案
+该问题源于硬件设计限制，XHCI控制器未实现USB3.0物理端口，属于预期行为，非软件缺陷。根据历史评审结论，无需修改驱动或固件，可忽略相关日志。若需消除日志干扰，建议在驱动层面针对特定硬件平台屏蔽无端口U3 hub的初始化尝试（需结合设备ID或ACPI表识别），但当前项目已确认按“非问题”关闭处理。

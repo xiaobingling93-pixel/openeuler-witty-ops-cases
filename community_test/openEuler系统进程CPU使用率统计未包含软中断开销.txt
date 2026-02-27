@@ -1,0 +1,14 @@
+#标题  
+openEuler系统进程CPU使用率统计未包含软中断开销
+
+#内核版本  
+2203sp4
+
+#问题现象  
+在openEuler系统上，进程进行CPU使用率统计时，未计入软中断（softirq）所消耗的CPU时间，导致CPU使用率统计结果偏低。
+
+#问题根因  
+CONFIG_IRQ_TIME_ACCOUNTING=y 配置项启用后，系统将中断（包括软中断）的CPU时间单独统计，不再归入具体进程的CPU使用率中，因此进程级CPU统计不包含软中断开销。
+
+#解决方案  
+该行为由内核配置 CONFIG_IRQ_TIME_ACCOUNTING=y 所决定，属于预期设计。经与客户沟通确认，无需修改当前行为。如确需调整统计方式，需在 openEuler Kernel SIG 双周例会上正式提出议题进行讨论和决策，申报链接为：https://etherpad.openeuler.org/p/Kernel-meetings。

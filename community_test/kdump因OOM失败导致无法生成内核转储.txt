@@ -1,0 +1,19 @@
+#标题
+kdump因OOM失败导致无法生成内核转储
+
+#内核版本
+2403
+
+#问题现象
+系统在触发kdump时失败，日志显示发生Out of Memory (OOM)事件，oom-killer被激活并终止了(udev-worker)进程（PID 584）。关键日志包括：
+- "Out of memory: Killed process 584 ((udev-worker))"
+- 调用栈显示内存分配失败路径：__alloc_pages → kvmalloc_node → con_font_get → vt_ioctl
+- 系统无swap空间（Total swap = 0kB）
+- Normal区域free内存为32408kB，但min水位为32632kB，实际可用内存低于低水位线，触发OOM
+- kdump服务未能成功保存崩溃上下文
+
+#问题根因
+系统配置的crashkernel预留内存不足，在kdump执行过程中因内存紧张触发全局OOM，导致关键进程被kill，进而使kdump流程中断。文档明确指出：“实际oom了，调整crashkernel大小解决”。
+
+#解决方案
+增大crashkernel预留内存大小，确保kdump执行时有足够的隔离内存资源，避免与主系统内存竞争。具体操作需根据系统总内存和工作负载合理设置crashkernel参数（例如在grub配置中调整crashkernel=xxxM）。

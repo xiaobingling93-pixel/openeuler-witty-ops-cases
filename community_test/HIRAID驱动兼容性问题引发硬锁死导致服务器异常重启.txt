@@ -1,0 +1,16 @@
+#标题
+HIRAID驱动兼容性问题引发硬锁死导致服务器异常重启
+
+#内核版本
+2203sp4
+
+#问题现象
+在鲲鹏920B平台（SPC686C 40i RAID卡 + 24块SSD）进行兼容性测试时，服务器发生异常重启。系统日志显示“Kernel panic - not syncing: Hard LOCKUP”，CPU 84在执行native_queued_spin_lock_slowpath时触发硬锁死（Hard LOCKUP），调用栈涉及hiraid驱动（hiraid_complete_io_cmnd、hiraid_handle_irq等），且硬盘未在兼容性列表中。
+
+#问题根因
+使用了不在兼容性列表中的SSD硬盘，在高负载IO场景下触发HIRAID驱动异常，导致内核自旋锁无法释放，进而引发硬狗超时和系统硬锁死。
+
+#解决方案
+1. 更换为官方兼容性列表中认证的SSD硬盘；
+2. 若必须使用当前硬盘，需联系介质团队对HIRAID驱动进行适配性分析与补丁验证；
+3. 建议在测试前严格校验硬件兼容性清单，避免非认证组件引入稳定性风险。

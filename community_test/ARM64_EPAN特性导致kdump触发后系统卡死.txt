@@ -1,0 +1,14 @@
+#标题  
+ARM64_EPAN特性导致kdump触发后系统卡死
+
+#内核版本  
+5.10.0-136.12.0.90.ctl3.aarch64
+
+#问题现象  
+在支持arm64_EPAN特性的板子上手动触发内核崩溃（echo c > /proc/sysrq-trigger）以启动kdump时，系统打印完“Bye!”后未复位，卡死在第二内核启动过程中。
+
+#问题根因  
+kdump启动第二内核的过程中，从用户态读取了exec-only属性的数据，由于arm64_EPAN特性启用，导致系统产生异常并卡死。
+
+#解决方案  
+参考内核修复提交：https://gitee.com/openeuler/kernel/commit/e2be8a4f7136e9c2d94a49fc9fd179bd01e399e5，升级至包含该修复的内核版本，或在不支持该特性的环境中禁用arm64_EPAN相关功能以规避问题。

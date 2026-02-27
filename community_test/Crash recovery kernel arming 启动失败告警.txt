@@ -1,0 +1,14 @@
+#标题  
+Crash recovery kernel arming 启动失败告警
+
+#内核版本  
+2403SP2
+
+#问题现象  
+系统日志中出现 "Failed to start Crash recovery kernel arming" 报错信息，出现在 systemcom.dat 日志文件中。
+
+#问题根因  
+系统未在 GRUB 启动参数中配置 crashkernel，且未启用 kdump 服务，导致该报错为正常现象，并非实际故障。
+
+#解决方案  
+该报错不影响系统功能使用，若无需使用内核崩溃转储（kdump）功能，可忽略此日志；如需启用 kdump，则应在 GRUB 配置中添加 crashkernel 参数并启动 kdump 服务。

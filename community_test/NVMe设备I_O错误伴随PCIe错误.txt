@@ -1,0 +1,14 @@
+#标题  
+NVMe设备I/O错误伴随PCIe错误  
+
+#内核版本  
+oe2403  
+
+#问题现象  
+系统日志中出现I/O error，具体表现为：dev nvme0n1, sector 12473086216, op 0x0:(READ), flags 0x80700, phys seg 32, prio class 2。该错误发生前有PCIe error报错。  
+
+#问题根因  
+该I/O错误的根本原因是在其之前出现了PCIe error，表明NVMe设备与主机之间的PCIe链路存在异常，导致读取操作失败。  
+
+#解决方案  
+建议优先排查硬件层面的PCIe链路稳定性，包括检查NVMe SSD插槽连接、主板PCIe通道状态及固件兼容性；若为硬件故障，需更换相关组件。同时，可结合系统日志（如dmesg）进一步确认PCIe AER（Advanced Error Reporting）信息以定位具体错误源。

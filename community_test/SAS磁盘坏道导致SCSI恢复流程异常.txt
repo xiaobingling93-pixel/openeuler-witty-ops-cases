@@ -1,0 +1,18 @@
+#标题  
+SAS磁盘坏道导致SCSI恢复流程异常
+
+#内核版本  
+2203sp2
+
+#问题现象  
+系统日志中反复出现以下信息：  
+- sas: Enter sas_scsi_recover_host busy: 0 failed: 0  
+- sas: ata3: end_device-3:0:2: dev error handler  
+- sas: --- Exit sas_scsi_recover_host: busy: 0 failed: 0 tries: 1  
+设备在SCSI错误恢复流程中被触发，但无实际I/O失败或忙状态，疑似底层存储介质异常。
+
+#问题根因  
+初步判断是磁盘坏道导致的，已转介质同事确认。
+
+#解决方案  
+联系介质相关同事对疑似存在坏道的磁盘进行检测与更换；建议在硬件层面执行SMART检测或使用厂商工具验证磁盘健康状态，并根据结果更换故障磁盘以避免后续I/O异常。

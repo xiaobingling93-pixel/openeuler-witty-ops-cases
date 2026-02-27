@@ -1,0 +1,18 @@
+#标题  
+CPU部分区域过温导致可恢复硬件错误
+
+#内核版本  
+5.10.0-216.0.0.115.oe2203sp4
+
+#问题现象  
+系统日志中频繁出现 APEI Generic Hardware Error Source 报告的可恢复硬件错误，具体日志特征如下：  
+- [Hardware Error]: event severity: recoverable  
+- [Hardware Error]: Error O, type: recoverable  
+- section type 为未知 UUID（c8b328a8-9917-4af6-9a13-2e08ab227586）  
+- 错误发生时伴随 CPU 部分区域温度异常升高  
+
+#问题根因  
+CPU部分区域过温
+
+#解决方案  
+加强CPU散热措施，排查并优化系统热设计，确保CPU工作温度在安全范围内；建议监控温度传感器数据，及时预警过温风险。

@@ -1,0 +1,20 @@
+#标题
+内存未释放导致内核Oops并触发系统重启
+
+#内核版本
+2403sp1
+
+#问题现象
+在node4节点上，由于存在未归还的借入内存，在执行相关操作时触发内核Oops，产生call trace，并最终导致系统panic和自动重启。关键日志包括：
+- Call trace中显示调用栈涉及remove_resource、close_import_memory、obmm_close等函数；
+- 最终触发"Kernel panic - not syncing: Oops: Fatal exception"；
+- 系统在panic后尝试停止其他CPU失败（SMP: failed to stop secondary CPUs 0-17），并在1秒后重启。
+
+#问题根因
+用户态驱动obmm模块在关闭导入内存（import memory）时，尝试移除资源（remove_resource）过程中发生异常，根本原因为存在未正确归还的借入内存，导致内核资源管理状态不一致，从而引发致命异常。
+
+#解决方案
+1. 检查并修复obmm驱动中内存借用与归还逻辑，确保所有借入内存均在使用完毕后正确释放；
+2. 在close_import_memory路径中增加对内存状态的校验，避免对未完全归还的内存执行资源移除操作；
+3. 建议在用户态调用obmm接口前后增加内存借用/归还的审计日志，便于问题追踪；
+4. 该问题已确认为非OS内核问题，应由obmm驱动维护团队负责修复并验证。

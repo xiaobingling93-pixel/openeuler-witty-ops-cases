@@ -1,0 +1,14 @@
+#标题  
+内核空指针解引用导致系统崩溃重启  
+
+#内核版本  
+2403sp2  
+
+#问题现象  
+系统运行 openEuler 24.03 SP2 时发生内核崩溃（Kernel Panic），触发系统自动重启。日志中可观察到与 pidns_update_load_tasks 相关的空指针异常。  
+
+#问题根因  
+pidns_update_load_tasks 函数中存在空指针解引用缺陷，导致内核崩溃。  
+
+#解决方案  
+升级至已修复该问题的内核版本。参考官方 issue 修复：https://gitee.com/openeuler/kernel/issues/ICTJEE。

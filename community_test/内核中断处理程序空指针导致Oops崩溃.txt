@@ -1,0 +1,22 @@
+#标题  
+内核中断处理程序空指针导致Oops崩溃
+
+#内核版本  
+2203sp4
+
+#问题现象  
+系统在运行过程中触发内核Oops，日志显示：  
+- 错误信息：`Internal error: Oops: 0000000086000004 [#1] SMP`  
+- 最终导致`Kernel panic - not syncing: Oops: Fatal exception in interrupt`  
+- 调用栈显示异常发生在中断上下文，具体路径为：`handle_percpu_devid_irq → __handle_domain_irq → gic_handle_irq → el0_irq_naked`  
+- 程序计数器（pc）为0x0，提示“bad PC value”，表明执行了非法地址  
+- 崩溃时正在执行进程`xhpcg_off`（PID: 3908765）
+
+#问题根因  
+有驱动在注册percpu-irq时，未传入有效的中断处理函数（handler），导致中断触发时跳转到空指针（pc = 0x0），引发内核Oops和系统崩溃。
+
+#解决方案  
+1. 对所有使用`percpu-irq`注册机制的驱动进行代码审查，确保注册时提供合法的中断处理函数。  
+2. 在内核中断注册接口中增加非空校验，防止空handler被注册，提前暴露问题。  
+3. 针对此类问题部署维测补丁（如文档中提及的复现补丁），用于捕获并定位注册异常的驱动模块。  
+4. 建议在驱动开发规范中明确要求中断handler必须有效，并纳入静态检查或CI流程。

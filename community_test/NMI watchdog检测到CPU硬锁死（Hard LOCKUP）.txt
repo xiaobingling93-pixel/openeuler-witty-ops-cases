@@ -1,0 +1,19 @@
+#标题
+NMI watchdog检测到CPU硬锁死（Hard LOCKUP）
+
+#内核版本
+2203sp4
+
+#问题现象
+系统日志中出现"NMI watchdog: Watchdog detected hard LOCKUP on cpu 287"告警，发生在CPU 287上。调用栈显示问题出现在时钟处理路径：second_overflow → logarithmic_accumulation.constprop.0 → timekeeping_advance → update_wall_time → tick_do_update_jiffies64.part.0 → tick_nohz_update_jiffies → tick_irq_enter，最终在中断入口处触发。系统运行于ARM64架构（aarch64），内核版本为5.10.0-249.0.0.152.oe2203sp4.aarch64。
+
+#问题根因
+初步排查和原因分析指向时钟链路异常，具体表现为在处理时间更新（timekeeping）过程中发生长时间关中断或循环，导致NMI watchdog超时并报告硬锁死。调用栈集中在second_overflow函数，表明与时钟计数溢出处理逻辑相关。
+
+#解决方案
+建议深入排查系统时钟源配置及时钟中断处理逻辑，重点检查：
+1. 硬件时钟源（如ARM Generic Timer）是否工作正常；
+2. 内核CONFIG_NO_HZ_FULL或tickless机制是否存在异常累积延迟；
+3. 是否存在高精度定时器或PMU驱动干扰时间子系统；
+4. 升级至包含相关时钟子系统修复的内核版本，或应用针对second_overflow路径的补丁。
+同时，可临时通过禁用NMI watchdog（nmi_watchdog=0）避免误报，但需优先解决根本时钟问题。

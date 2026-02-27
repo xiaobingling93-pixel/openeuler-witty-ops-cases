@@ -1,0 +1,19 @@
+#标题  
+OS挂死并触发NMI watchdog硬锁死（Hard LOCKUP）
+
+#内核版本  
+2203sp2
+
+#问题现象  
+- 系统OS挂死，无法响应操作。  
+- 内核日志中出现Call trace，关键栈帧包括：native_queued_spin_lock_slowpath、drain_zone_pages、refresh_cpu_vm_stats、vmstat_update等，表明卡在自旋锁等待路径。  
+- 触发NMI watchdog告警：“Watchdog detected hard LOCKUP on cpu 215”，表明CPU 215长时间未响应调度。  
+
+#问题根因  
+系统在执行vmstat更新过程中因等待自旋锁而阻塞，结合硬件错误日志“Error Type: Uncorrected error, Latent or Restartable error (UEO)”，初步判断为底层硬件（如内存或缓存）发生不可纠正错误（UEO），导致锁状态异常，进而引发CPU硬锁死。
+
+#解决方案  
+1. 联系硬件团队对鲲鹏920B平台进行硬件诊断，重点排查内存子系统是否存在UEO（Uncorrected Error）类故障。  
+2. 若确认为硬件故障，需更换存在缺陷的硬件模块（如内存条、CPU等）。  
+3. 在硬件修复前，可尝试通过固件或BIOS更新缓解潜在的硬件错误处理机制问题（如启用更严格的ECC纠错或错误隔离策略）。  
+4. 建议在系统侧增加对UEO类错误的监控与自动告警机制，以便快速定位类似硬件异常。

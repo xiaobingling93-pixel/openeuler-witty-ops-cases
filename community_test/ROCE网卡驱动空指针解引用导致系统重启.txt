@@ -1,0 +1,20 @@
+#标题
+ROCE网卡驱动空指针解引用导致系统重启
+
+#内核版本
+2203sp4
+
+#问题现象
+- 机器在运行业务时发生意外重启。
+- 内核日志中反复出现 ROCE 驱动报错：`[ROCE] roce3_event_report_common_b: [ofed event type] Wq access error. function id: 0`。
+- 随后触发内核 Oops，具体为 `Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000`。
+- 崩溃发生在工作队列 `ib-comp-wq` 中，调用栈显示崩溃点位于 `hiroce3` 模块的 `hmm_rdma_mtt_free+0x80/0x160`。
+- 系统最终进入 crashdump 流程并重启。
+
+#问题根因
+由于 hiroce3 网卡驱动在处理 WQ（Work Queue）访问错误时，存在空指针解引用缺陷，导致内核在 `hmm_rdma_mtt_free` 函数中访问了虚拟地址 0，从而触发内核 Oops 并引发系统重启。
+
+#解决方案
+1. 升级或修复 hiroce3 网卡驱动，确保在 WQ 访问错误等异常路径下不会对空指针进行解引用操作。
+2. 在驱动代码中增加对关键指针（如 MTT 相关结构体）的有效性校验，避免在资源未正确初始化或已释放的情况下继续访问。
+3. 建议联系昇腾网卡驱动团队，针对该问题提供带修复补丁的驱动版本，并验证在相同业务负载下的稳定性。

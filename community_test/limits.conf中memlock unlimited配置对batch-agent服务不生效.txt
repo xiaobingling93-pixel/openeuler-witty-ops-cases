@@ -1,0 +1,19 @@
+#标题  
+limits.conf中memlock unlimited配置对batch-agent服务不生效  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+在/etc/security/limits.conf中配置了memlock unlimited，但系统服务batch-agent启动后该配置未生效，无法获得预期的内存锁定权限。  
+
+#问题根因  
+/etc/security/limits.conf配置文件不对基于系统资源调用的服务（如systemd管理的服务）生效；此类服务需通过其对应的systemd服务单元文件进行资源限制配置。  
+
+#解决方案  
+针对由systemd管理的服务（如batch-agent），应在对应的服务单元文件（如/etc/systemd/system/batch-agent.service.d/override.conf）中添加以下配置以启用memlock unlimited：  
+```ini
+[Service]
+LimitMEMLOCK=infinity
+```  
+然后执行 systemctl daemon-reload 和 systemctl restart batch-agent 使配置生效。

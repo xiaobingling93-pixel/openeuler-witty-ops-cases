@@ -1,0 +1,18 @@
+#标题  
+InfiniBand GID 表满导致网口反复启停失败
+
+#内核版本  
+22.03sp3
+
+#问题现象  
+客户在反复对网口执行 down/up 操作约128次后，系统报错：  
+__ib_cache_gid_add: unable to add gid fe80:0000:0000:0000:e37e:8d8b:690d:c004 error=-28  
+错误码 -28 对应 ENOSPC（No space left on device），表明资源耗尽。
+
+#问题根因  
+GID（Global Identifier）表已满，无法继续添加新的 GID 条目。测试尝试通过 drop cache 清理无效条目未生效，确认为内核 InfiniBand 模块 GID 缓存管理机制在频繁接口启停场景下未能及时释放资源。
+
+#解决方案  
+1. 临时恢复：重启系统以清空 GID 表，恢复网络接口正常功能。  
+2. 长期规避：避免对 InfiniBand 网络接口进行高频次的 down/up 操作；若业务必需，建议优化操作频率或引入延迟间隔。  
+3. 根本修复：需内核 InfiniBand 模块增强 GID 缓存回收机制，确保在接口关闭时及时清理对应 GID 条目，后续可通过升级内核补丁解决。

@@ -1,0 +1,14 @@
+#标题  
+OS卡死报softlockup伴随RAS错误
+
+#内核版本  
+2403sp2
+
+#问题现象  
+系统运行过程中出现OS卡死，并上报softlockup告警；同时有RAS（Reliability, Availability, and Serviceability）错误上报。
+
+#问题根因  
+经海思同事分析，该问题为已知问题，由BIOS缺陷导致，在特定条件下触发softlockup并伴随RAS错误上报。
+
+#解决方案  
+升级BIOS至修复版本以解决该问题。具体可参考DTS工单：https://dts-szv.clouddragon.huawei.com/DTSPortal/ticket/DTS2025102236804。

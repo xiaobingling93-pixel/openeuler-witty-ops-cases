@@ -1,0 +1,18 @@
+#标题  
+dnf-makecache.service 因网络超时失败
+
+#内核版本  
+22.03-LTS-SP4
+
+#问题现象  
+1. OS系统日志中出现 ldapdb_canonuser_plug_init() failed 错误，提示“invalid parameter supplied”。  
+2. dnf 在执行元数据下载时反复出现 Curl error (28): Timeout was reached，无法解析或连接到 mirrors.openeuler.org 和 repo.openeuler.org 的指定仓库地址。  
+3. dnf-makecache.service 启动失败，systemd 日志显示 Main process exited with status=1/FAILURE。
+
+#问题根因  
+系统启动后通过定时器触发 dnf-makecache.service 执行自动更新 DNF 软件仓库元数据缓存，但在执行过程中无法访问 repo 源地址 https://mirrors.openeuler.org/metalink?repo=22.03LTS_SP4/，导致超时失败。
+
+#解决方案  
+1. 检查系统网络连通性，确保可正常访问 openEuler 官方软件源（如 mirrors.openeuler.org 或 repo.openeuler.org）。  
+2. 若处于内网或隔离环境，配置可用的本地或代理软件源，替换默认远程仓库地址。  
+3. 可临时禁用 dnf-makecache 定时任务（如 systemctl disable dnf-makecache.timer）以避免重复失败日志，待网络或源配置修复后再启用。

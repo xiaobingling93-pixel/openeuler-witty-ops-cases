@@ -1,0 +1,22 @@
+#标题  
+RAID设备及逻辑卷出现Buffer I/O错误
+
+#内核版本  
+22.03-LTS-SP4
+
+#问题现象  
+系统日志（/var/log/messages）和dmesg中持续出现以下错误信息：  
+- "Buffer I/O error on dev md126, logical block 0, async page read"  
+- "Buffer I/O error on dev dm-3, logical block 0, async page read"  
+- "Buffer I/O error on dev dm-4, logical block 0, async page read"  
+- "Buffer I/O error on dev dm-5, logical block 0, async page read"  
+上述错误重复出现，涉及RAID设备（md126）及其上层逻辑卷（dm-3、dm-4、dm-5），表明底层存储I/O异常。
+
+#问题根因  
+I/O error，初步判断为RAID配置异常或底层存储介质（如磁盘或RAID卡）故障，需由RAID卡或存储介质相关同事进一步定位。
+
+#解决方案  
+1. 检查RAID配置状态，确认RAID阵列（如md126）是否处于降级、失效或重建状态。  
+2. 使用RAID管理工具（如MegaCLI、storcli或iprconfig等，视具体硬件而定）检查RAID卡健康状况及成员盘状态。  
+3. 对底层物理磁盘进行SMART检测，排查是否存在坏道或硬件故障。  
+4. 若确认为介质故障，及时更换故障磁盘并重建RAID阵列；若为配置问题，修正RAID或LVM配置后恢复服务。

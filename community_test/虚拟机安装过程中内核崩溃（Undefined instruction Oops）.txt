@@ -1,0 +1,19 @@
+#标题
+虚拟机安装过程中内核崩溃（Undefined instruction Oops）
+
+#内核版本
+5.10.0-182.0.0.95.oe2203sp3
+
+#问题现象
+在使用 virt-install 安装 openEuler-22.03-LTS-SP3 虚拟机时，系统在解压 initramfs 后触发内核 Oops，日志显示：
+[    4.108655][    T1] Internal error: Oops - Undefined instruction: 0000000002000000 [#1] SMP  
+崩溃发生在函数 __armv8pmu_probe_pmu+0xe0/0x100，调用栈显示与 ARMv8 PMU（性能监控单元）初始化相关。  
+主机内核版本为 4.19.90-89.11.v2401.ky10.aarch64，虚拟机尝试安装的 ISO 对应内核为 5.10.0-182.0.0.95.oe2203sp3.aarch64。
+
+#问题根因
+初步判断是虚拟化软件（QEMU/KVM）版本过低，无法正确支持 openEuler 22.03 SP3 所需的 ARMv8 PMU 特性，导致在探测 PMU 硬件时执行了未定义指令，引发内核崩溃。文档中明确指出“2003 可以安装”，说明旧版系统兼容当前虚拟化环境，而 SP3 引入的新特性与底层虚拟化平台不兼容。
+
+#解决方案
+1. 升级主机上的 QEMU 和 KVM 组件至支持 openEuler 22.03 SP3 的版本；
+2. 或在创建虚拟机时禁用 PMU 相关功能（如通过内核启动参数添加 `arm_pmu.disable=1`）以规避该问题；
+3. 若仅为测试目的，可临时改用已验证兼容的 openEuler 20.03 LTS 版本进行安装。

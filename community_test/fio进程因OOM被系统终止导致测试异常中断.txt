@@ -1,0 +1,19 @@
+#标题  
+fio进程因OOM被系统终止导致测试异常中断  
+
+#内核版本  
+2203sp3  
+
+#问题现象  
+- pcp-pmie告警显示“High per disk average queue length”和“Severe demand for real memory（2566 pgsout/s）”  
+- fio测试用例执行过程中异常中断  
+- 系统message日志记录fio进程在16:26被OOM Killer终止  
+
+#问题根因  
+系统内存严重不足，触发Linux OOM Killer机制，主动终止了占用大量内存的fio进程；同时存在高swap换出速率（2566 pages/s）和较高的I/O等待，表明系统处于严重内存压力状态。  
+
+#解决方案  
+- 优化fio测试参数，限制其内存使用量（如调整buffer size、job数量等）  
+- 增加系统可用物理内存或配置合理的swap空间以缓解内存压力  
+- 在执行高负载I/O测试前，监控系统内存与swap使用情况，避免触发OOM  
+- 如需保留关键进程不被OOM Killer终止，可适当调整其oom_score_adj值（谨慎使用）

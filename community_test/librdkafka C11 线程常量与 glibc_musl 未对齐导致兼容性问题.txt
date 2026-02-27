@@ -1,0 +1,14 @@
+#标题  
+librdkafka C11 线程常量与 glibc/musl 未对齐导致兼容性问题  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+在使用 librdkafka 的系统中出现兼容性异常，具体表现为因 C11 线程（tinycthreads）相关常量在 librdkafka、glibc 与 musl 之间未对齐，导致运行时行为异常或崩溃。问题关联至特定 OS 内核环境（5.10.0-216.0.0.115.oe2203sp4.aarch64），且已在社区 issue 和博客中被报告。  
+
+#问题根因  
+librdkafka 中 C11 线程（tinycthreads）使用的常量与 glibc 和 musl 标准库未对齐，引发底层线程接口不兼容。上游社区已确认该问题并提交修复补丁（commit: 7915f2a9adf30ca5938945c607b35c9c5a5a63e3）。  
+
+#解决方案  
+升级 librdkafka 至包含上游社区修复补丁的版本。根据记录，问题已于 2025/11/12 完成版本升级并关闭。建议用户同步更新至已修复的 librdkafka 版本，以确保与 glibc/musl 的兼容性。

@@ -1,0 +1,21 @@
+#标题  
+内核编译后启动Hard LOCKUP故障
+
+#内核版本  
+2403sp1
+
+#问题现象  
+编译新内核后系统启动过程中出现 Hard LOCKUP，具体表现为：  
+- 日志中大量 "Sending IPI failed to CPU xx" 错误  
+- SMP 停止次级 CPU 失败，提示 "SMP: failed to stop secondary CPUs 15-16,30,56-57,62-63,70,91-92,151-152,191-192,251-252,311-312"  
+- 最终触发 Kernel panic: "Hard LOCKUP" 并挂死
+
+#问题根因  
+编译的内核版本与系统不匹配，加载了不兼容的 ub 相关驱动模块（如 ummu、ubus、ummu_core、ummu_pmu、hibmc_drm、ubfi），在启动过程中触发 Hard LOCKUP。
+
+#解决方案  
+1. 在 GRUB 启动参数中添加以下内容临时规避：  
+   ```
+   module_blacklist=ummu,ubus,ummu_core,ummu_pmu,hibmc_drm,ubfi modprobe.blacklist=ummu,ubus,ummu_core,ummu_pmu,hibmc_drm,ubfi hardlockup_all_cpu_backtrace=1
+   ```  
+2. 长期解决方法：使用 /boot 目录下系统默认内核的 .config 配置文件重新编译内核，确保配置一致性，避免引入不兼容驱动。

@@ -1,0 +1,20 @@
+#标题  
+irqbalance 无法调整特定 IRQ 中断亲和性导致 I/O 错误
+
+#内核版本  
+22.03-LTS-SP4
+
+#问题现象  
+在整机压力测试过程中，系统日志中反复出现以下错误信息：  
+- `Sep 10 22:34:38 localhost /usr/sbin/irqbalance[3202]: Cannot change IRQ 163 affinity: Input/output error`  
+- `Sep 14 19:16:23 localhost /usr/sbin/irqbalance[3243]: Cannot change IRQ 170 affinity: Input/output error`  
+表明 irqbalance 服务尝试修改 IRQ 163 和 IRQ 170 的 CPU 亲和性时失败，返回“Input/output error”。
+
+#问题根因  
+驱动中已将 PMU（Performance Monitoring Unit）的 IRQ 标记为 `IRQF_NO_BALANCING`，表示该中断已被固定绑定到特定 CPU，不允许 irqbalance 动态调整其亲和性。因此，当 irqbalance 尝试更改这些 IRQ 的亲和性时，内核拒绝操作并返回 I/O 错误。
+
+#解决方案  
+1. 通过命令 `cat /proc/interrupts | column -t` 确认 IRQ 163 和 IRQ 170 对应的硬件设备，识别是否为 PMU 或其他关键性能监控单元。  
+2. 若确认为 PMU 中断，因其设计上禁止负载均衡（`IRQF_NO_BALANCING`），应避免 irqbalance 对其进行干预。  
+3. 可通过配置 irqbalance 忽略特定 IRQ（例如使用 `--banirq=163,170` 启动参数）或在 `/etc/default/irqbalance` 中设置 `IRQBALANCE_BANNED_INTERRUPTS` 来排除这些中断，防止重复报错。  
+4. 建议相关硬件模块责任人确认该中断绑定策略是否符合预期，无需调整则可忽略此日志。

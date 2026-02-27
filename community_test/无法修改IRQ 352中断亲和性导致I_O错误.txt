@@ -1,0 +1,16 @@
+#标题  
+无法修改IRQ 352中断亲和性导致I/O错误  
+
+#内核版本  
+22.03 sp4  
+
+#问题现象  
+系统日志中出现错误信息：“Cannot change IRQ 352 affinity: Input/output error”。通过命令 cat /proc/interrupts | column -t 可查看该中断对应的硬件设备。该错误在尝试通过 irqbalance 或其他方式修改 IRQ 352 的 CPU 亲和性时触发。  
+
+#问题根因  
+驱动中为 PMU（Performance Monitoring Unit）的中断指定了 IRQF_NO_BALANCING 标志，表示该中断已被固定绑定到特定 CPU，不允许再通过 irqbalance 或用户空间工具修改其亲和性。因此，任何尝试更改该中断亲和性的操作都会失败并返回 I/O 错误。  
+
+#解决方案  
+1. 确认 IRQ 352 对应的硬件设备（通过 cat /proc/interrupts | column -t），联系对应设备的责任人核实中断绑定策略是否合理。  
+2. 若业务确实需要调整中断亲和性，需修改驱动代码，移除 IRQF_NO_BALANCING 标志（需评估对性能和功能的影响）。  
+3. 若无需调整，则可忽略该错误，或配置 irqbalance 忽略该特定中断（例如通过 irqbalance 的 --banirq 参数），避免重复报错。

@@ -1,0 +1,15 @@
+#标题  
+kdump未生成vmcore文件
+
+#内核版本  
+5.10.0-60.18.0.50.oe2203.aarch64
+
+#问题现象  
+在openEuler 22.03系统中配置kdump服务状态为active，但通过执行 echo c > /proc/sysrq-trigger 手动触发内核panic后，未生成vmcore转储文件。
+
+#问题根因  
+RAID卡存在已知问题，导致kdump在内核崩溃时无法正常保存vmcore文件。
+
+#解决方案  
+1. 启用SMMU（System Memory Management Unit）；  
+2. 配置内核启动参数 crashkernel=512M。

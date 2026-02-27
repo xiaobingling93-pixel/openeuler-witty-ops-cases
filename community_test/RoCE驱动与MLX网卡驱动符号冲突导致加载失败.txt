@@ -1,0 +1,17 @@
+#标题
+RoCE驱动与MLX网卡驱动符号冲突导致加载失败
+
+#内核版本
+2203sp4
+
+#问题现象
+加载hns_roce_hw_v2驱动时出现以下内核日志错误：  
+- "hns_roce_hw_v2: disagrees about version of symbol ibdev_warn"  
+- "hns_roce_hw_v2: Unknown symbol ibdev_warn (err -22)"  
+系统中同时存在MLX网卡驱动与板载RoCE高速链路驱动，导致驱动无法正常加载。
+
+#问题根因
+MLX网卡驱动和板载网卡附带的RoCE高速链路协议驱动存在符号版本冲突，二者不能在同一环境中共存。
+
+#解决方案
+在安装MLX网卡驱动前，先卸载RoCE相关驱动（如hns_roce_hw_v2），再加载MLX网卡驱动，以避免符号冲突。

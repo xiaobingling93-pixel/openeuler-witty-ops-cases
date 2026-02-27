@@ -1,0 +1,14 @@
+#标题  
+920BS单板安全内存分配AUTO模式下OS启动挂死  
+
+#内核版本  
+2203sp3  
+
+#问题现象  
+920BS 1P单板在安全内存分配设置为AUTO时，系统启动到OS阶段挂死；日志中出现“sparse init nids node0 memory map backing failed, Some memory will not be available.”，初步观察存在页表异常，后续页表访问发生空指针。  
+
+#问题根因  
+BIOS reserved后分配给内核的内存不足，导致系统启动过程中内存初始化失败，进而引发页表异常和空指针访问，最终造成OS启动卡死。  
+
+#解决方案  
+调整BIOS配置，避免上报reserved内存区域，并增大分配给内核的可用内存容量，以确保OS启动阶段有足够内存完成初始化。

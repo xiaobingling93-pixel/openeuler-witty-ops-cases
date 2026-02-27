@@ -1,0 +1,14 @@
+#标题
+mdmonitor.service 启动失败
+
+#内核版本
+2203sp4
+
+#问题现象
+系统启动时 mdmonitor.service 服务启动失败。日志显示在没有 RAID 设备的环境中，mdadm monitor 后台进程不会持续运行，其对应的 mdadm.pid 文件仅短暂存在后即被删除；若 systemd 在读取该 pid 文件时稍有延迟，会因文件不存在而判定服务启动失败。
+
+#问题根因
+在未配置软 RAID 的环境下，mdadm 服务的 monitor 进程不会常驻运行，导致 mdadm.pid 文件快速消失。systemd 若未能及时读取该文件，会误判服务启动异常，从而引发 mdmonitor.service 启动失败。
+
+#解决方案
+已在 mdadm 软件包中增加对无 RAID 环境的判断逻辑，避免因 pid 文件短暂存在而导致服务启动失败。相关修复已提交 PR（https://gitee.com/src-openeuler/mdadm/pulls/141），建议升级至包含该修复的 mdadm 版本。
