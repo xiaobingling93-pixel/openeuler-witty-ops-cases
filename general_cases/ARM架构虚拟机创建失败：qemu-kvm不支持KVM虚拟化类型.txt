@@ -1,0 +1,22 @@
+#标题  
+ARM架构虚拟机创建失败：qemu-kvm不支持KVM虚拟化类型  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 执行`virsh create /home/test_qemu/config/2u2g_memlink_balloon.xml`时失败，返回明确错误：  
+  `error: unsupported configuration: Emulator '/usr/bin/qemu-kvm' does not support virt type 'kvm'`  
+- 测试框架日志标记`create vm failed`（ERROR级别），用例`oe_test_migrate_memlink_balloon.sh`在第35行退出，实际结果=1（期望=0）  
+- 复现条件：ARM64/UB架构环境执行smoke-migrate测试套中的内存迁移气球测试用例  
+
+#问题根因  
+测试用例未对执行环境施加必要约束，在ARM64/UB架构且缺乏灵衢硬件支持的环境中，虚拟机XML配置强制指定`virt type='kvm'`，但当前qemu-kvm环境不支持该虚拟化类型。根本原因为**用例设计缺陷**：未校验硬件架构与特性依赖（文档明确标注【硬件架构】ARM64/UB、【特性约束】依赖灵衢硬件），导致配置与环境能力不匹配。  
+
+#解决方案  
+1. **修正测试用例约束**：在用例执行前增加环境检查逻辑，仅当满足以下条件时运行：  
+   - 硬件架构为x86_64（KVM原生支持环境），或  
+   - ARM环境已部署灵衢硬件且qemu-kvm版本明确支持ARM KVM虚拟化类型  
+2. **配置适配**：若需在非灵衢ARM环境验证基础功能，将虚拟机XML中`<domain type='kvm'>`临时调整为`type='qemu'`（TCG模式），并同步更新用例预期结果与测试目标说明  
+3. **环境治理**：在测试调度层增加架构与硬件标签过滤，禁止将依赖灵衢硬件的用例分发至不满足条件的ARM节点  
+（依据文档结论：测试环境不满足，用例问题，对于执行环境缺乏约束条件）

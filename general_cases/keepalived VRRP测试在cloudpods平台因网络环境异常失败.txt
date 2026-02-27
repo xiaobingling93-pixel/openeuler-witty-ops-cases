@@ -1,0 +1,19 @@
+#标题  
+keepalived VRRP测试在cloudpods平台因网络环境异常失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 在cloudpods平台执行测试套`oe_test_vrrp_bond_vlan_keepalived`时失败，本地环境执行通过  
+- 关键日志显示：脚本通过`ip a | grep vrrp4 | grep -c 192`检测vrrp4接口IP，期望计数20，实际返回0  
+- 测试脚本报错：`oe_test_vrrp_bond_vlan_keepalived.sh line 91`，ERROR级别日志记录  
+- 服务层面：vrrp4虚拟接口未生成预期的192网段IP地址，VRRP主备切换及bond/vlan网络配置流程中断  
+
+#问题根因  
+cloudpods平台网络环境问题，导致keepalived的VRRP、bond、vlan相关网络配置无法正常生效（原文关键表述：“cloudpods平台网络问题”），具体表现为虚拟接口IP分配失败。  
+
+#解决方案  
+1. **规避措施**：该测试用例需迁移至本地物理环境或网络功能完备的测试环境执行（原文：“需在本地环境执行，本地执行pass”）  
+2. **根治建议**：联系cloudpods平台运维团队，排查平台虚拟网络层对bond/vlan封装、VRRP多播通信及虚拟IP绑定的支持情况，修复底层网络策略或驱动限制  
+3. **验证补充**：执行前增加平台网络能力预检（如bond/vlan创建、多播包收发测试），避免无效测试资源消耗

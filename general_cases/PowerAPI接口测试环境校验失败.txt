@@ -1,0 +1,14 @@
+#标题
+PowerAPI接口测试环境校验失败
+
+#内核版本
+2403sp3
+
+#问题现象
+在ARM架构服务器上执行smoke-powerapi测试套中的oe_test_interface_powerapi_01用例时，测试程序中断并输出关键错误日志："The test environment don't meet the requirements, please check your environment."；测试无法继续执行，无其他服务异常日志。
+
+#问题根因
+测试环境不满足要求，该测试需在物理机环境下执行，而当前测试平台（非物理机）不支持物理机测试。
+
+#解决方案
+将测试迁移至具备物理机特性的测试环境执行。当前测试平台（如虚拟机、云实例或模拟环境）无法提供PowerAPI接口测试所需的硬件级物理机支持，需使用真实物理服务器重新部署测试环境并执行用例。

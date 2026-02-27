@@ -1,0 +1,20 @@
+#标题  
+ARM架构下KVM虚拟化创建虚拟机失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 执行 `virsh create /home/test_qemu/config/2u2g_memlink_balloon.xml` 时失败，报错：`error: unsupported configuration: Emulator '/usr/bin/qemu-kvm' does not support virt type 'kvm'`  
+- 测试脚本 `oe_test_memlink_balloon.sh` 第39行触发错误日志：`create vm failed`（ERROR级别）  
+- 自动化测试框架（mugen）标记用例执行失败，退出码为1  
+- 环境特征：ARM66/UB架构，测试套为 smoke-memlink  
+
+#问题根因  
+测试用例依赖灵衢硬件特性以支持KVM虚拟化，但当前ARM66/UB测试环境缺乏该硬件支持，导致qemu-kvm无法启用virt type 'kvm'。根本原因为“测试环境不满足，用例问题，对于执行环境缺乏约束条件”，即用例未校验硬件虚拟化能力即尝试创建KVM类型虚拟机。  
+
+#解决方案  
+1. **环境前置校验**：在测试用例执行前增加硬件能力检测（如检查`/proc/cpuinfo`中虚拟化特性或灵衢硬件标识），仅当环境满足KVM支持条件时执行用例。  
+2. **用例约束强化**：在测试框架中明确标注该用例的硬件依赖（`【特性约束】依赖灵衢硬件`），禁止在非兼容ARM环境（如ARM66/UB）中调度执行。  
+3. **配置适配（可选）**：若测试目标允许，将虚拟机XML配置中的`<domain type='kvm'>`临时调整为`<domain type='qemu'>`，但需同步评估对memlink_balloon功能测试有效性的影响，并在用例文档中注明限制条件。  
+4. **环境治理**：部署专用支持灵衢硬件的ARM测试节点，专用于此类依赖硬件虚拟化的测试场景。

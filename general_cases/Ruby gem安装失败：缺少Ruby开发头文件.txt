@@ -1,0 +1,26 @@
+#标题  
+Ruby gem安装失败：缺少Ruby开发头文件  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 安装autotest gem时失败，关键报错：`mkmf.rb can't find header files for ruby at /usr/share/include/ruby.h`  
+- 错误日志明确提示：`You might have to install separate package for the ruby development environment, ruby-dev or ruby-devel for example.`  
+- 前置步骤中multiruby脚本因`/root/.rubies`目录不存在触发`Errno::ENOENT`错误（经sed修复脚本后流程继续），但最终因native extension编译失败导致测试中断  
+- gem安装过程卡在prism-1.8.0扩展编译阶段，退出码1，日志指向头文件缺失  
+
+#问题根因  
+系统未安装Ruby开发环境依赖包（ruby-devel），导致gem安装native extension时无法定位ruby头文件（ruby.h），编译构建失败。  
+
+#解决方案  
+1. 安装Ruby开发依赖包：  
+   ```bash  
+   dnf install -y ruby-devel  # openEuler系统推荐使用dnf  
+   # 或兼容命令：yum install -y ruby-devel  
+   ```  
+2. 重新执行gem安装命令：  
+   ```bash  
+   gem install autotest  
+   ```  
+3. （预防措施）在测试环境初始化阶段预装ruby-devel，避免同类构建依赖缺失问题。

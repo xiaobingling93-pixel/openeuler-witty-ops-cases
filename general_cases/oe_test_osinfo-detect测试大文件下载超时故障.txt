@@ -1,0 +1,18 @@
+#标题  
+oe_test_osinfo-detect测试大文件下载超时故障  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 在cloudpods平台ARM架构环境下执行`libosinfo\oe_test_osinfo-detect`测试套时，`oe_test_osinfo-detect.sh`脚本下载大文件过程异常缓慢（日志显示传输速率波动于63.4K~146K，累计耗时约1小时48分钟）  
+- 关键错误日志：`Wed Jan 14 12:17:37 2026 - ERROR - Timeout : Command 'bash -x oe_test_osinfo-detect.sh' timed out after 1799.9999846899998 seconds`  
+- 测试任务因超过1800秒阈值被强制终止，复现条件为cloudpods平台网络环境执行该测试用例  
+
+#问题根因  
+cloudpods平台网络原因，下载大文件超时  
+
+#解决方案  
+1. 将`oe_test_osinfo-detect`测试用例迁移至本地网络环境执行（经验证本地环境执行通过）  
+2. 建议涉及大文件下载的测试用例避免在cloudpods等网络波动风险较高的平台执行  
+3. 如必须在云平台执行，需提前评估网络带宽稳定性，或适当调整测试超时阈值（需结合业务容忍度）

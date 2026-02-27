@@ -1,0 +1,22 @@
+#标题  
+SELinux无法启用导致安全测试套件执行失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 执行 `setenforce 1` 命令时返回提示：`setenforce: SELinux is disabled`  
+- `getenforce` 命令检测结果为 `Disabled`  
+- 测试脚本触发警告日志：`Testing cannot be performed if selinux cannot be enabled.`（日志级别 WARN）  
+- 安全测试套 `oe_test_selinux_audit` 以退出码 255 中止执行，测试流程无法继续  
+- 问题在 cloudpods 平台 ARM 架构环境下稳定复现  
+
+#问题根因  
+cloudpods 平台默认将 SELinux 配置为 disable 状态，且系统运行时无法通过 `setenforce` 命令启用 SELinux，导致依赖 SELinux 启用状态的安全审计测试无法执行。  
+
+#解决方案  
+- **短期措施**：在 cloudpods 平台测试环境中，对该测试用例（`oe_test_selinux_audit`）执行跳过（pass）处理，避免测试流程中断。  
+- **长期建议**：  
+  1. 检查 cloudpods 平台系统镜像或启动参数（如内核 cmdline 中 `selinux=0` 或 `security=none`），确认是否可调整为 permissive/enforcing 模式；  
+  2. 与云平台团队协同优化测试环境基线配置，为需 SELinux 的测试场景提供专用镜像或配置开关；  
+  3. 在测试框架中增加平台适配逻辑，自动识别不可启用 SELinux 的环境并标记用例为 skipped。

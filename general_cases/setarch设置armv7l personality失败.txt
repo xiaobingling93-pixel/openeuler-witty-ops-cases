@@ -1,0 +1,14 @@
+#标题
+setarch设置armv7l personality失败
+
+#内核版本
+2403sp3
+
+#问题现象
+在ARM架构系统执行util-linux测试套oe_test_setarch用例时，运行命令`setarch armv7l uname -m`失败，终端输出明确错误：`setarch: failed to set personality to armv7l: Invalid argument`。该现象稳定复现于无32位ARM环境的测试节点。
+
+#问题根因
+系统无任何32位ARM支持（内核未启用ARM 32位personality，且系统缺失32位库及运行时环境）。
+
+#解决方案
+修改测试脚本逻辑：增加32位库存在性检测（如检查`/lib/arm-linux-gnueabihf`等典型32位库路径），若检测到系统无32位ARM支持能力，则自动跳过oe_test_setarch中涉及armv7l personality的测试项，避免无效执行与误报。

@@ -1,0 +1,20 @@
+#标题  
+radsniff非交互式执行输出文件生成失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 在cloudpods平台以非交互式、无TTY方式执行测试脚本时，命令`radsniff -w /tmp/test.pcap -I ../common/test.pcap`执行后，预期生成的`/tmp/test.pcap`文件不存在；  
+- 后续执行`xxd -b /tmp/test.pcap`时明确报错：`xxd: /tmp/test.pcap: No such file or directory`；  
+- radsniff命令虽指定输入文件（-I）与输出路径（-w），但无任何数据包处理日志，输出文件未创建。  
+
+#问题根因  
+平台非交互模式下标准输入（stdin）被重定向至`/dev/null`，即便通过`-I`参数指定了输入pcap文件，radsniff仍因缺少默认数据源、无数据包流转导致解析失败，进而使`-w`参数无法生成输出文件`/tmp/test.pcap`。  
+
+#解决方案  
+将原命令调整为：  
+`radsniff -I ../common/test.pcap -S > /tmp/test.pcap`  
+- 通过`-S`参数将PCAP格式数据输出至标准输出（stdout）；  
+- 借助Shell重定向符号`>`将数据写入目标文件；  
+- 此方式绕过radsniff内置`-w`写入逻辑对stdin环境的依赖，彻底规避非交互式环境下的stdin关闭问题及潜在目录权限限制，确保输出文件可靠生成。

@@ -1,0 +1,21 @@
+#标题
+radsniff非交互式环境stdin依赖导致启动失败
+
+#内核版本
+2403sp3
+
+#问题现象
+- 执行`radsniff -P /tmp/radsniff.pid`时立即报错：`radsniff: Failed opening pcap handle (stdin): error reading dump file: Bad file descriptor`
+- 后续尝试读取PID文件失败：`cat: /tmp/radsniff.pid: No such file or directory`
+- 进程检测为空：`pgrep -f 'radsniff -P'`无输出，触发脚本条件判断异常：`oe_test_freeradius_freeradius-utils_radsniff.sh: line 52: [: : integer expression expected`
+- 仅在cloudpods平台非交互式、无TTY环境下复现，交互式终端执行正常
+
+#问题根因
+在cloudpods平台非交互式、无TTY环境下，标准输入（stdin）被重定向至已关闭的`/dev/null`。radsniff默认从stdin读取pcap数据，导致打开pcap句柄时触发`Bad file descriptor`错误，进程启动失败，-P参数无法完成PID文件写入。
+
+#解决方案
+将原命令`radsniff -P /tmp/radsniff.pid`修改为`radsniff -i lo -P /tmp/radsniff.pid`：  
+1. 通过`-i lo`显式指定回环网卡（lo）作为pcap数据源  
+2. 彻底规避对stdin的依赖  
+3. 确保radsniff进程正常启动并成功写入PID文件  
+（适用于所有非交互式自动化测试/部署场景）

@@ -1,0 +1,19 @@
+#标题  
+脏页写回超时故障（cloudpos平台）  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 测试用例 `oe_test_FSIO_dirty_page_writeback_centisecs` 执行失败，脚本第35行触发错误。  
+- 检查 `/proc/meminfo` 中 `Dirty` 值：预期写回后为 `0`，实际仍为 `4`。  
+- 系统日志明确报错：`The dirty page doesn't writeback after dirty_writeback_centisecs.`（时间戳：Tue Jan 13 10:03:39 2026）。  
+- 该现象仅在 cloudpos 平台复现，相同测试在本地标准环境执行通过。  
+
+#问题根因  
+cloudpos 平台环境差异导致内核脏页写回机制异常，无法在 `dirty_writeback_centisecs` 配置时间内完成脏页回写，违反内核预期行为。  
+
+#解决方案  
+1. **临时规避**：将该测试用例迁移至已验证通过的非 cloudpos 平台（如本地标准环境）执行。  
+2. **根本解决**：联合 cloudpos 平台团队专项排查环境差异点（如内核参数配置、I/O 调度策略、硬件驱动或平台特有补丁），修复脏页写回机制，确保符合 `dirty_writeback_centisecs` 参数行为规范。  
+3. **预防建议**：在测试基线中明确标注平台兼容性要求，对 cloudpos 等定制化平台增加脏页写回专项验证环节。
