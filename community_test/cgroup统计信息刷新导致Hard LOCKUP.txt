@@ -1,0 +1,19 @@
+#标题  
+cgroup统计信息刷新导致Hard LOCKUP
+
+#内核版本  
+2203sp2
+
+#问题现象  
+A3服务器在运行业务过程中触发Hard LOCKUP，系统挂死并产生Kernel panic。日志显示：  
+- CPU 19 上的 kworker/u1281:1 线程在执行 flush_memcg_stats_dwork 工作队列时发生硬锁死  
+- 调用栈显示问题发生在 cgroup_rstat_cpu_pop_updated → cgroup_rstat_flush_irqsafe → __mem_cgroup_flush_stats → flush_memcg_stats_dwork  
+- 内核日志中明确打印 "Kernel panic - not syncing: Hard LOCKUP"
+
+#问题根因  
+在系统中 CPU 核数与 cgroup 数量较多时，flush_memcg_stats_dwork 会关闭中断并遍历所有 CPU 和所有 cgroup 收集统计信息，该操作耗时过长，超过 hard lockup watchdog 阈值，从而触发 Hard LOCKUP。
+
+#解决方案  
+1. 配置并启用 kdump 服务，以便在复现时自动捕获 vmcore 日志，用于深入分析。  
+2. 若问题可复现，建议收集完整的 vmcore 并结合内部相似 issue（如 http://hulk.rnd.huawei.com/issue/info/20748）进行比对分析。  
+3. 长期可考虑优化 cgroup 统计信息刷新机制，避免在关中断上下文中执行长时间遍历操作，或拆分刷新任务以降低单次执行时间。

@@ -1,0 +1,17 @@
+#标题  
+RCU回调函数地址非法导致系统宕机
+
+#内核版本  
+5.10.0-60.18.0.50.oe2203.aarch64
+
+#问题现象  
+- 系统发生宕机，触发 crashdump  
+- 内核日志显示 PC（程序计数器）为无效地址 0x10000000000c8  
+- Call trace 显示在 rcu_do_batch → rcu_core → rcu_core_si 路径中异常  
+- 日志末尾出现 "Code: bad PC value"、"SMP: stopping secondary CPUs" 和 "Bye!"，表明系统已崩溃并启动 crashdump  
+
+#问题根因  
+call_rcu 时传入了非法的回调函数地址（func），导致 RCU 执行路径中跳转到无效地址，引发系统崩溃。
+
+#解决方案  
+已开发并提供维测补丁，修复 call_rcu 传入非法 func 地址的问题。建议部署该补丁以防止同类故障再次发生。

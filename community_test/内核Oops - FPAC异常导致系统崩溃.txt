@@ -1,0 +1,17 @@
+#标题
+内核Oops - FPAC异常导致系统崩溃
+
+#内核版本
+2203sp4
+
+#问题现象
+系统在运行过程中触发内核Oops，日志显示“Internal error: Oops - FPAC: 0000000072000000 [#1] SMP”，随后引发“Kernel panic - not syncing: Oops - FPAC: Fatal exception in interrupt”。关键调用栈位于 tick_check_oneshot_broadcast_this_cpu+0x68/0xa0，LR（Link Register）值为非法地址0x0，CPU处于中断上下文中（swapper/347），最终导致系统宕机。
+
+#问题根因
+栈上的LR地址被修改为非法内存地址0x0，在函数返回时执行FPAC（Fine-Grained Pointer Authentication Code）检查失败，触发致命异常。具体导致LR被篡改为0x0的原因尚未明确，初步怀疑与浮点寄存器检查或内存破坏有关。
+
+#解决方案
+1. 确认该问题是否可稳定复现；
+2. 若可复现，采集并分析vmcore以深入定位LR被篡改的根本原因；
+3. 检查是否存在已知的内核调度或定时器子系统相关缺陷，尤其是在高并发或特定硬件平台（如鲲鹏HPC环境）下的兼容性问题；
+4. 建议升级至包含FPAC相关修复的内核版本，或临时关闭FPAC功能（如业务允许）以规避风险。

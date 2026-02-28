@@ -1,0 +1,19 @@
+#标题  
+irqbalance 无法设置 IRQ 154 亲和性导致 I/O 错误
+
+#内核版本  
+openEuler-22.03-LTS-SP4
+
+#问题现象  
+系统日志中持续出现以下错误信息：  
+Oct 8 18:17:25 localhost /usr/sbin/irqbalance[2052]: Cannot change IRQ 154 affinity: Input/output error  
+该错误表明 irqbalance 服务尝试修改中断号 154 的 CPU 亲和性时失败，返回“Input/output error”。
+
+#问题根因  
+irqbalance 无法修改特定中断（IRQ 154）的亲和性，可能与该中断所关联的硬件设备不支持亲和性变更有关。需通过 cat /proc/interrupts | column -t 确认 IRQ 154 对应的具体硬件设备，并由对应设备责任人进一步分析原因。
+
+#解决方案  
+1. 执行命令 cat /proc/interrupts | column -t，确认 IRQ 154 所属的硬件设备及驱动模块。  
+2. 联系该硬件设备的责任人，核实设备是否支持中断亲和性调整。  
+3. 若设备不支持亲和性修改，可考虑在 irqbalance 配置中排除该 IRQ（例如通过 --banirq=154 参数），避免重复报错。  
+4. 如为已知重复问题，参考历史问题跟踪记录统一处理。

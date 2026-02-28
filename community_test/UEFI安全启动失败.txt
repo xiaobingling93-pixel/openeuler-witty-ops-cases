@@ -1,0 +1,15 @@
+#标题  
+UEFI安全启动失败  
+
+#内核版本  
+2203sp2  
+
+#问题现象  
+系统在启用UEFI安全启动（Secure Boot）时启动失败，无法正常引导操作系统。  
+
+#问题根因  
+未导入用于验证的数字证书，导致UEFI固件无法验证启动镜像的签名，从而拒绝启动。  
+
+#解决方案  
+按照官方指导文档导入正确的安全启动证书，具体操作参考：  
+https://docs.openeuler.org/zh/docs/22.03_LTS_SP3/docs/CertSignature/安全启动.html

@@ -1,0 +1,17 @@
+#标题
+odc_core驱动导致kworker任务阻塞超时
+
+#内核版本
+2403
+
+#问题现象
+- 系统日志中出现 mulp path mgmt get path vnode failed, ret{-14} 错误；
+- kworker/19:2 任务被阻塞超过120秒，状态为D（不可中断睡眠）；
+- 阻塞发生在 odc_core 模块的 OdcRecyclePageBufferList 工作队列处理过程中；
+- 调用栈显示在执行 down_write 获取写信号量时发生长时间等待，涉及 OdcInvalidPgRBuf、OdcDestroyPgRBuf 等函数。
+
+#问题根因
+用户 odc_core 驱动存在已知缺陷，在回收页面缓冲区时因资源竞争或锁等待逻辑异常，导致内核工作线程长时间阻塞。
+
+#解决方案
+升级 odc_core 驱动至修复版本，具体参考 DTS 工单：https://dts-szv.clouddragon.huawei.com/DTSPortal/ticket/DTS2025091524779。

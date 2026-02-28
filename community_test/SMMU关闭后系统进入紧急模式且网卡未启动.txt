@@ -1,0 +1,18 @@
+#标题  
+SMMU关闭后系统进入紧急模式且网卡未启动
+
+#内核版本  
+2203sp4
+
+#问题现象  
+- 关闭SMMU并上下电服务器后，操作系统进入紧急模式，提示“Give root password for maintenance (or press Control-D to continue)”  
+- 网卡未up（未激活）  
+- 系统默认启动target被设置为rescue模式
+
+#问题根因  
+默认启动的target被测试脚本修改为rescue.target，且测试结束后未恢复为正常模式（multi-user.target）
+
+#解决方案  
+执行以下命令将默认启动target恢复为multi-user.target：  
+systemctl set-default multi-user.target  
+或通过 systemctl get-default 确认当前默认target，并在必要时手动修正。同时建议修复测试脚本，确保其在执行后恢复系统原始配置。

@@ -1,0 +1,20 @@
+#标题
+LeoFS模块导致内核空指针解引用引发Oops
+
+#内核版本
+2203sp3
+
+#问题现象
+- 系统日志中出现“Unable to handle kernel paging request at virtual address ffff45c4ce46cd01”错误
+- 触发内核Oops，错误码为0x96000021，属于数据访问异常（DABT）
+- 故障发生在smbd进程（PID: 556541）调用fgetxattr系统调用时
+- 调用栈显示问题源于LeoFS模块的__leofs_xattr_get_acl函数
+- 同时伴随日志“fh_to_dentry: objino:49077924609, update qtroot failed, ret:-2”
+
+#问题根因
+用户使用的三方驱动模块LeoFS存在缺陷，在__leofs_xattr_get_acl函数中访问了非法内存地址（ffff45c4ce46cd01），导致内核发生页错误（paging request fault）。该问题属于三方模块代码问题，非操作系统内核本身缺陷。
+
+#解决方案
+- 确认并升级LeoFS(OE)模块至厂商提供的修复版本
+- 若无可用修复版本，建议临时禁用LeoFS相关扩展属性（xattr）功能或避免通过SMB协议访问触发该路径的文件
+- 在部署三方内核模块前，应进行充分兼容性与稳定性验证，尤其在生产环境NFS/SMB共享场景中

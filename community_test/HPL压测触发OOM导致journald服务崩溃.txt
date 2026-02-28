@@ -1,0 +1,18 @@
+#标题
+HPL压测触发OOM导致journald服务崩溃
+
+#内核版本
+6.6.0-28.0.0.34.oe2403.aarch64
+
+#问题现象
+- HPL工具压测过程中，系统触发OOM（Out of Memory）机制，kill掉xhpl进程（PID 603356），其anon-rss内存占用达1177512kB。
+- 紧随其后，systemd-journald.service因watchdog超时被systemd强制终止（SIGKILL），并产生coredump。
+- journald服务多次重启失败，报“start operation timed out”，最终在重试后成功启动，并提示journal文件因非正常关机被替换。
+
+#问题根因
+HPL压测导致系统内存耗尽，触发全局OOM killer，杀死高内存占用的xhpl进程；随后因系统资源紧张或I/O阻塞，systemd-journald.service响应watchdog超时被systemd kill，造成日志服务中断。
+
+#解决方案
+- 优化HPL压测资源配置，限制单个进程内存使用（如通过cgroup或ulimit），避免触发全局OOM。
+- 调整systemd-journald的watchdog timeout阈值（如设置WatchdogSec=更大值），提升在高负载下的容错能力。
+- 压测前确保系统预留足够内存余量，并监控关键服务状态，必要时将journald置于受保护的slice中以降低被OOM影响的风险。

@@ -1,0 +1,20 @@
+#标题  
+/run/fsck目录权限检查测试失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 自动化测试用例 `oe_test_FSIO_dir_access_run.sh` 执行失败，关键报错日志：  
+  `ERROR - The access of /fsck is false.`（注：实际测试目标为 `/run/fsck` 目录，报错信息中路径存在笔误）  
+- 测试脚本通过 `ls -l /run | grep fsck` 检查 `/run/fsck` 目录是否存在且权限为 `drwxr-xr-x`，但检查结果不符合预期（`actual_result=1`, `expect_result=0`）  
+- 复现环境：cloudspod 平台、ARM 架构、OS 版本 24.03-LTS-SP3，测试套 `FS_Directory/oe_test_FSIO_dir_access_run` 稳定复现  
+
+#问题根因  
+systemd-fsck@.service 服务驱动的 fsck 操作仅在系统启动时检测到文件系统“脏位”（dirty bit）时创建 `/run/fsck` 目录；检查完成后若无错误，该目录会被系统自动清理。在 cloudspod 平台环境中，该目录已被正常清理，导致测试执行时目录不存在，触发权限检查失败。  
+
+#解决方案  
+1. **调整测试逻辑**：修改测试脚本，增加 `/run/fsck` 目录存在性判断。若目录不存在，结合系统日志确认 systemd-fsck 服务已正常完成且无报错，则将此场景视为测试通过。  
+2. **优化测试时机**：如需验证目录权限，应在触发文件系统脏位后、systemd-fsck 服务运行期间（目录存在时）立即执行检查。  
+3. **修正脚本表述**：修复测试脚本报错信息中的路径笔误（将“/fsck"更正为“/run/fsck"），避免日志误导。  
+4. **补充环境说明**：在测试文档中明确标注 cloudspod 平台会自动清理 `/run/fsck` 目录的特性，避免跨环境误判。

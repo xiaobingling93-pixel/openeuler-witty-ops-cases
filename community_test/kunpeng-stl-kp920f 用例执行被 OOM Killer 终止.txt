@@ -1,0 +1,14 @@
+#标题  
+kunpeng-stl-kp920f 用例执行被 OOM Killer 终止
+
+#内核版本  
+2203sp4
+
+#问题现象  
+kunpeng-stl-kp920f 用例在执行过程中必现被系统 kill 掉；系统日志中可观察到该进程被 OOM Killer（Out-Of-Memory Killer）终止。
+
+#问题根因  
+系统内存不足，触发 OOM Killer 机制，导致 kunpeng-stl-kp920f 进程被强制终止。
+
+#解决方案  
+执行 drop cache 操作释放系统缓存内存，缓解内存压力，从而恢复用例正常执行。建议在运行高内存消耗用例前主动清理缓存或增加系统可用内存资源。

@@ -1,0 +1,16 @@
+#标题  
+KASAN启用后内核启动时因vmalloc空间不足导致panic
+
+#内核版本  
+4.19.90-2303.3.0.0192
+
+#问题现象  
+启用KASAN的内核在启动过程中发生kernel panic，无法正常启动。系统日志中出现以下告警信息：  
+"percpu: allocation failed, size=296 align=8 atomic=0, failed to allocate new chunk"。  
+该问题在内存较大的系统上复现，表现为inet4模块因无法分配内存而触发panic。
+
+#问题根因  
+由于系统物理内存过大，且启用了KASAN（Kernel Address Sanitizer）选项，导致vmalloc地址空间被进一步压缩，在OS启动过程中无法为关键组件（如inet4）分配所需内存，从而触发内存分配失败并引发kernel panic。
+
+#解决方案  
+通过在GRUB启动参数中添加 mem=64G 限制系统可见内存大小，可有效规避vmalloc空间不足的问题，确保系统正常启动。建议在大内存系统上启用KASAN时，根据实际需求合理配置内存上限或调整内核vmalloc空间布局。

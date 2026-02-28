@@ -1,0 +1,15 @@
+#标题  
+XFS inode 回收导致 hung task 与 I/O 瓶颈
+
+#内核版本  
+22.03sp1
+
+#问题现象  
+系统出现 hung task，表现为 xfs_inodegc_flush 和 xfs_read_agi 函数卡住，伴随 I/O 瓶颈及系统负载显著升高。
+
+#问题根因  
+xfs_inodegc_flush 和 xfs_read_agi 卡住是表象，根本原因需通过 vmcore 分析或内核升级确认，初步指向 XFS 文件系统 inode 回收机制在特定负载下引发阻塞。
+
+#解决方案  
+1. 收集 vmcore 以进行深入分析，定位具体阻塞点；  
+2. 建议升级至修复该问题的内核版本（参考 issue: https://gitee.com/openeuler/kernel/issues/ID8QLE）。

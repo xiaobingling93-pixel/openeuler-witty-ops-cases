@@ -1,0 +1,19 @@
+#标题  
+HISI SAS PHY7 Disparity Error 导致磁盘异常
+
+#内核版本  
+22.03sp4
+
+#问题现象  
+系统日志中频繁出现 HISI SAS 控制器 disparity error 报错，具体表现为：  
+- Dec 7 18:30:46 出现 `hisi_sas_v3_hw 0000:32:04.0: phy7 disparity error cnt: 555`  
+- 1 秒后错误计数激增至 `phy7 disparity error cnt: 150517`  
+表明 PHY7 通道存在严重信号失配或物理层通信异常。
+
+#问题根因  
+初步分析为磁盘坏道导致，需介质相关同事确认。问题类型标记为“非问题”，但日志明确指向存储介质故障引发的 SAS PHY 层 disparity error。
+
+#解决方案  
+1. 联系介质团队对连接至 phy7 的磁盘进行坏道检测与健康状态评估；  
+2. 若确认磁盘存在物理损坏，应及时更换故障磁盘；  
+3. 建议在类似场景下增加对 SAS disparity error 计数的监控告警，以便早期发现介质或链路异常。

@@ -1,0 +1,21 @@
+#标题  
+mdmonitor.service 启动超时导致 RAID 监控服务失败  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+在 AC 测试过程中，系统日志中出现以下错误信息：  
+- Nov 28 19:04:39 localhost systemd[1]: mdmonitor.service: Failed with result 'timeout'.  
+- Nov 28 19:04:39 localhost systemd[1]: Failed to start MD array monitor.  
+该问题导致 MD 阵列监控服务未能正常启动。  
+
+#问题根因  
+mdmonitor.service 超时。该服务是 Linux 系统中用于管理 RAID 阵列的守护进程。由于系统未配置 RAID，初步判断可能由硬盘连接松动或系统资源不足导致服务启动超时。  
+
+#解决方案  
+1. 检查物理硬盘连接状态，确保硬盘连接牢固无松动。  
+2. 监控系统资源（CPU、内存、I/O）使用情况，确认是否存在资源瓶颈。  
+3. 若系统确实无需 RAID 功能，可考虑禁用 mdmonitor.service 以避免启动超时影响系统稳定性：  
+   systemctl disable mdmonitor.service  
+4. 待问题复现时，进一步采集 dmesg、systemctl status mdmonitor.service 及硬件自检日志以精确定位。

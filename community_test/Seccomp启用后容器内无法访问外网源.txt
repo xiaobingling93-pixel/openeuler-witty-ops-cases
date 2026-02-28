@@ -1,0 +1,16 @@
+#标题  
+Seccomp启用后容器内无法访问外网源
+
+#内核版本  
+24.03.lts.sp2
+
+#问题现象  
+使用24.03.lts.sp2版本Docker镜像作为源制作镜像，在开启seccomp配置后，容器内yum源和pip源无法正常使用；可ping通域名，但无法通过curl访问外网，导致无法正常拉取外部软件源。
+
+#问题根因  
+该问题为openEuler已知问题，具体见：https://gitee.com/src-openeuler/docker/issues/IAH5JW。在24.03.lts.sp2版本的Docker镜像中，启用seccomp策略后限制了部分网络系统调用，导致curl等工具无法正常建立外网连接，而ICMP（ping）仍可通行。
+
+#解决方案  
+1. 临时规避：在运行容器时禁用seccomp（如使用 --security-opt seccomp=unconfined），但需评估安全风险。  
+2. 长期修复：关注并合入openEuler社区针对该问题的修复补丁（参考issue IAH5JW），或升级至已修复该问题的Docker及内核版本。  
+3. 建议在构建镜像时，优先使用内网源或预下载依赖包，避免在seccomp启用环境下依赖外网访问。

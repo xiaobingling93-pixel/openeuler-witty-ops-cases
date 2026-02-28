@@ -1,0 +1,19 @@
+#标题  
+HISI L3C PMU 驱动探测失败及 USB Hub 配置错误
+
+#内核版本  
+22.03-LTS-SP4
+
+#问题现象  
+dmesg 日志中出现以下两类错误信息：  
+1. 多个 USB hub 配置失败日志，格式为：  
+   `hub X-0:1.0: config failed, hub doesn't have any ports! (err -19)`（X 为 2、6、10、14）  
+2. 大量 HISI L3C PMU 驱动探测失败日志，格式为：  
+   `hisi_l3c_pmu HISI0214:xx: ioremap failed for l3c_pmu resource`  
+   `hisi_l3c_pmu: probe of HISI0214:xx failed with error -16`（xx 为多个十六进制设备编号）
+
+#问题根因  
+BIOS 更新了 L3T 上报的需求，但内核未配套支持，导致 HISI L3C PMU 驱动在 probe 阶段因无法正确 ioremap 资源而失败；同时，USB hub 配置失败可能与 BIOS 对 USB 控制器的描述或初始化异常有关。该问题为 BIOS 与内核不匹配所致，后续方案已变更，不再需要内核修改。
+
+#解决方案  
+无需内核修改。BIOS 最新版本已回退相关代码，恢复至与当前内核兼容的状态。建议升级至已修复的 BIOS 版本以消除上述日志和潜在功能异常。

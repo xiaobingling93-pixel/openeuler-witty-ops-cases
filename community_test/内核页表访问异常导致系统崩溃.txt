@@ -1,0 +1,21 @@
+#标题
+内核页表访问异常导致系统崩溃
+
+#内核版本
+6.6.0-111.0.0.117.oe2403sp2
+
+#问题现象
+系统在运行过程中触发内核Oops并导致Kernel panic，具体表现为：
+- 日志中出现“Unable to handle kernel paging request at virtual address fffff8ffb394b7d8”
+- 异常类型为Data Abort（DABT），错误码ESR=0x96000004，FSC=0x04（level 0 translation fault）
+- 故障发生在进程(udev-worker)上下文中，调用栈显示在__mod_memcg_lruvec_state函数中访问非法虚拟地址
+- 最终触发“Kernel panic - not syncing: Oops: Fatal exception”，并尝试停止所有CPU但部分失败
+
+#问题根因
+测试脚本使用os_serdestool_9工具访问了已下电的hilink寄存器，hilink返回错误响应（err resp），从而触发一系列RAS（Reliability, Availability, Serviceability）报错，最终导致内核在处理内存管理相关操作时访问非法地址而崩溃。
+
+#解决方案
+1. 避免在hilink模块已下电状态下通过测试工具（如os_serdestool_9）访问其寄存器；
+2. 对商用工具hikptool进行风险评估，确认是否存在类似误操作导致系统挂死的可能性，并由hilink团队单独分析加固；
+3. 在复现环境中使用KASAN内核进一步验证内存非法访问路径，辅助定位潜在驱动或固件交互问题；
+4. 建议在测试流程中增加对硬件模块电源状态的检查，防止对未上电/已下电模块发起访问。

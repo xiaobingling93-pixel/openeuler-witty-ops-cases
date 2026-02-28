@@ -1,0 +1,22 @@
+#标题  
+swap分区检测脚本因设备名硬编码导致测试失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 测试脚本`oe_test_storage_DevMgmt_swap.sh`执行失败，关键报错：`test: : integer expression expected`（line 109）  
+- 变量`size_lv`获取为空（`size_lv=`），导致整数比较逻辑中断  
+- 错误日志明确记录：`Tue Jan 13 12:18:32 2026 - ERROR - oe_test_storage_DevMgmt_swap.sh line 110`  
+- 复现条件：在cloudpods平台ARM架构环境下运行存储测试套`os-storage/oe_test_storage_DevMgmt_swap`时稳定触发  
+
+#问题根因  
+脚本中硬编码指定swap设备名`dm-2`（`grep dm-2 /proc/swaps`），而cloudpods平台创建的swap分区设备名（如`dm-*`）具有不确定性，导致grep匹配失败、`size_lv`变量赋值为空，触发shell整数表达式校验异常。  
+
+#解决方案  
+修改测试脚本，将swap设备名与大小改为动态获取，替换原硬编码逻辑：  
+```bash  
+name_lv=$(grep dm /proc/swaps | tail -n1 | awk '{print $1}' | awk -F"/" '{print $NF}')  
+size_lv=$(grep dm /proc/swaps | tail -n1 | awk '{print $3}')  
+```  
+（依据原始文档建议：适配cloudpods平台swap设备名不确定性，通过通用匹配+尾行提取确保获取有效swap条目）

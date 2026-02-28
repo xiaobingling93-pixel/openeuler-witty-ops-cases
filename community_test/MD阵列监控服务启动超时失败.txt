@@ -1,0 +1,17 @@
+#标题
+MD阵列监控服务启动超时失败
+
+#内核版本
+22.03 SP4
+
+#问题现象
+系统日志中出现以下错误信息：  
+Jan 9 18:32:02 localhost systemd[1]: mdmonitor.service: Failed with result 'timeout'.  
+Jan 9 18:32:02 localhost systemd[1]: Failed to start MD array monitor.  
+表现为MD阵列监控服务（mdmonitor.service）无法正常启动，systemd报告超时失败。
+
+#问题根因
+该问题为已知问题，根因为mdadm软件包存在缺陷，导致mdmonitor.service在启动时无法在systemd设定的超时时间内完成初始化。
+
+#解决方案
+升级mdadm软件包至已修复该问题的版本。具体可参考Gitee上的修复记录：https://gitee.com/src-openeuler/mdadm/issues/IAD4OT。更新后重启系统或手动重启mdmonitor.service服务以验证修复效果。

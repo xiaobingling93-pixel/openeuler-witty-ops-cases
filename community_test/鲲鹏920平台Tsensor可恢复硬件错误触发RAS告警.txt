@@ -1,0 +1,19 @@
+#标题
+鲲鹏920平台Tsensor可恢复硬件错误触发RAS告警
+
+#内核版本
+openEuler-22.03-LTS-SP4
+
+#问题现象
+系统日志中频繁出现 rasdaemon 记录的 Hisilicon Common Error Section 错误，具体表现为：
+- 时间点（如 Oct 8 08:58:42）记录到 Kunpeng920 芯片上 Tsensor 模块（submodule_id=0）上报的可恢复错误（err_severity=recoverable）
+- 内核同时记录 APEI Generic Hardware Error Source 的硬件错误事件，严重等级为 recoverable
+- 错误 section type 显示为 unknown（UUID: c8b328a8-9917-4af6-9a13-2e08ab2e7586），section length 为 0x2c，并附带寄存器 dump 数据（如 reg00=0x00000002, reg01=0x03490000 等）
+
+#问题根因
+问题由海思硬件侧定位确认：该错误源于 Kunpeng920 芯片内部温度传感器（Tsensor）模块上报的可恢复性硬件异常，属于硬件 RAS（Reliability, Availability, Serviceability）机制捕获的底层硬件事件。
+
+#解决方案
+1. 此类错误为可恢复性硬件事件，不影响系统持续运行，但需监控是否高频发生；
+2. 建议联系海思硬件支持团队，提供完整的 rasdaemon 日志及寄存器 dump 信息，用于进一步分析 Tsensor 异常是否与特定工况（如高温、电压波动）相关；
+3. 若错误频率显著增加或转为不可恢复级别，应安排硬件检测或更换对应部件。

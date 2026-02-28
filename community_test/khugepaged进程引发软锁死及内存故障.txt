@@ -1,0 +1,26 @@
+#标题
+khugepaged进程引发软锁死及内存故障
+
+#内核版本
+2403sp2
+
+#问题现象
+- 系统日志中频繁出现“Memory failure”记录，涉及多个物理页地址（如0x88057432、0x88093298等），部分为clean LRU页，部分为dirty LRU页，均标记为“Recovered”。
+- 在内存故障发生后约13秒，触发软锁死（soft lockup）：CPU#57上的khugepaged进程（PID 1592）被卡住超过26秒。
+- 软锁死时的调用栈显示，khugepaged在执行collapse_huge_page → tlbr_remove_table_sync_one → smp_call_function路径时阻塞。
+- 内核尝试通过NMI中断向所有CPU核心收集回溯信息，但CPU 0未响应NMI，导致其他核心长时间等待，最终触发软锁死。
+
+#问题根因
+软锁死的根本原因是CPU 0未响应NMI中断，导致smp_call_function同步操作无法完成。未响应NMI的可能原因包括：
+1. CPU 0已挂死（如nocmt/ap hang up）；
+2. CPU 0陷入BIOS死循环。
+此外，问题复现与LLC（Last Level Cache）子测试项相关，且系统同时存在多起可恢复的内存页错误，可能加剧了系统负载或触发了底层硬件异常。
+
+#解决方案
+1. 启用全CPU软锁死回溯以增强诊断能力：  
+   ```bash
+   echo 1 > /proc/sys/kernel/softlockup_all_cpu_backtrace
+   ```
+2. 针对CPU 0未响应NMI的问题，需联合海思团队深入分析硬件状态，确认是否为LLC测试引发的底层挂死或BIOS异常。
+3. 检查并验证海思相关驱动（如hisi_uncore_l3c_pmu等）在高负载或内存压力下的稳定性，排除驱动对内存管理或CPU调度的干扰。
+4. 若问题可稳定复现于LLC测试场景，建议在测试中增加硬件健康监控（如RAS事件、温度、电压）及内核维测日志，辅助定位是否为硬件缺陷或固件兼容性问题。

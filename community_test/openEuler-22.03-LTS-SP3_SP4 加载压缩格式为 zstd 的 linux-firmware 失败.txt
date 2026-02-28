@@ -1,0 +1,16 @@
+#标题  
+openEuler-22.03-LTS-SP3/SP4 加载压缩格式为 zstd 的 linux-firmware 失败  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+在 openEuler-22.03-LTS-SP3/SP4 系统中加载 update 中的 linux-firmware 包失败；经测试，未使用压缩格式的 linux-firmware 可正常加载，而采用 zstd 压缩格式的 firmware 无法被正确加载。  
+
+#问题根因  
+openEuler 内核配置（openeuler_defconfig）未启用对 zstd 压缩格式固件的支持；同时，linux-firmware 仓库在 https://gitee.com/src-openeuler/linux-firmware/pulls/96 中已将压缩格式修改为 zstd，导致与当前内核配置不兼容。  
+
+#解决方案  
+1. 检查并确认内核配置中是否启用 CONFIG_FW_LOADER_COMPRESS=y 及对 zstd 压缩格式的支持；  
+2. 若未启用，需在内核配置中开启相关选项，并重新编译内核；  
+3. 或临时回退 linux-firmware 至未使用 zstd 压缩的版本，直至内核支持 zstd 压缩固件。

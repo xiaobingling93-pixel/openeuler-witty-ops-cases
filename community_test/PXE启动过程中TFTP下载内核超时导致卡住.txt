@@ -1,0 +1,17 @@
+#标题  
+PXE启动过程中TFTP下载内核超时导致卡住
+
+#内核版本  
+2203sp4
+
+#问题现象  
+- PXE启动时系统卡在GRUB界面，需通过串口登录并敲回车或重启才能继续  
+- GRUB日志显示错误：`error: ../../grub-core/net/tftp.c:404:time out opening '/84b89f08-a279-4c3f-b6b8-20f41228f90d/vmlinuz'`  
+- 后续提示：`you need to load the kernel first`，并要求“Press any key to continue...”  
+- 同时存在IPMI通信错误：`Ipmi Execute fail:Load Error`，`btReadData.completionCode:0xD6`
+
+#问题根因  
+网络原因导致TFTP下载vmlinuz超时，GRUB倒计时中断，无法自动加载内核，需人工干预后重新触发下载流程。
+
+#解决方案  
+优化PXE网络环境稳定性，确保TFTP服务器与客户端之间的网络延迟和丢包率在可接受范围内；建议增加GRUB TFTP重试机制或延长超时时间，避免因瞬时网络波动导致启动中断。

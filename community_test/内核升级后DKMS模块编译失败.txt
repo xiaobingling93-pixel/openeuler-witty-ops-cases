@@ -1,0 +1,16 @@
+#标题  
+内核升级后DKMS模块编译失败
+
+#内核版本  
+2203sp3
+
+#问题现象  
+升级至 kernel-5.10.0-293.0.0.195.oe2203sp3 后，执行相关操作时出现错误提示：  
+"Your kernel headers for kernel 5.10.0-293.0.0.195.oe2203sp3.aarch64 cannot be found at /lib/modules/5.10.0-293.0.0.195.oe2203sp3.aarch64/build or /lib/modules/5.10.0-293.0.0.195.oe2203sp3.aarch64/source."
+
+#问题根因  
+系统中存在由 DKMS 管理的内核模块，在升级内核后，DKMS 尝试为新内核重新编译这些模块，但缺少对应内核版本的 kernel-devel（即内核头文件和构建环境），导致编译失败。
+
+#解决方案  
+在升级内核后，需安装与新内核版本匹配的 kernel-devel 包，以提供必要的头文件和构建链接，确保 DKMS 能正常编译管理的模块。具体命令可参考：  
+sudo dnf install kernel-devel-5.10.0-293.0.0.195.oe2203sp3.aarch64

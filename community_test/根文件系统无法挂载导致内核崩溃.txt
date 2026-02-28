@@ -1,0 +1,18 @@
+#标题  
+根文件系统无法挂载导致内核崩溃
+
+#内核版本  
+2203sp4
+
+#问题现象  
+系统启动过程中出现以下关键日志：  
+- "No filesystem could mount root, tried:"  
+- "Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)"  
+- 内核调用栈显示在 mount_block_root 阶段失败，最终触发 panic  
+- 系统无法完成启动，停留在内核崩溃状态
+
+#问题根因  
+下载的 initrd 格式不对，或者不完整
+
+#解决方案  
+重新下载并验证 initrd 文件的完整性与格式正确性，确保其与当前内核版本（5.10.0-250.0.0.154.oe2203sp4.aarch64）兼容，再进行系统安装或启动。

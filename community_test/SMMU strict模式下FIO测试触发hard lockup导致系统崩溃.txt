@@ -1,0 +1,18 @@
+#标题  
+SMMU strict模式下FIO测试触发hard lockup导致系统崩溃
+
+#内核版本  
+6.6.0-116
+
+#问题现象  
+在电信CTyun OS 920B平台，基于OE 6.6内核并开启SMMU的情况下，执行FIO高负载NVMe测试时高概率触发hard lockup，导致系统崩溃。通过mpstat观察可发现中断占用率异常（如达到9x%），且问题与海思平台特定配置相关。
+
+#问题根因  
+问题由内核配置项CONFIG_HISILICON_ERRATUM_162100602引入，在SMMU strict模式下存在硬锁（hard lockup）风险。该配置在920B平台上虽此前未暴露，但在高I/O负载场景下会触发内核硬锁。
+
+#解决方案  
+1. 应用指定patch，可确保hard lockup问题不再复现（但soft lockup仍可能低概率出现）；  
+2. 启用SMMU lazy模式（即设置为no-strict模式），可显著降低hard lockup和soft lockup风险，并提升性能；  
+3. 推荐组合方案：打patch + 启用lazy模式，可彻底避免hard lockup，soft lockup仅低概率复现；  
+4. 长期建议：推动内核将SMMU默认模式从strict改为no-strict，预计12月确定是否合入。  
+5. 临时缓解措施：可尝试设置nvme.use_threaded_interrupts=1以优化中断处理。

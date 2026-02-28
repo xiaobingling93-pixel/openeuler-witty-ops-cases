@@ -1,0 +1,17 @@
+#标题
+无法修改IRQ 352亲和性导致I/O错误
+
+#内核版本
+22.03 sp4
+
+#问题现象
+执行修改IRQ 352亲和性的操作时，系统报错：“Cannot change IRQ 352 affinity: Input/output error”。通过检查/proc/interrupts发现该中断号在系统重启后已不存在。
+
+#问题根因
+系统环境曾发生重启，导致原IRQ 352对应的中断号失效；irqbalance尝试修改该已失效中断的CPU亲和性时失败，从而打印Input/output error错误。
+
+#解决方案
+1. 使用命令 cat /proc/interrupts | column -t 确认IRQ 352对应的具体硬件设备；
+2. 联系该硬件设备的责任人，确认中断异常的根本原因；
+3. 避免对已不存在或无效的中断号执行亲和性设置操作；
+4. 若为irqbalance自动行为导致的误报，可考虑临时禁用irqbalance对特定中断的管理，或在系统稳定后再进行亲和性配置。

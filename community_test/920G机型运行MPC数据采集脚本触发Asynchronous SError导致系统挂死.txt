@@ -1,0 +1,22 @@
+#标题
+920G机型运行MPC数据采集脚本触发Asynchronous SError导致系统挂死
+
+#内核版本
+6.6.0-106.0.0.112.oe2403sp2
+
+#问题现象
+在920G机型上运行MPC数据采集脚本时，操作系统挂死且无法ping通。串口日志显示以下关键信息：
+- 出现“SError Interrupt on CPU343, code 0x00000000be000011 -- SError”
+- 打印“L2_BUS_ERROR_SYN_REG[0x6300244010242a55]”和“SEI Handle”
+- 多次记录“ERROR: GetBtcBase: 0x28CC000050! tf”
+- 最终触发“Kernel panic - not syncing: Asynchronous SError Interrupt”，系统进入panic并停止所有CPU
+
+#问题根因
+系统在运行ipu_tool进程期间遭遇异步严重错误（Asynchronous SError Interrupt），由L2总线错误（L2_BUS_ERROR）引发，具体表现为硬件层面的不可恢复RAS（Reliability, Availability, and Serviceability）事件，导致内核调用arm64_serror_panic并触发panic。
+
+#解决方案
+当前文档未提供明确的修复建议或恢复措施。根据故障特征，建议采取以下操作：
+1. 检查硬件平台（特别是CPU L2缓存、内存子系统及IPU相关外设）是否存在物理故障或固件缺陷；
+2. 升级BIOS至最新版本（当前为13.22.00.07，发布于2025-08-28），确认是否已修复相关RAS错误处理逻辑；
+3. 在内核启动参数中尝试添加“ras=off”或“disable_ras_extensions”等选项（若支持）以临时规避非致命RAS错误升级为panic的行为（需评估风险）；
+4. 联系BMC及SoC厂商分析SEI（System Error Interrupt）上报的详细错误寄存器内容（如L2_BUS_ERROR_SYN_REG值），定位具体硬件模块故障点。

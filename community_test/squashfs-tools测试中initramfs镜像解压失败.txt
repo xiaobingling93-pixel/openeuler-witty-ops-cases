@@ -1,0 +1,18 @@
+#标题  
+squashfs-tools测试中initramfs镜像解压失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 在cloudpods平台执行`squashfs-tools/oe_test_squashfs-tools`测试用例时，解压initramfs镜像失败  
+- 关键日志报错：  
+  `gzip: /tmp/test_squashfs-tools/initramfs-6.6.0-132.0.0.111.oe2403sp3.x86_64.img: not in gzip format`  
+  `cpio: premature end of archive`  
+- 相同测试步骤在本地环境执行通过，无报错  
+
+#问题根因  
+cloudpods平台环境问题导致zcat工具无法正确识别和解压initramfs镜像（原文关键表述：*cloudpods平台问题无法使用zcat解压镜像*）  
+
+#解决方案  
+将测试执行环境切换至本地环境执行该测试用例（原文：*需在本地环境执行，本地执行pass*）。若需在cloudpods平台长期支持该测试，建议协同平台团队排查环境差异（如zcat工具链兼容性、镜像文件传输完整性校验机制）。

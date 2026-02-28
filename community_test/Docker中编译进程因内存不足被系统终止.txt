@@ -1,0 +1,14 @@
+#标题  
+Docker中编译进程因内存不足被系统终止  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+在Docker容器中执行编译脚本（bash build_scripts/build.sh release:java）时，编译进程被系统终止，日志中出现错误信息：g++: fatal error: Killed signal terminated program cc1plus。该问题在2025年9月2日发生，但在环境空闲时（2025年9月3日）可成功构建。  
+
+#问题根因  
+初步判断是内存不足导致编译进程（cc1plus）被系统OOM Killer终止。  
+
+#解决方案  
+确保编译时系统有充足可用内存，建议在资源空闲时段执行大型编译任务，或为Docker容器分配更多内存限制以避免因内存压力触发OOM Killer。

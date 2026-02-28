@@ -1,0 +1,22 @@
+#标题  
+vllm模块导入失败：缺失torch依赖  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 测试环境：ARM架构，OS版本24.03-LTS-SP3，执行测试用例`oe_test_python3-vllm_01`（测试套：python3-vllm）  
+- 执行命令`python3 -c 'import vllm; print(vllm.__version__)'`时立即失败  
+- 关键错误日志：  
+  `File "/usr/lib/python3.11/site-packages/vllm/env_override.py", line 5, in <module>`  
+  `import torch`  
+  `ModuleNotFoundError: No module named 'torch'`  
+- 测试流程中断，无法完成vllm模块版本验证  
+
+#问题根因  
+python3-vllm安装包缺少必要的依赖库（包括torch等），导致vllm初始化时因依赖缺失触发导入失败。文档明确结论：“python3-vllm安装包缺少许多依赖库”。  
+
+#解决方案  
+1. **临时恢复**：手动安装缺失依赖（示例：`pip3 install torch`，需根据实际缺失项补充安装其他依赖库）  
+2. **根本修复**：已提交issue至开发团队，推动修复python3-vllm安装包的依赖声明问题，确保安装时自动包含完整热依赖链  
+3. **预防建议**：在CI/CD流程中增加依赖完整性校验环节，避免类似缺失依赖问题流入测试环境

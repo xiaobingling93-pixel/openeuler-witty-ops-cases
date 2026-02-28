@@ -1,0 +1,18 @@
+#标题
+虚拟机安装时视频模型配置不支持 qxl
+
+#内核版本
+22.03
+
+#问题现象
+在 openEuler 22.03 系统（x86 架构）上安装虚拟机时，出现错误提示：“domain configuration does not support 'video model’ value 'qxl'”，导致虚拟机创建失败。
+
+#问题根因
+用户依据官方文档进行虚拟机配置，但所使用的 openEuler 22.03 版本中默认的虚拟化配置不支持 'qxl' 视频模型，与文档中示例配置存在兼容性差异。
+
+#解决方案
+将虚拟机配置文件中的 video model 由 'qxl' 修改为当前系统支持的模型（如 'vga' 或 'cirrus'），例如：
+<video>
+  <model type='vga' vram='16384' heads='1'/>
+</video>
+或参考对应 openEuler 22.03 版本的虚拟化文档，使用兼容的设备模型配置。

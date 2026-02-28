@@ -1,0 +1,14 @@
+#标题
+串口后台执行进程异常退出
+
+#内核版本
+2203sp4
+
+#问题现象
+串口后台执行的进程会意外退出。
+
+#问题根因
+/usr/lib/systemd/system/getty@.service 和 serial-getty@.service 缺少 KillMode=process 配置，导致进程在特定条件下被错误终止。
+
+#解决方案
+在 /usr/lib/systemd/system/getty@.service 和 serial-getty@.service 中增加 KillMode=process 配置项，以确保仅终止主进程而不影响其子进程。

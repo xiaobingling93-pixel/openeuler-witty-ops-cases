@@ -1,0 +1,14 @@
+#标题
+PXE启动失败：Illegal TFTP operation
+
+#内核版本
+22.03SP4
+
+#问题现象
+PXE引导过程中无法进入操作系统，报错提示 "error: Illegal TFTP operation"。故障发生在OS加载前的网络引导阶段。
+
+#问题根因
+用户使用了非OpenEuler官方提供的grub包，导致与TFTP服务器交互异常，引发非法TFTP操作错误。
+
+#解决方案
+使用OpenEuler官方配套的grub包进行PXE引导配置，确保引导组件与操作系统版本兼容。如遇类似问题，应首先验证引导镜像及组件来源是否符合发行版要求，并可通过抓包分析TFTP交互过程辅助排查。

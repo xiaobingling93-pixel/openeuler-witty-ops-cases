@@ -1,0 +1,14 @@
+#标题
+天工环境根目录分区过小导致系统空间不足
+
+#内核版本
+22.03sp4
+
+#问题现象
+天工环境部署后根目录（/）分区容量不足，影响系统正常运行及后续软件安装。
+
+#问题根因
+镜像制作过程中，isomaker/config/aarch64/livecd/livecd_aarch64.ks 配置文件中指定的根分区大小（part size）设置过小。
+
+#解决方案
+修改 isomaker/config/aarch64/livecd/livecd_aarch64.ks 文件中的 part size 参数，增大根目录分区容量，重新构建打榜镜像。

@@ -1,0 +1,22 @@
+#标题  
+mesg命令在无TTY环境执行失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 测试脚本`oe_test_mesg.sh`执行时，`mesg`无参数调用返回状态码2（预期0），触发`CHECK_RESULT`校验失败  
+- 关键错误日志：  
+  `Wed Jan 14 12:02:58 2026 - ERROR - mesg without arguments failed`  
+  `Wed Jan 14 12:02:58 2026 - ERROR - oe_test_mesg.sh line 43`  
+- 复现条件：在cloudpods平台以非交互式、无TTY方式执行测试套`util-linux\oe_test_mesg`时必现；本地具备TTY的交互式环境执行通过  
+
+#问题根因  
+cloudpods平台以非交互式、无TTY方式执行脚本，而`mesg`是终端专属命令，依赖TTY设备存在，无TTY环境调用必然失败  
+
+#解决方案  
+1. **环境适配**：该测试用例需在具备真实TTY的本地交互式终端环境执行，禁止在无TTY的自动化平台（如cloudpods）直接运行  
+2. **测试改造（推荐）**：  
+   - 修改测试脚本，在执行`mesg`前检测TTY存在性（如`[ -t 1 ]`），无TTY时跳过测试并记录跳过原因  
+   - 或通过`script -c "mesg"`、`unbuffer`等工具为命令提供伪TTY环境  
+3. **平台配置**：若平台支持，配置测试任务时显式启用PTY（伪终端）分配选项

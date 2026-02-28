@@ -1,0 +1,24 @@
+#标题  
+GPT备用标头与物理硬盘大小不匹配导致内核日志报错
+
+#内核版本  
+22.03sp4
+
+#问题现象  
+在运行DC测试时，dmesg中出现以下新增日志：  
+- hub 2-0:1.0、6-0:1.0、10-0:1.0、14-0:1.0 均报错 "config failed, hub doesn't have any ports! (err -19)"  
+- hiudk3 模块加载失败："module verification failed: signature and/or required key missing - tainting kernel"  
+- ecdh-nist-p256 算法测试失败："alg: ecdh-nist-p256: test failed on vector 2, err=-14"  
+- GPT 相关警告："GPT: Use GNU Parted to correct GPT errors."  
+
+#问题根因  
+在配置RAID盘（如sda和sdb组成RAID 1）过程中，GPT备用标头记录的磁盘大小与当前检测到的物理硬盘（如sda）实际大小不一致，导致GPT校验异常。该问题在更换不同型号硬盘后不再复现，表明与特定硬件组合下的GPT元数据不匹配有关。
+
+#解决方案  
+1. 使用 GNU Parted 工具检查并修复 GPT 分区表错误：  
+   ```bash
+   parted /dev/sdX print
+   parted /dev/sdX rescue
+   ```
+2. 在组建RAID前，确保所有成员盘的物理容量一致，并清除原有GPT分区信息（如使用 `sgdisk --zap-all /dev/sdX`）。  
+3. 若问题由旧盘残留GPT备份头引起，建议在RAID配置前对所有磁盘执行彻底擦除或重新初始化。

@@ -1,0 +1,14 @@
+#标题  
+CPU 112硬锁死导致系统挂死
+
+#内核版本  
+5.10.0-249.0.0.152.oe2203sp4
+
+#问题现象  
+系统发生OS挂死，日志中出现“Kernel panic - not syncing: Hard LOCKUP”错误。Call trace显示在CPU 112上执行idle路径（do_idle → cpuidle_idle_call → tick_nohz_idle_stop_tick → quiet_vmstat → memchr_inv）时触发硬锁死。系统随后向其他所有CPU发送NMI，并停止secondary CPUs。
+
+#问题根因  
+CPU 112存在硬件异常，导致在idle状态下发生硬锁死（Hard LOCKUP）。通过隔离或屏蔽该CPU核后问题不再复现，初步判断为硬件故障。
+
+#解决方案  
+临时规避措施：在启动参数中屏蔽或隔离故障CPU核（如使用isolcpus或maxcpus内核参数排除CPU 112）。建议联系硬件厂商（海思）对CPU 112进行进一步硬件诊断与修复。

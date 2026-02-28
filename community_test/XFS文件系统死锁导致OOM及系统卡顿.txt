@@ -1,0 +1,19 @@
+#标题  
+XFS文件系统死锁导致OOM及系统卡顿
+
+#内核版本  
+5.10.0-136.12.0.87.upel2_0.aarch64
+
+#问题现象  
+- 鲲鹏服务器出现明显卡顿，系统触发OOM（Out-Of-Memory）  
+- 日志显示任务 DiskHealthMonit（PID 675206）处于 D 状态（不可中断睡眠）超过121秒  
+- 调用栈显示在执行 statfs 系统调用时，进入 XFS 文件系统的 xfs_inodegc_flush 流程，并最终在 __flush_work 中阻塞  
+- 已提供 vmcore 文件用于分析  
+
+#问题根因  
+XFS 文件系统存在已知内核 bug，导致 xfs_buf 死锁。具体表现为在 inode 回收过程中，因缓冲区管理异常引发死锁，进而阻塞关键系统调用（如 statfs），最终导致系统响应停滞并触发 OOM。
+
+#解决方案  
+1. 升级内核至包含修复补丁的版本。参考 OpenEuler 内核提交：https://gitee.com/openeuler/kernel/commit/f5b6fa0381ca4f8d96cef55101e8b918fd0c1c05  
+2. 或应用 Red Hat 提供的对应修复方案（详见：https://access.redhat.com/solutions/6984334）  
+3. 临时规避措施：避免频繁触发 statfs 或 inode 回收密集型操作，但根本解决仍需内核更新。

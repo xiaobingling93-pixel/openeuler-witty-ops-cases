@@ -1,0 +1,19 @@
+#标题  
+本地YUM源配置错误导致dnf-makecache服务启动失败  
+
+#内核版本  
+22.03-LTS-SP4  
+
+#问题现象  
+- 系统日志中出现 ldapdb_canonuser_plug_init() failed in sasl_canonuser_add_plugin(): invalid parameter supplied（可能为伴随日志，非主因）  
+- dnf 在尝试下载仓库 'local' 的元数据时失败，报错：Curl error (37): Couldn't read a file:// file for file:///mnt/repodata/repomd.xml [Couldn't open file /mnt/repodata/repomd.xml]  
+- dnf-makecache.service 启动失败，systemd 记录状态为 exit-code 1，明确提示 "Failed to start dnf makecache"  
+
+#问题根因  
+访问本地YUM源失败，具体原因为系统无法打开文件 /mnt/repodata/repomd.xml，表明本地仓库路径配置错误或挂载点 /mnt 下缺少有效的 repodata 目录及 repomd.xml 文件。  
+
+#解决方案  
+1. 检查 /etc/yum.repos.d/ 中配置的 'local' 仓库的 baseurl 是否指向正确的本地路径（如 file:///mnt）。  
+2. 确认 /mnt 目录已正确挂载（若为光盘、ISO 或网络文件系统），且包含完整的 repodata 目录及 repomd.xml 文件。  
+3. 若本地源不再使用，建议禁用或删除该仓库配置，避免 dnf-makecache 服务因无效源而失败。  
+4. 修复后执行 systemctl restart dnf-makecache 或 dnf makecache 手动验证缓存生成是否成功。

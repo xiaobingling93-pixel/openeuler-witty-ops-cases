@@ -1,0 +1,16 @@
+#标题  
+dnf-makecache.service 启动失败
+
+#内核版本  
+22.03-LTS-SP4
+
+#问题现象  
+系统日志（dmesg 或 systemd 日志）中出现以下错误信息：  
+Nov 17 15:23:16 localhost systemd[1]: dnf-makecache.service: Failed with result 'exit-code'.  
+Nov 17 15:23:16 localhost systemd[1]: Failed to start dnf makecache.
+
+#问题根因  
+访问不了 repo 源地址导致 dnf-makecache.service 启动失败。
+
+#解决方案  
+检查网络连通性及 repo 源配置，确保系统能够正常访问软件仓库地址。若为临时网络问题，可稍后重试；若为配置错误，需修正 /etc/yum.repos.d/ 下的仓库配置文件。

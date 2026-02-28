@@ -1,0 +1,14 @@
+#标题  
+安装过程中efibootmgr命令卡死
+
+#内核版本  
+2203sp3
+
+#问题现象  
+在系统安装过程中执行 efibootmgr -c -w -L openEuler -d /dev/nvme0n1 -p 1 -l \EFI\openEuler\shimaa64.efi 命令时卡死，日志显示“Socket error Event: 32 Error: 10053. Connection closing...Socket close.”，安装流程停滞在 boot loader 阶段。
+
+#问题根因  
+BIOS 版本为专为 lingquOS 适配的定制版本，导致在通用系统安装过程中 EFI 变量操作异常；同时 /sys/firmware/efi/efivars/ 目录下存在过多 EFI 启动项，加剧了 efibootmgr 执行时的资源或兼容性问题。
+
+#解决方案  
+将 BIOS 固件版本从 lingquOS 定制版更换为通用版本，以确保与 openEuler 等通用操作系统兼容，从而解决安装过程中 efibootmgr 卡死的问题。

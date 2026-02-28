@@ -1,0 +1,18 @@
+#标题  
+khugepaged进程在内存压力测试下触发hung task告警
+
+#内核版本  
+6.6.0-28.0.0.34.oe2403.aarch64
+
+#问题现象  
+在执行大内存压力测试命令（nohup numactl --physcpubind 0-255 stress-ng --vm 256 --vm-bytes 442001M -t 10800）期间，系统日志中出现以下告警：  
+[Thu Nov 20 23:26:59 2025] INFO: task khugepaged:1313 blocked for more than 604 seconds.  
+khugepaged进程状态为D（不可中断睡眠），调用栈显示其在collapse_huge_page过程中因等待写信号量（down_write）而阻塞，持续超过604秒。该现象仅在压测期间出现，压测结束后不再复现。
+
+#问题根因  
+压测期间系统内存压力极大，khugepaged内核线程在尝试合并透明大页（THP）时需获取内存管理相关的写信号量，但由于高并发内存操作导致锁竞争激烈，造成khugepaged长时间阻塞，触发hung task检测机制。此为高负载下的正常行为，并非功能性故障。
+
+#解决方案  
+该hung task告警属于高内存压力场景下的预期现象，无需修复。若需避免此类告警干扰，可临时调整hung task检测超时阈值：  
+echo 0 > /proc/sys/kernel/hung_task_timeout_secs  
+或在非调试场景下忽略该日志。建议在常规运行环境中保持默认配置，在压力测试报告中注明此现象为已知行为。

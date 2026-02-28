@@ -1,0 +1,18 @@
+#标题
+启动时因重复卷组名称卡住
+
+#内核版本
+22.03sp3
+
+#问题现象
+系统启动过程中卡住，无法正常进入操作系统。日志中出现提示：“Multiple VGs found with the same name: skipping openenuler”，表明存在两个名称均为“openeuler”的卷组（VG），导致LVM无法正确处理。
+
+#问题根因
+系统中存在两个同名的LVM卷组（VG），名称均为“openeuler”，导致LVM在启动阶段无法确定应激活哪一个卷组，从而跳过该卷组并造成系统启动卡住。
+
+#解决方案
+1. 在系统可维护状态下（如通过Live CD或救援模式）检查所有物理卷和卷组：使用 vgscan、pvs、vgs 命令确认重复VG。
+2. 重命名其中一个冲突的卷组：使用 vgrename <旧VG名> <新VG名> 命令为重复的VG指定唯一名称。
+3. 更新 /etc/fstab 和引导配置（如 /boot/grub2/grub.cfg 或 initramfs 中的相关引用），确保系统引用正确的VG名称。
+4. 重新生成initramfs（如 dracut -f）以确保启动镜像包含更新后的LVM元数据。
+5. 重启系统验证是否恢复正常启动。

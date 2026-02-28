@@ -1,0 +1,14 @@
+#标题  
+CPU过温触发内核崩溃（Kernel Panic）
+
+#内核版本  
+2203sp4
+
+#问题现象  
+CPU2因过温触发“Kernel panic - not syncing: Fatal hardware error!”；另一颗CPU在未进入操作系统前即发生过温，未触发内核panic。
+
+#问题根因  
+实际是由于CPU过温导致的内核panic；另一颗CPU因在进入OS前就已过温，故未触发内核panic。
+
+#解决方案  
+加强硬件散热设计，确保CPU工作温度在安全范围内；建议在系统启动早期阶段增加温度监控与保护机制，防止因过温导致系统崩溃或无法正常启动。

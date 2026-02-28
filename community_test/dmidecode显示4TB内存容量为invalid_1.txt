@@ -1,0 +1,14 @@
+#标题
+dmidecode显示4TB内存容量为invalid
+
+#内核版本
+2203SP2
+
+#问题现象
+在满配32根128GB内存（总容量4TB）的系统上，使用dmidecode工具查询内存信息时显示“invalid”。该问题在BIOS传递的内存容量数据超过1TB时触发。
+
+#问题根因
+BIOS传递的内存容量数据存在偏差。dmidecode在处理内存容量时，对于32位data字段仅支持最大1TB的表示；当实际内存容量超过1TB时，应通过将偏移量0x04位置设为全F（即0xFFFFFFFF），以触发64位地址拆解逻辑（高/低32位组合）。原始BIOS未正确设置该标志，导致dmidecode无法正确解析超1TB的内存容量，从而显示为invalid。
+
+#解决方案
+修改BIOS实现，在内存容量超过1TB时，确保SMBIOS内存设备结构中偏移量0x04处的值设为0xFFFFFFFF，以启用64位容量解析逻辑。相关修复已通过PR合并：https://gitee.com/src-openeuler/dmidecode/pulls/64，并关联Issue：https://atomgit.com/src-openeuler/dmidecode/issues/12。升级BIOS至包含该修复的版本即可解决。

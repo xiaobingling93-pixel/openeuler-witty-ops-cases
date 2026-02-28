@@ -1,0 +1,14 @@
+#标题  
+audit规则在切换至openEuler 22.03 SP1内核后失效  
+
+#内核版本  
+22.03SP1  
+
+#问题现象  
+系统从旧版OS切换至openEuler 22.03 SP1内核后，audit规则未生效，导致审计功能异常。  
+
+#问题根因  
+grub启动项参数中设置了禁用SELinux，导致audit规则加载失败或被忽略。  
+
+#解决方案  
+检查并修改GRUB启动参数，移除禁用SELinux的相关配置（如selinux=0），确保SELinux处于启用状态以支持audit规则正常加载。

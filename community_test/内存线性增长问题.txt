@@ -1,0 +1,14 @@
+#标题  
+内存线性增长问题  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+系统内存使用量持续线性增长；执行 drop cache 操作后内存可恢复；/proc/cgroups 中 memory 数量显著下降；停用 sysstat-collect 和 dnf-makecache 服务后，内存不再增长。  
+
+#问题根因  
+初步判断为 dying_cgroup 导致内存无法及时释放，结合 bpftrace 监控 /sys/fs/cgroup/memory/ 目录确认存在大量未清理的 cgroup 条目。  
+
+#解决方案  
+停用 sysstat-collect 和 dnf-makecache 服务以避免产生过多临时 cgroup；定期执行 drop cache 或优化相关服务对 cgroup 的使用，防止 dying_cgroup 积累导致内存泄漏。

@@ -1,0 +1,14 @@
+#标题  
+HBA卡驱动未使能show_rport_dev_loss_tmo导致多路径兼容性问题  
+
+#内核版本  
+2003sp4  
+
+#问题现象  
+在openEuler系统中，HBA卡驱动在开源社区代码中未使能show_rport_dev_loss_tmo标志，导致scsi模块未生成rport的dev_loss_tmo文件，与上层多路径软件存在兼容性问题。  
+
+#问题根因  
+HBA卡驱动在openEuler开源社区的代码中，show_rport_dev_loss_tmo标志未使能，致使scsi模块无法生成rport的dev_loss_tmo文件，从而引发与多路径软件的兼容性问题。  
+
+#解决方案  
+已在2025年11月19日提供技术指导，建议在HBA卡驱动代码中使能show_rport_dev_loss_tmo标志，以确保scsi模块正确生成rport的dev_loss_tmo文件，解决与多路径软件的兼容性问题。

@@ -1,0 +1,19 @@
+#标题  
+I2C驱动在中断上下文中触发内核Oops导致系统panic
+
+#内核版本  
+5.10.0-136.12.0.86.oe2203sp1
+
+#问题现象  
+在920B 2P1U服务器上安装操作系统时触发内核panic，日志显示在中断处理函数hisi_i2c_irq中调用complete()时发生致命异常（Oops: Fatal exception in interrupt），导致系统无法继续启动。相同硬件配置的2P2U机型无此问题。内核日志包含以下关键信息：
+- Call trace中显示异常发生在hisi_i2c_irq → complete调用链
+- 最终触发"Kernel panic - not syncing: Oops: Fatal exception in interrupt"
+- 异常仅在特定BIOS版本与OS组合下复现
+
+#问题根因  
+BIOS使用的I2C资源与操作系统中的i2c_hisi驱动存在冲突。具体表现为：BIOS未正确释放或配置I2C控制器，导致OS在中断上下文中执行complete()操作时访问非法状态或资源，从而引发内核Oops。该问题本质需由BIOS侧修复，当前OS新版本已通过屏蔽相关I2C功能临时规避。
+
+#解决方案  
+1. **短期措施**：升级至已包含屏蔽逻辑的OS内核版本（参考commit c504d963ccfaab1fd6042fa03c7d176d103cdab5），避免加载冲突的I2C驱动。
+2. **长期根本解决**：联系硬件厂商更新BIOS固件，确保I2C控制器在移交OS前处于正确初始化状态，消除资源冲突。
+3. 若必须使用当前BIOS版本，可在内核启动参数中添加i2c_hisi模块黑名单（如modprobe.blacklist=i2c_hisi）以规避问题。

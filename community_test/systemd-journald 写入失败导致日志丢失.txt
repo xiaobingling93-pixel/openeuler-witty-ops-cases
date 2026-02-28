@@ -1,0 +1,18 @@
+#标题  
+systemd-journald 写入失败导致日志丢失
+
+#内核版本  
+2203sp4
+
+#问题现象  
+系统日志中反复出现以下错误信息：  
+systemd-journald[3549]: Failed to write entry (15 items, 420 bytes), ignoring: Cannot assign requested address  
+类似错误多次出现，条目大小在419–701字节之间，表明 journald 无法将日志条目写入磁盘。系统盘环境已破坏，复现前无更多日志留存。
+
+#问题根因  
+fio 压力测试脚本误操作写入系统盘，导致 dm-2 对应的文件系统损坏，进而使 systemd-journald 无法正常写入日志，触发 "Cannot assign requested address" 错误。
+
+#解决方案  
+1. 优化用户 fio 测试脚本，确保其仅作用于非系统盘设备，避免对系统盘造成写入压力或破坏。  
+2. 在执行高负载 I/O 操作前，明确挂载和使用专用测试盘，隔离系统关键分区。  
+3. 复测验证脚本安全性，确认文件系统完整性未受影响后再进行大规模测试。

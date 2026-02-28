@@ -1,0 +1,19 @@
+#标题  
+ARM架构grubby命令因grub.cfg路径硬编码失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 在ARM架构openEuler 24.03-LTS-SP3系统执行grubby内核注册命令时，SSH远程操作返回明确错误：  
+  `error opening /boot/grub2/grub.cfg for read: No such file or directory`  
+- 该问题在sysmaster测试套`oe_test_devmaster_devctl`自动化测试中稳定复现  
+- 命令尝试写入固定路径`/boot/grub2/grub.cfg`，但ARM环境实际不存在该路径  
+
+#问题根因  
+ARM架构与x86架构的grub配置文件路径存在差异，命令中硬编码了x86架构路径`/boot/grub2/grub.cfg`，而ARM架构下该路径无效，导致grubby无法读取配置文件。  
+
+#解决方案  
+将grubby命令中的`--config-file`参数改为动态查找grub.cfg实际路径：  
+`--config-file=$(find /boot/ -name grub.cfg)`  
+（注：需确保find命令在目标系统可用，且仅匹配唯一grub.cfg文件；建议在脚本中增加路径校验逻辑）

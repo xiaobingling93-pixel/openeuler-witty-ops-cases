@@ -1,0 +1,20 @@
+#标题  
+irqbalance 无法设置特定 IRQ 的 CPU 亲和性导致 I/O 错误
+
+#内核版本  
+22.03sp4
+
+#问题现象  
+在整机压力测试过程中，系统日志中反复出现以下错误信息：  
+- Sep 10 22:34:38 localhost /usr/sbin/irqbalance[3202]: Cannot change IRQ 163 affinity: Input/output error  
+- Sep 14 19:16:23 localhost /usr/sbin/irqbalance[3243]: Cannot change IRQ 170 affinity: Input/output error  
+表现为 irqbalance 服务尝试调整 IRQ 163 和 IRQ 170 的 CPU 亲和性时失败，返回“Input/output error”。
+
+#问题根因  
+irqbalance 尝试修改特定中断（如 IRQ 163、170）的 CPU 亲和性时，底层硬件或驱动不支持该操作，导致系统调用返回 I/O 错误。需通过 cat /proc/interrupts | column -t 确认对应中断所属硬件设备，并由设备责任人进一步分析为何无法调整其 CPU 亲和性。
+
+#解决方案  
+1. 执行命令 cat /proc/interrupts | column -t，定位 IRQ 163 和 IRQ 170 对应的硬件设备及驱动模块。  
+2. 联系该硬件设备的责任人，确认设备是否支持动态调整中断亲和性，以及是否存在固件或驱动限制。  
+3. 若设备确实不支持亲和性调整，可考虑将相关 IRQ 从 irqbalance 管理中排除（例如通过配置 irqbalance 的 banned IRQ 列表），避免持续报错。  
+4. 如为驱动缺陷，建议升级或修复对应驱动以支持标准中断亲和性操作。

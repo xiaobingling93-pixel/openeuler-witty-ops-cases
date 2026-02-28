@@ -1,0 +1,28 @@
+#标题
+khugepaged软锁死伴随内存错误恢复日志
+
+#内核版本
+2403sp2
+
+#问题现象
+- 系统日志中频繁出现“Memory failure”记录，涉及多个物理页地址（如0x88057432、0x88093298等），部分为clean LRU页，部分为dirty LRU页，均标记为“Recovered”。
+- 在内存错误发生后约10秒，触发软锁死（soft lockup）：CPU#57卡在khugepaged进程（PID 1592）超过26秒，调用栈显示卡在smp_call_function_many_cond函数中。
+- 软锁死期间，内核尝试向所有CPU发送NMI中断以收集回溯信息，但CPU 0未响应NMI，导致其他CPU等待超时，形成软锁。
+- 系统运行于Huawei TaiShan 200服务器（ARM64架构），内核版本为6.6.0-98.0.0.103.oe2403sp2.aarch64。
+
+#问题根因
+根本原因为RAS测试工具（ras-tools）在LLC（Last Level Cache）子测试项中注入了0x400类型的错误，该值对应L2C的不可纠正错误（UER）。根据海思结论，该错误类型在芯片设计上会导致系统行为异常（如软锁），属于预期行为。  
+进一步分析表明，软锁死的直接原因是CPU 0在错误发生后未能响应NMI中断，可能处于nocmt/ap hang或BIOS死循环状态，导致khugepaged在执行跨CPU同步操作（tlb flush）时永久阻塞。
+
+#解决方案
+1. **避免在生产环境使用ras-tools注入L2C UER类错误（如0x400）**，此类错误会触发芯片级异常行为，不符合正常运行预期。
+2. 若需进行RAS测试，应明确区分可恢复错误与设计限制内的不可恢复错误，并在受控环境中执行。
+3. 对于khugepaged相关软锁风险，可考虑临时禁用透明大页（THP）以规避collapse_huge_page路径：
+   ```bash
+   echo never > /sys/kernel/mm/transparent_hugepage/enabled
+   ```
+4. 启用全CPU软锁回溯以便快速定位类似问题：
+   ```bash
+   echo 1 > /proc/sys/kernel/softlockup_all_cpu_backtrace
+   ```
+5. 建议海思团队评估是否可通过固件或微码更新改善CPU在特定UER场景下的NMI响应能力。

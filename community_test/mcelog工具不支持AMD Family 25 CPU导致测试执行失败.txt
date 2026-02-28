@@ -1,0 +1,24 @@
+#标题  
+mcelog工具不支持AMD Family 25 CPU导致测试执行失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 执行命令 `mcelog --cpumhz 50` 或 `mcelog --raw` 时，终端报错：  
+  `mcelog: ERROR: AMD Processor family 25: mcelog does not support this processor. Please use the edac_mce_amd module instead.`  
+  `CPU is unsupported`  
+- 测试用例 `oe_test_mcelog_02` 在 cloudpods 平台（AMD Family 25 CPU）上执行失败，日志路径：`x86_logs\mcelog\oe_test_mcelog_02\2026-01-14_11-48-56.log`  
+- 相同测试在本地支持 CPU 环境下可正常通过（"本地执行pass"）  
+
+#问题根因  
+mcelog 工具当前版本不支持 AMD Processor Family 25 架构 CPU。错误日志明确提示：  
+`mcelog does not support this processor. Please use the edac_mce_amd module instead.`  
+cloudpods 平台所用 CPU 型号属于 AMD Family 25，触发工具兼容性限制。  
+
+#解决方案  
+1. **生产/运维场景**：在 AMD Family 25 CPU 机器上，停用 mcelog 工具，改用内核模块 `edac_mce_amd` 进行机器检查异常（MCE）日志采集与处理。  
+2. **测试场景**：  
+   - 将 `mcelog` 相关测试用例（如 `oe_test_mcelog_02`）限定在支持 mcelog 的 CPU 环境（如本地测试机）中执行；  
+   - 避免在 cloudpods 等 AMD Family 25 CPU 平台上运行 mcelog 命令或相关测试。  
+3. **长期建议**：更新测试规范文档，明确标注 mcelog 工具的 CPU 兼容范围，防止同类问题复现。

@@ -1,0 +1,18 @@
+#标题
+内核启动时因内存位翻转导致Kernel Panic
+
+#内核版本
+2203sp4
+
+#问题现象
+BIOS启动过程中卡住并打印“kernel panic”，具体日志显示：
+- 出现“Internal error: Oops - FPAC”及“Unable to handle kernel paging request at virtual address fffdb98bd5a356c0”
+- CPU 246 上 systemd-udevd 进程触发异常，调用栈指向 kernfs_iop_lookup 函数
+- ESR = 0x96000004，EC = 0x25（DABT，当前EL的数据访问中止），表明发生数据访问异常
+- 异常地址高位字节由预期的 ffff 变为 fffd，存在单bit翻转特征
+
+#问题根因
+内存地址出现1个bit位跳变（ffff → fffd），Call trace具有随机性，判定为硬件内存RAS（Reliability, Availability, Serviceability）问题概率较大。
+
+#解决方案
+转交硬件团队进行内存RAS相关定位与修复，建议对服务器内存模块进行ECC校验日志分析、内存压力测试及硬件替换验证。

@@ -1,0 +1,17 @@
+#标题
+CPU硬锁导致NMI watchdog触发
+
+#内核版本
+2203sp2
+
+#问题现象
+系统日志中出现“NMI watchdog: Watchdog detected hard LOCKUP on cpu 31”告警，CPU 31发生硬锁（hard LOCKUP）。调用栈显示进程卡在 native_queued_spin_lock_slowpath 函数中，正在等待自旋锁，且该CPU上运行的是 rcu_sched 内核线程。系统随后触发 panic。
+
+#问题根因
+硬锁（hard LOCKUP）发生在CPU 31，根本原因为内核在执行RCU宽限期处理时，因无法获取所需自旋锁而长时间阻塞，触发NMI watchdog机制。文档指出“调用栈在等锁”，需通过vmcore进一步分析具体锁竞争源头，但产线环境已不可用。
+
+#解决方案
+1. 保留并分析vmcore转储文件以定位具体锁持有者及竞争路径（当前因环境丢失未能完成）。
+2. 在可复现环境中更换主板进行测试，排查是否为硬件（如CPU或内存子系统）异常导致锁状态异常。
+3. 建议升级至包含RCU或自旋锁相关修复的内核版本，并监控类似LOCKUP事件。
+4. 若为偶发性问题，可临时调整watchdog阈值（如 softlockup_panic、nmi_watchdog 等参数）以避免误触发panic，但需谨慎评估系统可靠性影响。

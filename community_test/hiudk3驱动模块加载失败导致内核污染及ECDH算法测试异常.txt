@@ -1,0 +1,16 @@
+#标题  
+hiudk3驱动模块加载失败导致内核污染及ECDH算法测试异常  
+
+#内核版本  
+22.03sp4  
+
+#问题现象  
+- 加载 hiudk3 驱动模块时出现错误日志：“module verification failed: signature and/or required key missing - tainting kernel”  
+- 系统日志中同时报出加密算法错误：“alg: ecdh-nist-p256: test failed on vector 2, err=-14”  
+- 内核被标记为 tainted（污染状态）  
+
+#问题根因  
+hiudk3 用户驱动未进行数字签名，导致在启用了模块签名验证的系统中加载失败；该问题为已知问题，已有其他 issue 跟踪。  
+
+#解决方案  
+对 hiudk3 驱动模块进行合规签名，确保其满足内核模块签名要求后再加载；若为开发或测试环境，可临时禁用模块签名验证（需评估安全风险），但生产环境必须使用已签名模块。

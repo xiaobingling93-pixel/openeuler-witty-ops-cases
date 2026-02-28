@@ -1,0 +1,16 @@
+#标题  
+fisql非交互式环境dbopen连接初始化失败  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 在cloudpods平台以非交互式、无TTY方式执行fisql数据库操作脚本时，命令行直接报错：`fisql: dbopen() failed.`  
+- 数据库连接初始化失败，导致测试用例（oe_test_freetds_fisql）执行中断  
+- 相同脚本及参数（`fisql -e -U sa -P Hw123456 -S egServer70 -D test1 -i inputFile.sql -o outFile`）在本地交互式TTY环境执行可正常通过（日志显示INSERT操作成功）  
+
+#问题根因  
+cloudpods平台以非交互式、无TTY方式执行脚本，直接导致dbopen()连接初始化失败  
+
+#解决方案  
+将fisql数据库操作脚本迁移至具备TTY的本地交互式环境执行；避免在cloudpods等无TTY的非交互式平台直接运行依赖终端交互的数据库连接命令

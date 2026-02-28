@@ -1,0 +1,19 @@
+#标题  
+auter测试用例在cloudpods平台执行超时故障  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 执行`auter --enable`时校验失败：实际返回值1（期望0），日志明确报错"Enable the failure"（ERROR级别）  
+- 后续执行`auter --prep`过程中，测试脚本`oe_test_auter.sh`整体执行超时，日志记录：`Timeout : Command 'bash -x oe_test_auter.sh' timed out after 1799.9999848700002 seconds`  
+- 该故障在cloudpods平台稳定复现；相同测试用例在本地物理/虚拟环境执行通过（pass）  
+- 测试框架（mugen）完整记录两处ERROR：`Enable the failure`及脚本超时终止  
+
+#问题根因  
+cloudpods平台存在环境级缺陷（平台bug），导致auter测试脚本执行链异常阻塞并触发超时机制  
+
+#解决方案  
+1. **规避措施**：该测试用例（oe_test_auter）应迁移至本地可信环境执行，避免在cloudpods平台运行  
+2. **验证要求**：本地环境执行需通过完整测试流程（含`auter --enable`与`auter --prep`环节）  
+3. **平台跟进**：将超时日志及复现路径同步至cloudpods平台维护团队，推动底层环境缺陷修复

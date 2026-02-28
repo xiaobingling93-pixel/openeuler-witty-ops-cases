@@ -1,0 +1,17 @@
+#标题
+安装openEuler 24.03SP2时触发GHES致命硬件错误导致内核崩溃
+
+#内核版本
+24.03SP2
+
+#问题现象
+在安装openEuler 24.03SP2操作系统过程中，系统日志中出现APEI Generic Hardware Error Source报告的致命硬件错误（event severity: fatal），错误类型为fatal，section type为unknown（UUID: c8b328a8-9917-4af6-9a13-2e08ab2e7586）。随后触发内核panic，具体信息为“Kernel panic - not syncing: GHES: Fatal hardware error”，系统无法继续安装并完全挂起。调用栈显示错误由ghes_proc处理硬件错误事件后调用__ghes_panic引发。
+
+#问题根因
+系统在安装过程中通过ACPI APEI机制接收到一个来自固件的致命硬件错误通知（GHES），该错误被标记为fatal级别，且内核配置未禁用panic行为，导致内核主动触发panic以防止数据损坏或不可预测行为。根本原因指向底层硬件（如内存、CPU、主板等）存在严重故障，或固件（BIOS版本10.61）错误上报了无效/异常的硬件错误记录。
+
+#解决方案
+1. 检查并更新主板BIOS至最新稳定版本，确认是否存在已知GHES误报问题。
+2. 对硬件进行诊断，重点排查内存、CPU及主板健康状态，使用厂商提供的硬件检测工具验证是否存在物理故障。
+3. 若确认为偶发性固件误报且业务允许，可临时通过内核启动参数`ghes.disable=1`或`panic_on_oops=0`抑制GHES触发panic（仅限测试环境，生产环境需谨慎评估风险）。
+4. 联系硬件供应商提供针对该型号（Hardware name: To be filled by O.E.M. / BC85AMDATE）的兼容性支持与故障分析。

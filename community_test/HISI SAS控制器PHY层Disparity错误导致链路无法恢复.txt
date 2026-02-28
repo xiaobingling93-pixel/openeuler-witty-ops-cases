@@ -1,0 +1,21 @@
+#标题  
+HISI SAS控制器PHY层Disparity错误导致链路无法恢复
+
+#内核版本  
+22.03-LTS-SP4
+
+#问题现象  
+- 系统日志（/var/log/messages）和dmesg中持续出现大量hisi_sas_v3_hw驱动相关错误日志，具体表现为：  
+  - phy2 和 phy5 上频繁报告 "disparity error cnt"，错误计数持续快速增长（如 phy5 错误计数从千万级增至一千六百万以上）。  
+  - 最终出现 "phy2 failed to come up 10 times, giving up" 和 "phy5 failed to come up 10 times, giving up" 日志，表明SAS物理链路多次尝试初始化失败后被放弃。  
+- 故障集中在 HISI SAS v3 硬件控制器（PCI设备 0000:32:04.0）的 phy2 和 phy5 通道。
+
+#问题根因  
+SAS物理层（PHY）存在严重的信号完整性问题，导致持续的 disparity 错误（通常由线路噪声、连接器松动、线缆损坏或背板故障引起），最终使 PHY 无法完成链路训练（link training），在重试10次失败后驱动主动放弃恢复。
+
+#解决方案  
+1. 检查并更换 phy2 和 phy5 对应的SAS线缆，确保连接牢固、无物理损伤。  
+2. 检查背板及硬盘托架的连接状态，排除接触不良或背板硬件故障。  
+3. 若更换线缆和检查连接后问题仍存在，建议更换对应的硬盘或SAS扩展器（Expander）模块。  
+4. 在硬件修复后，可通过重启系统或重新扫描SAS控制器（如使用 echo "- - -" > /sys/class/scsi_host/hostX/scan）恢复设备识别。  
+5. 建议对同批次设备进行预防性检查，避免同类硬件缺陷引发批量故障。

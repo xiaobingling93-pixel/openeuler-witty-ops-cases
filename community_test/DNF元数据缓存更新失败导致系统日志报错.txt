@@ -1,0 +1,17 @@
+#标题  
+DNF元数据缓存更新失败导致系统日志报错
+
+#内核版本  
+2203sp4
+
+#问题现象  
+- 系统日志中出现以下错误信息：  
+  `Sep 22 13:41:37 localhost python3[13732]: ldapdb_canonuser_plug_init() failed in sasl_canonuser_add_plugin(): invalid parameter supplied`  
+  `Sep 22 13:41:37 localhost dnf[13732]: Failed determining last makecache time.`  
+- 故障发生在 host6（IP: 71.11.56.66）系统启动后，由定时器触发 dnf-makecache.service 执行时。
+
+#问题根因  
+系统启动后通过定时器触发 dnf-makecache.service 自动更新 DNF 软件仓库元数据缓存，执行过程中无法访问仓库地址 https://mirrors.openeuler.org/metalink?repo=22.03LTS_SP4/，导致缓存更新失败并记录错误日志。
+
+#解决方案  
+确保系统可正常访问 openEuler 软件源地址 https://mirrors.openeuler.org/metalink?repo=22.03LTS_SP4/，建议检查网络连通性、DNS解析及防火墙策略；若为临时网络问题，可手动执行 `dnf makecache` 验证并重建缓存。

@@ -1,0 +1,18 @@
+#标题  
+2U4P加RAID卡环境下kdump生成vmcore失败  
+
+#内核版本  
+oe2203sp4  
+
+#问题现象  
+在2U4P服务器加装RAID卡的环境中，触发内核崩溃后kdump无法成功生成vmcore文件，系统日志中出现报错：hiraid 0000:81:00.0: io map data err。在openEuler系统中即使分配512M crashkernel内存，仍会出现OOM（Out of Memory）导致vmcore保存失败；而CentOS在分配512M crashkernel时可成功保存vmcore，但768M则分配失败。  
+
+#问题根因  
+问题与RAID卡驱动及I/O内存映射相关，具体表现为在kdump第二内核启动过程中，hiraid驱动因IO地址映射异常（io map data err）导致vmcore生成失败。初步分析涉及SMMU配置、驱动对高地址位（如46bit）处理不当，以及crashkernel内存分配不足或冗余驱动加载占用过多资源。文档指出“和OS本身无关”，根因聚焦于驱动层与硬件兼容性问题。  
+
+#解决方案  
+1. 在第二内核启动参数中添加 swiotlb=32768 以规避IO映射问题。  
+2. 屏蔽kdump initrd中非必要的冗余驱动（如 hns3、hns_roce、hns_roce_hw_v2），减少crashkernel内存占用。  
+3. 启用SMMU（System Memory Management Unit）功能，根据RAID卡厂商建议进行配置，可使vmcore正常生成。  
+4. 将crashkernel内存调整为512M，并确保kdump环境精简，避免OOM。  
+5. 参考华为鲲鹏RAID故障排查文档（https://www.hikunpeng.com/document/detail/zh/raid/trouble/sp686cTrbshoot/SP686C_raid_09_0016.html）进行进一步验证与配置优化。

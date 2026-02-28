@@ -1,0 +1,18 @@
+#标题  
+ARM架构grubby命令执行失败：GRUB配置文件路径不存在  
+
+#内核版本  
+2403sp3  
+
+#问题现象  
+- 执行grubby命令添加sysmaster内核启动项时失败，关键错误日志：`error opening /boot/grub2/grub.cfg for read: No such file or directory`  
+- 复现路径：在ARM架构（aarch64）节点运行测试套`sysmaster\oe_test_sysmaster_sctl`，通过SSH远程执行grubby命令配置启动参数  
+- 服务影响：内核启动项添加流程中断，系统无法按预期切换至sysmaster初始化流程  
+
+#问题根因  
+ARM架构与x86架构的GRUB配置文件实际存储路径存在差异，测试脚本中硬编码使用x86路径`/boot/grub2/grub.cfg`，而ARM环境下该路径不存在，导致grubby命令无法读取配置文件。  
+
+#解决方案  
+修改grubby命令参数，将`--config-file`的固定路径替换为动态查找逻辑：  
+`--config-file=$(find /boot/ -name grub.cfg)`  
+确保脚本适配多架构环境，自动定位实际存在的GRUB配置文件路径。
