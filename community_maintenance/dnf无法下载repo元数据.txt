@@ -1,0 +1,16 @@
+#标题  
+dnf无法下载repo元数据  
+
+#内核版本  
+22.03 LTS SP4  
+
+#问题现象  
+在openEuler 22.03 LTS SP4系统上执行整机压力测试时，运行dnf命令（如dnf update）报错：“Error: Failed to download metadata for repo 'OS': Cannot download”。该错误导致软件包管理及系统更新功能不可用，复现步骤为执行常规dnf操作即可触发。  
+
+#问题根因  
+系统无法访问配置的repo源地址，可能由于网络不通、DNS解析失败、repo URL配置错误或远程仓库服务不可用所致。  
+
+#解决方案  
+1. 检查网络连通性，确认服务器可访问外网或内网repo源；  
+2. 验证/etc/yum.repos.d/下对应repo文件中的baseurl是否正确且可达；  
+3. 使用curl或wget手动测试repo元数据URL是否可下载。

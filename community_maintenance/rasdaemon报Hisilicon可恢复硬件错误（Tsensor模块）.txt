@@ -1,0 +1,17 @@
+#标题
+rasdaemon报Hisilicon可恢复硬件错误（Tsensor模块）
+
+#内核版本
+22.03 LTS SP4
+
+#问题现象
+系统日志中频繁出现 rasdaemon 记录的 “Hisilicon Common Error Section” 错误，具体模块为 Tsensor（温度传感器），错误级别为 recoverable；内核日志同时显示来自 APEI 的硬件错误事件，section type 为未知 UUID。该问题在搭载 Kunpeng920 芯片的 920BS-4U1P 服务器（IP: 92.88.35.103）上复现，通过正常启动系统后观察 /var/log/messages 或 journalctl 日志即可发现。
+
+#问题根因
+错误源于鲲鹏920 SoC内部的Tsensor模块上报的可恢复性硬件异常，可能与传感器读数异常、固件上报机制或底层RAS（Reliability, Availability, Serviceability）配置有关，需海思侧解析寄存器值及错误上下文。
+
+#解决方案
+1. 收集完整日志：执行 `journalctl -u rasdaemon --since "2025-10-08 08:50:00" --until "2025-10-08 09:10:00"` 保存上下文；  
+2. 导出内核硬件错误信息：`cat /var/log/messages | grep -A20 "Hardware Error"`；  
+3. 记录固件版本（BIOS/BMC）及 openEuler 内核版本（`uname -r`）；  
+4. 将上述信息提交至海思硬件团队，用于进一步分析寄存器值和错误上下文以定位根本原因。

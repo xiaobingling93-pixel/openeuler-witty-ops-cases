@@ -1,0 +1,16 @@
+#标题  
+OS挂死并出现硬锁死Call Trace  
+
+#内核版本  
+22.03 SP2  
+
+#问题现象  
+系统运行过程中突然挂死，日志显示“NMI watchdog: Watchdog detected hard LOCKUP on cpu 215”，Call Trace指向native_queued_spin_lock_slowpath函数中的自旋锁等待路径；同时FDM日志报告Uncorrected error (UEO)。问题复现步骤尚未明确，但与硬件潜在错误相关。  
+
+#问题根因  
+CPU在等待自旋锁时长时间无法获得锁资源，触发看门狗硬锁死；底层可能由硬件不可纠正错误（UEO）引发内存或缓存异常，导致锁状态异常。  
+
+#解决方案  
+1. 联系硬件团队确认FDM中报告的UEO错误，检查鲲鹏920B处理器及内存模块健康状态；  
+2. 更新固件和BIOS至最新稳定版本，修复已知硬件兼容性问题；  
+3. 在内核启动参数中添加“nmi_watchdog=0”临时规避看门狗误报（仅用于诊断）。

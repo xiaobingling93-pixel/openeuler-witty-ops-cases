@@ -1,0 +1,16 @@
+#标题
+驱动未签名导致内核警告
+
+#内核版本
+22.03 LTS SP4
+
+#问题现象
+在鲲鹏920Bs硬件平台（aarch64架构）上运行openEuler-22.03-LTS-SP4系统执行AC测试时，dmesg日志出现“aes_ce_cipher: module verification failed: signature and/or required key missing - tainting kernel”警告；该现象在正常加载aes_ce_cipher内核模块或执行依赖该模块的加密操作时可稳定复现。
+
+#问题根因
+内核启用了模块签名验证机制，而aes_ce_cipher驱动模块未进行有效签名，导致加载时验证失败，进而污染内核（taint kernel）。
+
+#解决方案
+1. 若为开发或测试环境，可临时禁用模块签名验证：在内核启动参数中添加 module.sig_unenforce=1；  
+2. 若需保持签名验证机制，则应对驱动模块进行正确签名：生成密钥对，使用 sign-file 工具对 aes_ce_cipher.ko 签名，并将公钥集成至内核信任链；  
+3. 更新系统或驱动包，确认厂商是否已提供已签名的正式版本驱动。

@@ -1,0 +1,16 @@
+#标题  
+irqbalance调整中断亲和性失败  
+
+#内核版本  
+22.03 LTS SP4  
+
+#问题现象  
+在openEuler 22.03 LTS SP4系统上运行整机压力测试时，系统日志（/var/log/messages 或 journalctl）反复出现“Cannot change IRQ 163/170 affinity: Input/output error”错误。该问题发生在Kunpeng硬件平台，伴随irqbalance服务尝试调整特定IRQ的CPU亲和性失败，影响中断负载均衡，可能导致系统性能或稳定性下降。  
+
+#问题根因  
+驱动程序在注册PMU（性能监控单元）中断时设置了IRQF_NO_BALANCING标志，导致内核禁止irqbalance动态调整该中断的CPU亲和性；强行修改会触发I/O错误。  
+
+#解决方案  
+1. 执行 `cat /proc/interrupts | column -t` 确认IRQ 163和170对应的设备（通常为PMU性能监控单元）；  
+2. 联系对应硬件或驱动责任人确认是否需保留IRQF_NO_BALANCING标志；  
+3. 若无需动态平衡，可将相关IRQ加入irqbalance黑名单：编辑 `/etc/default/irqbalance`，添加 `IRQBALANCE_BANNED_INTERRUPTS="163 170"`。

@@ -1,0 +1,16 @@
+#标题  
+内核Oops因LR寄存器清零触发FPAC失败导致系统崩溃  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+系统运行期间出现内核Oops错误，日志显示“Internal error: Oops - FPAC: 0000000072000000 [#1] SMP”，随后触发“Kernel panic - not syncing: Oops - FPAC: Fatal exception in interrupt”。调用栈指向tick_check_oneshot_broadcast_this_cpu函数，LR寄存器被非法修改为0x0，导致返回地址校验失败。故障发生在鲲鹏硬件平台上的openEuler 22.03 SP4系统。  
+
+#问题根因  
+LR（Link Register）在中断上下文中被意外清零，可能由内存越界、驱动异常或内核模块（如mem_hijack、hinic3等OE模块）破坏栈帧所致，进而触发FPAC（指针认证）机制失败。  
+
+#解决方案  
+1. 确认问题是否可稳定复现，若可复现，配置kdump以捕获vmcore用于分析；  
+2. 检查已加载的第三方内核模块（标记为OE或E），尤其是mem_hijack、hinic3等，尝试卸载后观察是否仍发生崩溃；  
+3. 更新BIOS至最新版本（当前为32.22E），排除固件兼容性问题。

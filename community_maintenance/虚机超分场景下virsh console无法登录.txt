@@ -1,0 +1,16 @@
+#标题
+虚机超分场景下virsh console无法登录
+
+#内核版本
+22.03 SP2
+
+#问题现象
+在虚机超分并成功借用内存后，执行 virsh console <vm_name> 命令无法登录虚拟机，表现为无响应或连接失败。该问题在 BeiMing 25.2.T3.B103 版本的超分环境中可稳定复现，具体操作包括：部署超分环境、创建并启动虚机、确认内存借用成功后尝试 console 登录。
+
+#问题根因
+虚机超分场景下，借用内存可能导致串口设备未正确初始化或 console 配置缺失，使得 virsh console 无法与虚拟机串口建立有效通信。
+
+#解决方案
+1. 检查虚拟机 XML 配置中是否包含有效的串口和 console 设备，如无则添加；  
+2. 重启 libvirtd 服务：systemctl restart libvirtd；  
+3. 重新定义并启动虚拟机：virsh define <xml_file> && virsh start <vm_name>。

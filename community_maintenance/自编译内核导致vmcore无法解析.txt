@@ -1,0 +1,17 @@
+#标题
+自编译内核导致vmcore无法解析
+
+#内核版本
+22.03 SP4
+
+#问题现象
+系统崩溃后生成的vmcore文件无法被crash等工具正常解析；使用自编译内核触发panic（如通过sysrq）后，尝试加载对应vmlinuz与vmcore进行分析时，工具报错或无法识别符号信息。
+
+#问题根因
+自编译内核未包含完整的调试符号，或其配置、版本与openEuler官方提供的vmlinuz及配套debuginfo包不一致，导致crash工具无法匹配符号表，从而无法解析vmcore。
+
+#解决方案
+1. 使用openEuler官方发布的内核及其对应的debuginfo包；  
+2. 若必须使用自编译内核，需确保编译时启用CONFIG_DEBUG_INFO=y，并保留未压缩的vmlinux文件；  
+3. 使用该vmlinux（而非压缩后的vmlinuz）配合crash工具解析vmcore；  
+4. 验证内核版本与vmcore生成环境完全一致，避免符号错位。

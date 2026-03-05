@@ -1,0 +1,17 @@
+#标题
+openEuler 25.09 启动卡死内核崩溃
+
+#内核版本
+25.09
+
+#问题现象
+在 QEMU 或 UTM 虚拟化平台上加载 openEuler 25.09 的 ISO、qcow2 或 DevStation 镜像时，系统在启动初期卡死；串口日志显示内核在执行 acpi_arm_init 过程中触发 Oops，最终导致 Kernel panic。相同虚拟机配置下，openEuler 24.03 SP2 可正常启动，问题可稳定复现。
+
+#问题根因
+内核在初始化 ACPI ARM 架构相关组件（build_devid_pools 函数）时发生空指针解引用或内存访问异常，可能与新版本内核对 ARM64 平台 ACPI 支持的改动或虚拟化环境兼容性有关。
+
+#解决方案
+1）确认使用最新版 QEMU（建议 ≥8.0），并启用正确的 ARM64 机器类型（如 virt）；  
+2）在内核启动参数中添加 acpi=off 或 acpi_enforce_resources=lax 以规避 ACPI 初始化；  
+3）若需 ACPI 功能，可回退至已知稳定的内核版本（如 24.03 SP2 对应内核）；  
+4）向 openEuler 社区提交完整日志及复现环境，跟踪内核补丁修复进展。

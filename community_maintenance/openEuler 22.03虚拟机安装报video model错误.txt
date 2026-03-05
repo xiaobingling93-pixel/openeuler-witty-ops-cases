@@ -1,0 +1,18 @@
+#标题
+openEuler 22.03虚拟机安装报video model错误
+
+#内核版本
+22.03
+
+#问题现象
+在x86架构物理机上依据openEuler官方虚拟化文档创建虚拟机时，使用默认或推荐配置（含video model='qxl'），系统报错“domain configuration does not support 'video model’ value 'qxl'”，导致虚拟机无法正常创建或启动。复现步骤包括：准备openEuler 22.03 ISO镜像、通过virt-install或virt-manager创建虚拟机、选择QXL显卡模型、启动时报错。
+
+#问题根因
+openEuler 22.03所用QEMU/KVM版本或libvirt配置中未启用或不支持QXL虚拟显卡驱动，尤其在最小化安装或特定硬件环境下，QXL模块可能未被包含或加载。
+
+#解决方案
+1）编辑虚拟机XML配置文件，将<video>段中的model type='qxl'改为type='vga'或type='cirrus'；  
+2）若需保留图形性能，可尝试安装qxl驱动包：sudo dnf install spice-vdagent qemu-guest-agent；  
+3）使用virsh edit <vm-name>修改配置后重启虚拟机；  
+4）或在创建虚拟机命令中显式指定--video vga避免使用qxl。  
+建议后续参考适配22.03的虚拟化文档而非24.03版本。

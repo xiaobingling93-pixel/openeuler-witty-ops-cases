@@ -1,0 +1,16 @@
+#标题  
+系统启动进入紧急模式  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+设备在PXE启动安装过程中，加载initramfs后进入emergency shell，提示“Entering emergency mode”，无法继续正常安装流程。系统停留在维护shell界面，需手动干预。复现路径为：PXE启动 → 加载initramfs → 进入emergency shell。  
+
+#问题根因  
+initramfs阶段初始化失败，可能由根文件系统挂载异常、关键驱动缺失或PXE配置错误导致系统无法继续启动流程。  
+
+#解决方案  
+1. 复现问题，在emergency shell中执行 mount /dev/xxx /mnt（根据实际情况挂载/boot分区或U盘等可持久化存储）；  
+2. 将 /run/initramfs/rdsosreport.txt 保存至已挂载的持久化存储路径；  
+3. 执行 journalctl -xb > /mnt/journal.log 收集完整系统日志，用于进一步分析根因。

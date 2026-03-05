@@ -1,0 +1,17 @@
+#标题
+perl-homedir导致csh环境崩溃
+
+#内核版本
+22.03 SP2
+
+#问题现象
+在openEuler 22.03 SP2系统中，同时安装tcsh与perl-homedir软件包后，csh/tcsh shell环境无法正常加载用户profile，表现为shell启动失败或环境变量未正确初始化。复现步骤为：1）安装tcsh；2）安装perl-homedir；3）切换至csh或tcsh shell，观察到环境初始化错误或shell崩溃。
+
+#问题根因
+perl-local-lib建仓时错误引入了过时的perl-homedir.csh脚本，该脚本在csh环境下执行时存在语法或逻辑错误，导致profile加载失败。
+
+#解决方案
+1）访问补丁链接 https://gitee.com/src-openeuler/perl-local-lib/pulls/19 下载修复后的perl-homedir.csh脚本；  
+2）替换系统中现有的 /etc/profile.d/perl-homedir.csh 文件；  
+3）重新加载shell环境或重启终端验证修复效果；  
+4）建议更新 perl-local-lib 软件包至包含该修复的版本。

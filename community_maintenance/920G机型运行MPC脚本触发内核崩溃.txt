@@ -1,0 +1,16 @@
+#标题  
+920G机型运行MPC脚本触发内核崩溃  
+
+#内核版本  
+24.03 SP2  
+
+#问题现象  
+在920G机型上执行MPC数据采集脚本时，系统突然无响应，无法通过网络访问（无法ping通）。串口日志显示CPU343触发了Asynchronous SError Interrupt，伴随L2总线错误（L2_BUS_ERROR_SYN_REG）和SEI异常处理信息，最终导致内核panic并停止所有CPU。故障可在部署并运行MPC脚本数分钟后稳定复现。  
+
+#问题根因  
+硬件层面出现L2缓存或总线错误，触发ARM64架构下的异步SError中断；当前内核配置未正确处理此类RAS（Reliability, Availability, Serviceability）错误，导致直接panic而非恢复。  
+
+#解决方案  
+1. 升级BIOS至最新版本（当前为13.22.00.07），以修复潜在固件层RAS处理缺陷；  
+2. 更新内核至包含RAS错误容忍补丁的版本（如6.6.0-106.0.0.112.oe2403sp2或更高）；  
+3. 在内核启动参数中添加`ras=on`和`arm64.nosync_errata=off`（若适用），启用RAS错误处理机制。

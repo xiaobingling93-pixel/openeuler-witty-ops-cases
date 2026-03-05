@@ -1,0 +1,16 @@
+#标题  
+修改网卡配置后IP不生效  
+
+#内核版本  
+5.10  
+
+#问题现象  
+在openEuler-22.03-LTS-SP4系统中，用户手动修改网卡配置文件（如ifcfg-xxx）并执行systemctl restart NetworkManager后，新配置的IP地址未生效；网络接口仍使用旧IP或无IP，导致网络连通性异常。该问题在搭载Intel E810或XL710网卡的设备上可复现。  
+
+#问题根因  
+NetworkManager对传统ifcfg配置文件的支持有限，尤其在较新版本中更推荐使用nmcli或nmtui进行配置；直接修改配置文件后仅重启NetworkManager可能无法触发配置重载，导致IP未应用。  
+
+#解决方案  
+1. 使用nmcli命令替代手动编辑配置文件，例如：nmcli con mod "连接名" ipv4.addresses "IP/掩码"；  
+2. 设置ipv4.method为manual：nmcli con mod "连接名" ipv4.method manual；  
+3. 重新激活连接：nmcli con up "连接名"。

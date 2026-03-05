@@ -1,0 +1,16 @@
+#标题  
+2P1U安装时I2C驱动冲突导致内核崩溃  
+
+#内核版本  
+22.03 SP1  
+
+#问题现象  
+在Yangtze Computing R210K V2（920B 2P1U）服务器上安装openEuler 22.03 SP1系统时，内核初始化阶段触发Oops，日志显示在hisi_i2c_irq中断处理函数中发生致命异常，最终导致“Kernel panic - not syncing: Oops: Fatal exception in interrupt”；相同配置的2P2U机型未复现该问题，复现步骤为标准安装流程。  
+
+#问题根因  
+BIOS固件启用了I2C控制器但未正确释放或声明其占用，导致操作系统加载i2c_hisi驱动时尝试访问已被BIOS使用的硬件资源，引发中断冲突和空指针解引用，最终造成内核崩溃。  
+
+#解决方案  
+1. 升级BIOS至已修复该问题的版本（联系厂商获取支持）；  
+2. 若无法立即更新BIOS，可临时使用已屏蔽冲突I2C设备的内核版本（参考commit c504d963ccfaab1fd6042fa03c7d176d103cdab5）；  
+3. 在内核启动参数中添加 acpi_enforce_resources=lax 或通过设备树禁用相关I2C节点（需根据具体硬件调整）。

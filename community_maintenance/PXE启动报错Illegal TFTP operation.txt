@@ -1,0 +1,16 @@
+#标题  
+PXE启动报错Illegal TFTP operation  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+在鲲鹏HPC服务器上通过PXE方式启动安装openEuler 22.03 SP4系统时，在引导阶段稳定复现“error: Illegal TFTP operation”错误，导致无法进入操作系统安装流程。  
+
+#问题根因  
+用户使用了非openEuler官方提供的grub引导包，与TFTP服务器或PXE环境不兼容，导致TFTP协议交互异常，触发“Illegal TFTP operation”错误。  
+
+#解决方案  
+1. 确保使用openEuler 22.03 SP4官方ISO中提供的grubx64.efi、vmlinuz和initrd等引导文件；  
+2. 检查TFTP服务器配置，确认文件权限及路径正确，支持TFTP标准操作；  
+3. 使用tcpdump或wireshark抓包分析TFTP交互过程，定位具体非法操作类型。

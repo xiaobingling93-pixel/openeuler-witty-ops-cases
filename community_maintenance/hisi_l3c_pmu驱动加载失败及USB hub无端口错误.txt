@@ -1,0 +1,20 @@
+#标题  
+hisi_l3c_pmu驱动加载失败及USB hub无端口错误  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+系统启动后dmesg日志中频繁出现以下错误信息：  
+- “hub doesn't have any ports! (err -19)”  
+- “hisi_l3c_pmu: ioremap failed... error -16”  
+该问题在openEuler 22.03 LTS SP4（内核版本5.10.0-216.0.0.115.oe2203sp4.aarch64）运行于Kunpeng/TaiShan服务器时可稳定复现，影响系统稳定性与硬件监控功能。  
+
+#问题根因  
+BIOS新增了L3T上报需求，但对应内核未同步适配，导致hisi_l3c_pmu驱动尝试映射不存在的资源而失败；USB hub错误为伴随现象或由固件初始化异常引起。  
+
+#解决方案  
+1. 确认当前BIOS版本已回退相关L3T上报代码；  
+2. 无需对内核进行修改；  
+3. 升级至最新官方BIOS版本以确保兼容性；  
+4. 若仍需启用L3缓存PMU功能，应等待配套内核与BIOS联合发布后再启用。

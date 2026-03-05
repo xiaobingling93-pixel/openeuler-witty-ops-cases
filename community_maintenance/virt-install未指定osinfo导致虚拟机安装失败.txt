@@ -1,0 +1,17 @@
+#标题  
+virt-install未指定osinfo导致虚拟机安装失败  
+
+#内核版本  
+24.03  
+
+#问题现象  
+在openEuler 24.03系统中使用virt-install命令创建虚拟机时，若未显式指定--osinfo参数或指定为非RHEL系列值，会导致虚拟机配置不兼容、安装过程异常或虚拟机无法正常启动。复现步骤包括：1）在openEuler 24.03环境中执行virt-install命令；2）未添加--osinfo=rhel8或rhel9等有效值；3）观察到安装失败或启动异常。  
+
+#问题根因  
+virt-install依赖osinfo数据库识别操作系统特性，而openEuler环境下默认未自动匹配RHEL兼容配置，需手动指定--osinfo参数以确保正确的固件、驱动和安装流程。  
+
+#解决方案  
+1）确认已安装osinfo-db和libosinfo包；  
+2）执行virt-install时显式添加--osinfo=rhel8（或rhel9等适配版本）参数；  
+3）若仍存在问题，可通过virt-manager图形界面选择对应RHEL模板创建虚拟机；  
+4）参考官方文档验证osinfo支持列表，执行命令：osinfo-query os。

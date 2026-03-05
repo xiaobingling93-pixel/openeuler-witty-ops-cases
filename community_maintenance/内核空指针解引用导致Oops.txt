@@ -1,0 +1,16 @@
+#标题  
+内核空指针解引用导致Oops  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+系统运行过程中出现内核Oops，日志显示“Unable to handle kernel NULL pointer dereference at virtual address 00000000000006b0”，发生在show_interrupts函数中（pc: show_interrupts+0x148/0x4c0）。故障由irqbalance进程读取/proc/interrupts时触发，最终导致Kernel panic。  
+
+#问题根因  
+show_interrupts函数在遍历中断描述符时，访问了未初始化或已释放的irq_desc结构体指针（地址0x6b0），导致空指针解引用。可能与特定驱动（如hinic3、hns_roce等）注册中断后异常注销或并发访问有关。  
+
+#解决方案  
+1. 收集完整的vmcore转储文件，使用crash工具分析Oops发生时的内存状态和irq_desc结构；  
+2. 检查已加载模块（特别是标记为OE的闭源驱动如hinic3、hisdk3）是否存在中断管理缺陷；  
+3. 升级内核至最新稳定版本（如5.10.0-249后续补丁版本），确认是否已有相关修复。

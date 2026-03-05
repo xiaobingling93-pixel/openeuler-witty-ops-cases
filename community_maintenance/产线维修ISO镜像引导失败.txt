@@ -1,0 +1,16 @@
+#标题
+产线维修ISO镜像引导失败
+
+#内核版本
+22.03 SP4
+
+#问题现象
+使用openEuler 22.03 SP4产线维修环境ISO镜像引导系统时，无法正常启动，直接进入紧急模式。通过串口连接可进入救援模式，日志显示系统未能识别Live CD根文件系统。
+
+#问题根因
+ISO镜像的引导配置（如grub.cfg或isolinux配置）未正确设置root=live:CDLABEL=openEuler-livecd-22.03-LTS-SP4-a参数，致使内核无法挂载Live CD根文件系统，从而触发紧急模式。
+
+#解决方案
+1. 挂载原ISO镜像，提取其引导配置文件（通常位于/EFI/BOOT/grub.cfg或/isolinux/isolinux.cfg）；  
+2. 在kernel启动行末尾添加参数：root=live:CDLABEL=openEuler-livecd-22.03-LTS-SP4-a；  
+3. 重新打包ISO镜像，确保修改后的配置生效。

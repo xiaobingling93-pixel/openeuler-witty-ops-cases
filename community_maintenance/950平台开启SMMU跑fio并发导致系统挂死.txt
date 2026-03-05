@@ -1,0 +1,16 @@
+#标题  
+950平台开启SMMU跑fio并发导致系统挂死  
+
+#内核版本  
+24.03 SP2  
+
+#问题现象  
+在鲲鹏950服务器上连接16块NVMe盘，开启SMMU功能后运行fio并发压力测试，openEuler系统在短时间内直接挂死，无法响应。使用Velinux内核运行30分钟未复现该问题。启用softlockup和hardlockup的全CPU回溯（echo 1 > /proc/sys/kernel/softlockup_all_cpu_backtrace 及对应hardlockup项）可辅助复现问题。  
+
+#问题根因  
+初步定位为内核中与鲲鹏950 SMMU使能相关的补丁缺失或存在缺陷，在特定I/O压力下触发内核死锁或中断处理异常，导致系统挂死。  
+
+#解决方案  
+1. 应用已确认有效的内核补丁（如commit f0f9be237c2266d30fa01c294577438a2e2ee749）；  
+2. 若无法立即升级内核，可临时关闭SMMU以规避问题；  
+3. 启用softlockup和hardlockup全CPU回溯功能，便于问题复现与诊断。

@@ -1,0 +1,16 @@
+#标题
+内核执行非可执行内存导致Oops
+
+#内核版本
+2203sp4
+
+#问题现象
+系统触发内核Oops，日志显示“Unable to handle kernel execute from non-executable memory”，发生在虚拟地址ffff66d37fe5ef40；错误类型为IABT（指令访问异常），EC=0x21，ESR=0x8600000d；调用栈路径为tick_program_event → hrtimer_interrupt → arch_timer_handler_phys；由进程cc_dry2reg（PID 86074）触发；可能导致系统崩溃或服务中断，影响天工HPC平台稳定性。
+
+#问题根因
+内核试图在标记为不可执行（NX）的内存页中执行代码，可能由内存映射错误、驱动bug、固件问题或内核模块损坏引起，尤其与高精度定时器（hrtimer）中断处理相关。
+
+#解决方案
+1. 配置并启用kdump服务，确保下次崩溃时自动生成完整的vmcore内存转储文件，用于深入分析；
+2. 检查最近加载或卸载的内核模块，重点关注[OE]标记的专有模块（如hisdk3、hinic3、hiudk3），排查是否存在模块损坏或兼容性问题；
+3. 升级内核至最新稳定版本（当前版本为5.10.0-249.0.0.152.oe2203sp4），确认是否已包含针对该类非可执行内存执行问题的修复补丁。

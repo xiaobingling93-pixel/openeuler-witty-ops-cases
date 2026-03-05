@@ -1,0 +1,16 @@
+#标题  
+在线升级时主机core复位  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+在对A600设备执行在线升级至B119版本过程中，系统在特定阶段触发异常，导致主机发生core复位，升级中断。日志分析显示，异常发生在调用alloc_workqueue接口创建odcioq时，传入了不支持delayed work的flag，进而引发系统挂死。  
+
+#问题根因  
+驱动代码中调用alloc_workqueue时错误地使用了不兼容delayed work的标志位，导致内核工作队列初始化失败，进而引发系统挂死和core复位。  
+
+#解决方案  
+1. 定位并修改驱动代码中alloc_workqueue的调用参数，移除或替换不支持delayed work的flag；  
+2. 使用支持delayed work的正确标志（如WQ_MEM_RECLAIM）重新编译驱动模块；  
+3. 在测试环境中验证修复后的驱动在升级过程中的稳定性。

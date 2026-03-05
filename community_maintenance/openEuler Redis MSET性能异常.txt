@@ -1,0 +1,16 @@
+#标题  
+openEuler Redis MSET性能异常  
+
+#内核版本  
+22.03-LTS-SP4  
+
+#问题现象  
+在相同硬件环境下使用 redis-benchmark 执行 MSET 压测（如 -t mset -n 100000）时，openEuler 系统表现出较高的 QPS，但平均延迟显著高于 Ubuntu，影响实际应用响应效率。  
+
+#问题根因  
+openEuler 默认启用透明大页（always 模式）、较高的 vm.dirty_ratio（60%）以及 SELinux 和 audit 审计等安全机制，导致内存管理和 I/O 行为与 Ubuntu 不一致，引发延迟升高。  
+
+#解决方案  
+1. 将透明大页设置为 madvise：echo madvise > /sys/kernel/mm/transparent_hugepage/enabled；  
+2. 关闭 SELinux（setenforce 0）和 auditd 服务（systemctl stop auditd）；  
+3. 调整脏页比例：sysctl -w vm.dirty_ratio=20；

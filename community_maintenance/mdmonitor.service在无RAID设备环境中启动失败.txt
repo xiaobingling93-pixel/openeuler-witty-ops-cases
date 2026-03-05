@@ -1,0 +1,16 @@
+#标题
+mdmonitor.service在无RAID设备环境中启动失败
+
+#内核版本
+2203sp4
+
+#问题现象
+系统启动时 mdmonitor.service 服务启动失败。复现环境为未配置软件RAID的主机，运行内核版本5.10.0-216.0.0.115.oe2203sp4.aarch64。日志显示因无法找到 mdadm.pid 文件，systemd 判定服务启动失败。该问题仅在无RAID设备的系统中出现。
+
+#问题根因
+mdadm服务在无RAID设备环境下不会启动monitor后台进程，导致pid文件缺失，systemd因无法验证进程状态而报错。
+
+#解决方案
+1. 更新mdadm软件包至包含修复补丁的版本（参考PR：https://gitee.com/src-openeuler/mdadm/pulls/141）；  
+2. 该修复增加了对RAID设备存在的判断，避免在无RAID环境下尝试启动monitor服务；  
+3. 用户可手动验证是否已应用更新，并确认系统中无RAID配置时服务不再报错。

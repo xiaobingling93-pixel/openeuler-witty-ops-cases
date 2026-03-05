@@ -1,0 +1,16 @@
+#标题
+IPMI看门狗触发后OS无法重启
+
+#内核版本
+24.03 / 22.03 SP4
+
+#问题现象
+在920bs服务器上执行IPMI watchdog测试，人为触发OS崩溃（如通过sysrq或内核panic）后，系统在看门狗超时后未能自动重启，而是卡死，需人工干预。该现象在openEuler 24.03和22.03 SP4版本中均可复现。
+
+#问题根因
+BMC与OS之间的看门狗事件处理机制存在兼容性问题，可能因内核未正确响应IPMI watchdog timeout事件，或BMC固件未在OS崩溃后接管重启流程。
+
+#解决方案
+1. 确认BMC固件版本是否为最新，若非，请升级至支持IPMI watchdog完整功能的版本；  
+2. 在OS中检查ipmi_watchdog模块是否加载：`lsmod | grep ipmi_watchdog`，若未加载，执行 `modprobe ipmi_watchdog`；  
+3. 配置watchdog行为为“reset”：`echo reset > /sys/module/ipmi_watchdog/parameters/action`；

@@ -1,0 +1,16 @@
+#标题  
+OS概率性缓启问题  
+
+#内核版本  
+2403sp2  
+
+#问题现象  
+在920G服务器上使用6.6.0-106.0.0.112.oe2403sp2.aarch64内核版本时，系统启动过程中偶发缓慢启动现象；该问题在无显卡或串口控制台环境下更易出现，表现为启动流程卡顿、耗时显著增加。开发人员通过裁剪Plymouth组件（dnf remove --installroot=/opt/initrd_tmp -y）后暂未复现问题。  
+
+#问题根因  
+Plymouth图形启动管理器在特定initrd环境中可能因资源竞争或初始化延迟导致系统启动卡顿，尤其在无显卡或串口控制台环境下易引发超时等待。  
+
+#解决方案  
+1. 确认是否必须使用Plymouth，若无需图形启动画面，可永久移除；  
+2. 若需保留Plymouth，优化其配置：编辑 /etc/plymouth/plymouthd.conf，设置 DeviceTimeout=5；  
+3. 更新initramfs以应用变更：执行 dracut -f。

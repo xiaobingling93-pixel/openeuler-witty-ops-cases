@@ -1,0 +1,16 @@
+#标题
+odc_core驱动导致kworker任务阻塞
+
+#内核版本
+2403
+
+#问题现象
+系统日志显示kworker/19:2任务因执行OdcRecyclePageBufferList工作队列被阻塞超过120秒，状态为D（不可中断睡眠）；调用栈指向odc_core驱动的页面缓冲回收流程，并伴随mulp路径管理获取失败错误；该问题已在用户环境中复现，且与驱动版本相关。
+
+#问题根因
+odc_core驱动旧版本在页面缓冲销毁过程中存在锁竞争或资源释放异常，导致写信号量无法及时释放，引发工作队列线程永久阻塞。
+
+#解决方案
+1. 访问指定链接 https://dts-szv.clouddragon.huawei.com/DTSPortal/ticket/DTS2025091524779 获取最新版odc_core驱动；
+2. 卸载当前驱动：执行 rmmod odc_core（确保无业务依赖）；
+3. 安装更新后的驱动包并执行 insmod 或 modprobe 加载。

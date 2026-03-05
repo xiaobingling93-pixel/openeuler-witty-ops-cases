@@ -1,0 +1,16 @@
+#标题  
+Exagear多核运行异常  
+
+#内核版本  
+2403sp1  
+
+#问题现象  
+在openEuler 24.03 LTS SP1系统中，使用Exagear for Docker运行多线程应用时，仅能使用单个CPU核心，导致性能显著下降；而在openEuler 22.03 LTS系列版本中可正常利用多核并行执行。复现方式为：部署Exagear容器并启动多线程应用后，观察到CPU使用率仅集中在单核上。  
+
+#问题根因  
+openEuler 24.03 LTS SP1内核或调度策略变更，可能限制了Exagear容器对多核资源的访问，或与cgroup v2、CPU亲和性设置存在兼容性问题。  
+
+#解决方案  
+1. 检查系统是否启用cgroup v2，若启用可尝试临时切换至cgroup v1（通过内核参数systemd.unified_cgroup_hierarchy=0）；  
+2. 在Docker运行命令中显式指定CPU亲和性，如使用--cpuset-cpus="0-7"启用多核；  
+3. 更新Exagear至最新版本，确认是否已适配openEuler 24.03 LTS SP1。

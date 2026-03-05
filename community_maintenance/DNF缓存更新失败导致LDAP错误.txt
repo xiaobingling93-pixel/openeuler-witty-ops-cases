@@ -1,0 +1,16 @@
+#标题
+DNF缓存更新失败导致LDAP错误
+
+#内核版本
+22.03 SP4
+
+#问题现象
+系统启动后，定时任务触发 dnf-makecache.service 服务更新DNF元数据缓存时失败。日志中记录以下错误信息：“ldapdb_canonuser_plug_init() failed”和“Failed determining last makecache time”。故障期间无法访问软件源地址 https://mirrors.openeuler.org/metalink?repo=22.03LTS_SP4/，导致基础服务运行受影响。
+
+#问题根因
+DNF在执行 makecache 时无法解析或连接指定的 metalink 地址，可能由于网络配置、DNS解析异常或镜像源暂时不可用，进而触发 SASL 插件初始化失败的连锁错误。
+
+#解决方案
+1. 检查服务器网络连通性，确认可正常访问外网及 mirrors.openeuler.org；  
+2. 验证DNS配置是否正确，尝试使用 nslookup 或 dig 解析 mirrors.openeuler.org；  
+3. 临时更换为可用的openEuler镜像源（如华为云镜像站），编辑 /etc/yum.repos.d/ 目录下对应 repo 文件。

@@ -1,0 +1,16 @@
+#标题  
+virtCCA虚机启停触发EL0异常致系统崩溃  
+
+#内核版本  
+6.6.0-107.0.0.103.oe2403  
+
+#问题现象  
+在鲲鹏BOOSKIT平台上反复启停多个virtCCA机密虚拟机时，系统偶发EL0异常并崩溃，串口打印“ERROR: Unexpected affinity info state”及“Unhandled Exception from EL0”，导致物理机挂死。该问题在内核版本从84升级至100后首次出现。  
+
+#问题根因  
+机密虚拟机启停流程可能间接触发物理CPU核下线操作，而BIOS在处理核亲和性状态时存在异常，导致EL0异常未被正确处理，引发系统崩溃。  
+
+#解决方案  
+1. 使用systemd debug模式复现问题，收集完整日志；  
+2. 在内核侧增加PSCI调用路径的trace或debug打印，记录触发核下电的进程PID；  
+3. 检查virtCCA虚拟机管理代码，确认是否存在主动或间接触发CPU offline的行为。

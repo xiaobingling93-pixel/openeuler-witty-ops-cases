@@ -1,0 +1,16 @@
+#标题  
+安装openEuler 24.03 SP2触发硬件致命错误导致内核崩溃  
+
+#内核版本  
+2403sp2  
+
+#问题现象  
+在920G服务器上使用标准ISO镜像安装openEuler 24.03 SP2时，系统启动至约181秒触发内核恐慌（Kernel panic）。日志显示APEI（ACPI Platform Error Interface）报告“Fatal hardware error”，错误源为Generic Hardware Error Source 20，错误类型为fatal，section type未知。系统随后停止所有CPU并终止安装流程，在初始化阶段即可稳定复现。  
+
+#问题根因  
+固件（BIOS版本10.61）通过APEI上报了无法识别的致命硬件错误（GHES），而内核配置为在检测到此类错误时触发panic。可能原因包括固件bug、硬件故障（如内存、CPU或主板异常）或内核对特定错误类型的处理不兼容。  
+
+#解决方案  
+1. 更新服务器BIOS至最新稳定版本，以修复已知固件问题；  
+2. 检查硬件状态（如内存、CPU、电源），运行厂商提供的诊断工具排除物理故障；  
+3. 若确认非硬件问题，可临时在内核启动参数中添加 `ghes.disable=1` 禁用GHES错误处理以绕过panic（仅限测试环境使用）。

@@ -1,0 +1,16 @@
+#标题  
+fio测试触发OOM导致systemd-udev超时及硬盘响应异常  
+
+#内核版本  
+22.03 SP2  
+
+#问题现象  
+在执行fio性能测试过程中，物理内存被大量占用，触发系统OOM（Out-Of-Memory）机制；dmesg日志中出现异常信息，systemd-udev进程因资源竞争或内存压力发生执行超时，进而引发硬盘响应超时并打印错误日志，影响系统稳定性。  
+
+#问题根因  
+fio测试未限制内存使用，造成物理内存耗尽触发OOM killer；systemd-udev因资源竞争或内存压力无法及时响应，导致设备管理异常。  
+
+#解决方案  
+1. 优化fio测试参数，通过设置--max-jobs、--memory-limit或使用cgroup限制其内存使用；  
+2. 调整系统vm.overcommit_memory和vm.overcommit_ratio参数，合理控制内存分配策略；  
+3. 增加系统交换空间（swap）作为内存缓冲，缓解瞬时高内存压力。

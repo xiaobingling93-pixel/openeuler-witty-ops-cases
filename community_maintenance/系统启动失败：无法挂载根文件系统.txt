@@ -1,0 +1,16 @@
+#标题
+系统启动失败：无法挂载根文件系统
+
+#内核版本
+2203sp4
+
+#问题现象
+设备启动时出现“Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)”错误，系统无法继续引导；日志显示“No filesystem could mount root”，且未识别到有效块设备。该问题在多台天工HPC产线环境中复现，发生于使用5.10.0-249.0.0.152.oe2203sp4.aarch64内核版本启动时。
+
+#问题根因
+initrd镜像在网络加载过程中因网络不稳定或中断导致下载不完整，致使系统无法正确挂载根文件系统，触发内核panic。
+
+#解决方案
+1. 检查PXE或网络启动环境的网络连接稳定性，确保TFTP/NFS服务正常；  
+2. 重新下载并校验initrd镜像完整性（如比对MD5/SHA256）；  
+3. 在启动参数中临时增加debug选项（如earlyprintk、initcall_debug）以获取更详细日志；

@@ -1,0 +1,16 @@
+#标题
+Docker多容器启动失败因BPF Map内存限制
+
+#内核版本
+2203sp4
+
+#问题现象
+在aarch64架构的openEuler 22.03 SP4系统上启动大量Docker容器时，部分容器启动失败；日志无明确报错，但结合内核版本5.10.0-249.0.0.152.oe2203sp4及调试信息，怀疑与BPF Map总内存受限于1GB硬限制有关。
+
+#问题根因
+Linux 5.10内核中，BPF Map的总内存使用受memlock限制（通过ulimit -l控制），默认值较低（通常64KB或由系统策略设定），而大量容器可能创建大量BPF程序和Map，导致超出限制而失败。
+
+#解决方案
+1. 检查当前memlock限制：执行 ulimit -l，确认软硬限制值；  
+2. 临时提升限制：执行 ulimit -l unlimited 或设置具体大数值（如 1073741824 表示1GB）；  
+3. 永久生效：在 /etc/security/limits.conf 中添加 "* soft memlock unlimited" 和 "* hard memlock unlimited"；

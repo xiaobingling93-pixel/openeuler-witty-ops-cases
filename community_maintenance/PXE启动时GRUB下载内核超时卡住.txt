@@ -1,0 +1,16 @@
+#标题  
+PXE启动时GRUB下载内核超时卡住  
+
+#内核版本  
+22.03-LTS-SP4  
+
+#问题现象  
+在PXE网络启动openEuler LiveCD过程中，GRUB自动倒计时结束后尝试从TFTP服务器下载`/84b89f08-.../vmlinuz`失败，报错“time out opening”，随后提示“you need to load the kernel first”，系统卡住，需通过串口人工干预（如敲回车或重启）才能继续，影响自动化部署流程。  
+
+#问题根因  
+网络不稳定或TFTP服务器响应延迟，导致GRUB在默认超时时间内无法完成vmlinuz内核文件的下载，触发加载失败，GRUB停止自动引导流程。  
+
+#解决方案  
+1. 检查PXE服务器与客户端之间的网络连通性及带宽，确保低延迟、高可靠性；  
+2. 调整GRUB配置中的TFTP超时时间（如设置`net_default_timeout=30`）以适应网络环境；  
+3. 优化TFTP服务器性能（如使用更高效的TFTP实现或启用多线程）。

@@ -1,0 +1,16 @@
+#标题
+percpu内存分配失败告警
+
+#内核版本
+mt2203sp4
+
+#问题现象
+系统启动后dmesg日志中出现“percpu: allocation failed, size=8 align=8 atomic=1, atomic alloc failed, no space left”告警。该问题在openEuler 22.03 SP2系统上、使用mt2203sp4内核的920G服务器中可稳定复现，正常启动系统并检查dmesg即可观察到该告警。
+
+#问题根因
+系统启动时percpu静态内存分配优先使用各NUMA节点的大块连续物理内存，若NUMA间内存布局间隔过大，会压缩vmalloc虚拟地址空间，导致后续原子上下文中的percpu动态分配无法从vmalloc fallback区域获取足够空间。
+
+#解决方案
+1. 调整内核启动参数，增加vmalloc区域大小，例如添加 vmalloc=512M 或更大值；  
+2. 检查BIOS设置，优化NUMA内存分布，避免节点间内存碎片化；  
+3. 升级至修复该问题的内核版本（如后续SP补丁）；

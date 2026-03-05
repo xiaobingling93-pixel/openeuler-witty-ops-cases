@@ -1,0 +1,16 @@
+#标题  
+A3服务器因cgroup统计触发Hard Lockup  
+
+#内核版本  
+22.03 SP2  
+
+#问题现象  
+A3服务器在业务运行中出现Hard LOCKUP并触发Kernel panic；日志显示CPU 19在执行flush_memcg_stats_dwork工作队列时卡死，调用栈涉及cgroup_rstat_cpu_pop_updated函数；该问题在高CPU核数与大量cgroup并发场景下复现。  
+
+#问题根因  
+内核在执行memcg统计刷新时关闭中断，并遍历全部CPU和cgroup结构，当系统CPU核数多、cgroup数量大时，该操作耗时过长，触发hard lockup watchdog机制，引发panic。  
+
+#解决方案  
+1. 配置kdump服务以捕获vmcore，便于后续分析；  
+2. 升级至已修复该问题的内核版本（参考内部issue 20748）；  
+3. 若无法立即升级，可临时调大hard lockup检测阈值（如通过内核参数hardlockup_panic=0或调整watchdog_thresh）。

@@ -1,0 +1,16 @@
+#标题
+Docker中编译进程被OOM Killer终止
+
+#内核版本
+22.03 SP4
+
+#问题现象
+在Docker容器中执行bash build_scripts/build.sh release:java命令编译Java项目时，g++编译进程被系统强制终止，报错“g++: fatal error: Killed signal terminated program cc1plus”。该问题在系统负载较高时复现，环境空闲时可成功构建。
+
+#问题根因
+Docker容器在编译过程中内存消耗较大，宿主机或容器内存不足触发OOM Killer，强制终止了占用高内存的cc1plus编译进程。
+
+#解决方案
+1. 增加Docker容器可用内存：启动容器时通过--memory参数分配更多内存（如--memory=8g）；  
+2. 限制并行编译任务数：在构建脚本中设置MAKEFLAGS="-j2"等降低并发度，减少内存峰值；  
+3. 监控宿主机资源：确保编译时系统有足够空闲内存，避免其他高负载任务同时运行；

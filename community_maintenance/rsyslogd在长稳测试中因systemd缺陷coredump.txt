@@ -1,0 +1,16 @@
+#标题
+rsyslogd在长稳测试中因systemd缺陷coredump
+
+#内核版本
+24.03 SP1
+
+#问题现象
+在内存超分虚拟机长稳测试中，rsyslogd进程异常退出并生成core文件；日志显示ntcld向journald发送大量消息，导致journald队列阻塞，rsyslogd调用其接口时触发崩溃。
+
+#问题根因
+systemd版本225-34存在已知缺陷（Gitee Issue IBGQUW），在journald通信异常时未正确处理错误，导致rsyslogd调用相关接口时崩溃。
+
+#解决方案
+1. 确认当前系统systemd版本：执行 `rpm -q systemd`；  
+2. 升级systemd至255-38或更高版本，可通过更新openEuler 24.03 SP1的软件源并执行 `dnf update systemd`；  
+3. 若无法立即升级，可临时限制ntcld日志输出频率或调整journald缓冲区配置以缓解队列阻塞。

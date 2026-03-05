@@ -1,0 +1,16 @@
+#标题  
+SYN Flood导致系统中断过高  
+
+#内核版本  
+22.03-LTS-SP4  
+
+#问题现象  
+系统出现大量进程等待，中断负载异常升高；即使关闭irbance服务，问题依旧存在；dmesg日志频繁输出“sysc flooding on port: 80”信息，表明有大量SYN连接涌入并超出内核参数tcp_max_syn_backlog设定的队列上限，触发SYN Flood告警，导致网络处理性能下降。  
+
+#问题根因  
+外部或内部异常流量发起大量TCP SYN请求，未完成三次握手，耗尽SYN队列资源，触发内核SYN flood保护机制，进而引发高中断和系统响应延迟。  
+
+#解决方案  
+1. 临时缓解：增大tcp_max_syn_backlog值（如echo 'net.ipv4.tcp_max_syn_backlog = 4096' >> /etc/sysctl.conf）并执行sysctl -p生效；  
+2. 启用SYN Cookie：设置net.ipv4.tcp_syncookies=1以防御SYN Flood；  
+3. 配置防火墙规则（如iptables或nftables）限制单位时间内SYN包速率。

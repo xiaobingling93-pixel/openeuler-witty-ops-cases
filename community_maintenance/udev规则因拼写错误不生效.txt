@@ -1,0 +1,18 @@
+#标题
+udev规则因拼写错误不生效
+
+#内核版本
+2203sp4
+
+#问题现象
+用户创建的udev规则未按预期生效，设备节点未被正确创建或权限未被正确设置。具体表现为：规则文件中将“rules”误写为“reles”，并将“SUBSYSTEM”错写为“SUBSYSYEM”；在重新加载udev规则并插入对应设备后，规则未触发。
+
+#问题根因
+udev规则文件名必须以.rules结尾，且关键字如SUBSYSTEM需严格拼写正确。拼写错误导致udev解析失败，规则被忽略。
+
+#解决方案
+1）检查并修正规则文件扩展名，确保为.rules；  
+2）修正关键字拼写，如将“SUBSYSYEM”改为“SUBSYSTEM”；  
+3）执行 sudo udevadm control --reload 重新加载规则；  
+4）执行 sudo udevadm trigger 触发规则应用；  
+5）验证设备是否按预期响应。

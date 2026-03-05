@@ -1,0 +1,16 @@
+#标题
+开启KASAN后内核启动panic
+
+#内核版本
+4.19.90-2303.3.0.0192
+
+#问题现象
+在启用KASAN功能的4.19.90-2303.3.0.0192内核版本启动系统时，触发kernel panic，无法正常进入系统。OS日志中出现“percpu: allocation failed, size=296 align=8 atomic=0, failed to allocate new chunk”等内存分配失败告警。复现方式为：启用KASAN编译选项并启动系统即可稳定复现。
+
+#问题根因
+开启KASAN会显著增加内核对虚拟地址空间（尤其是vmalloc区域）的占用，在物理内存较大（如超过64G）时，导致vmalloc空间被过度压缩，无法满足启动过程中inet4等模块的内存分配需求，从而触发panic。
+
+#解决方案
+1. 编辑GRUB配置文件（通常为/etc/default/grub）；  
+2. 在GRUB_CMDLINE_LINUX行添加内核启动参数“mem=64G”，限制系统可用内存为64GB；  
+3. 更新GRUB配置（如执行grub2-mkconfig -o /boot/efi/EFI/openEuler/grub.cfg 或对应路径）。

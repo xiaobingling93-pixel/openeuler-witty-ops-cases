@@ -1,0 +1,17 @@
+#标题  
+串口OS启动日志时间戳缺失  
+
+#内核版本  
+24.03 SP2  
+
+#问题现象  
+在鲲鹏PoD硬件（920G服务器）上通过串口查看openEuler 24.03 SP2系统启动日志时，发现systemd拉起服务阶段的部分日志行缺少时间戳，呈现“断层”现象，影响日志分析与问题定位。  
+
+#问题根因  
+systemd在启动服务时默认不向内核日志（如串口输出）添加时间戳，仅由内核或特定日志组件（如journald）负责时间记录，导致用户感知为日志断层。  
+
+#解决方案  
+1）确认是否需完整带时间戳日志，可启用systemd-journald并配置串口转发；  
+2）编辑/etc/systemd/journald.conf，设置ForwardToConsole=yes；  
+3）重启systemd-journald服务：systemctl restart systemd-journald；  
+4）若仍需内核级时间戳，可在内核启动参数中添加loglevel=7和printk.time=1。

@@ -1,0 +1,16 @@
+#标题
+gdb因Python依赖问题执行失败
+
+#内核版本
+22.03sp4
+
+#问题现象
+在openEuler 22.03 SP4系统中，用户执行gdb命令调试应用core dump文件时失败。系统日志或终端报错显示gdb因Python依赖问题无法正常加载，具体表现为gdb启动异常，无法进入调试界面，影响core dump分析工作。
+
+#问题根因
+gdb依赖系统Python库，而该系统预装了自定义集成的Python 3.7，其库路径或ABI与gdb编译时所依赖的Python不一致，引发运行时错误。
+
+#解决方案
+1. 确认当前gdb依赖的Python版本：执行 `gdb --configuration` 查看编译配置；  
+2. 检查系统Python环境：确认 `/usr/bin/python3` 及相关库路径是否与gdb预期一致；  
+3. 若存在冲突，可临时通过设置环境变量 `PYTHONPATH` 或使用虚拟环境隔离。

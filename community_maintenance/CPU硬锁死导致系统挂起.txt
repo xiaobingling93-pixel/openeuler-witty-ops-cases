@@ -1,0 +1,16 @@
+#标题  
+CPU硬锁死导致系统挂起  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+系统运行过程中触发NMI watchdog报警，日志显示“Watchdog detected hard LOCKUP on cpu 568”，CPU 568陷入不可恢复的自旋锁等待（native_queued_spin_lock_slowpath），最终导致系统挂起，影响HPC业务稳定性。  
+
+#问题根因  
+CPU在中断上下文中尝试获取已被长时间占用的自旋锁，由于无法抢占且无超时机制，导致硬LOCKUP。可能由底层硬件异常（如内存或PCIe错误）或内核模块（如hinic3、hns_roce等）引发锁竞争。  
+
+#解决方案  
+1. 检查硬件健康状态，使用IPMI或BIOS工具排查CPU、内存及PCIe链路是否存在caterr等硬件错误；  
+2. 更新或回滚可疑内核模块（如hinic3、hns_roce_hw_v2）至稳定版本；  
+3. 在内核启动参数中添加“nmi_watchdog=0”临时规避，但需谨慎评估监控缺失风险。

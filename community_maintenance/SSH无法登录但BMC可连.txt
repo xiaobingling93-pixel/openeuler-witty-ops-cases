@@ -1,0 +1,18 @@
+#标题
+SSH无法登录但BMC可连
+
+#内核版本
+未知
+
+#问题现象
+在华为云HCE-2.0-Enterprise-aarch64系统中，BMC可正常连接，但无法通过SSH远程登录。具体表现为：启动基于该镜像的云服务器后，在网络和安全组已正确配置允许SSH（端口22）的前提下，SSH连接失败，提示“连接被拒绝”或“连接超时”。
+
+#问题根因
+SSH服务未启动、防火墙规则限制、或sshd配置错误导致监听异常，常见于最小化安装镜像默认未启用SSH服务。
+
+#解决方案
+1）通过BMC或控制台登录系统；  
+2）检查SSH服务状态：systemctl status sshd；  
+3）若服务未运行，执行 systemctl start sshd 并设置开机自启：systemctl enable sshd；  
+4）检查防火墙设置：firewall-cmd --list-all，确保放行22端口；  
+5）验证 /etc/ssh/sshd_config 配置是否监听正确地址（如 ListenAddress 0.0.0.0 或未注释默认监听所有接口）。

@@ -1,0 +1,16 @@
+#标题
+HPL压测触发OOM Killer
+
+#内核版本
+24.03
+
+#问题现象
+在Kunpeng服务器上运行HPL工具进行压力测试时，系统日志多次出现“Out of memory: Killed process xhpl”，OOM Killer被激活，xhpl进程被强制终止。观测到xhpl进程占用匿名内存（anon-rss）超过1TB，系统32GB swap空间已满，空闲内存极低，且Node 1标记为all_unreclaimable? yes，表明内存无法回收。
+
+#问题根因
+HPL配置的矩阵规模过大，超出系统物理内存与swap总容量，导致内存耗尽；同时系统未设置合理的内存限制或OOM防护策略，使内核被迫杀死高内存消耗进程。
+
+#解决方案
+1. 调整HPL输入参数（如N、NB、P、Q），降低内存需求，确保总内存占用不超过物理内存的80%；  
+2. 增加swap空间或启用zram以提供额外虚拟内存缓冲；  
+3. 为mpirun/xhpl进程设置cgroup内存限制（如使用systemd-run --scope -p MemoryMax=XXG）。

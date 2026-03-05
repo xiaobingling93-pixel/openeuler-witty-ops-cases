@@ -1,0 +1,16 @@
+#标题  
+内核Oops导致系统启动卡住  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+系统在鲲鹏PoD硬件上启动时卡在BIOS打印阶段，随后触发kernel panic。日志显示“Unable to handle kernel paging request at virtual address fffdb98bd5a356c0”，该虚拟地址存在单比特翻转（如ffff → fffd），Call trace指向kernfs_iop_lookup函数。故障在正常开机启动过程中可稳定复现。  
+
+#问题根因  
+内存地址中出现单比特翻转（如ffff变为fffd），结合Call trace的随机性和硬件RAS模块加载情况，表明可能是物理内存故障或内存控制器异常引发的内核页错误。  
+
+#解决方案  
+1. 更新BIOS至最新版本，确认是否修复已知内存兼容性问题；  
+2. 运行内存诊断工具（如memtest86+或厂商专用工具）检测物理内存稳定性；  
+3. 检查硬件RAS日志（通过hisi_mem_ras模块或BMC）确认是否存在内存可纠正/不可纠正错误。

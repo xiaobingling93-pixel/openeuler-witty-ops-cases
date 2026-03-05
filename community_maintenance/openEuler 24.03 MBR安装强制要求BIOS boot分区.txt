@@ -1,0 +1,16 @@
+#标题  
+openEuler 24.03 MBR安装强制要求BIOS boot分区
+
+#内核版本  
+24.03
+
+#问题现象  
+在使用MBR分区表（msdos磁盘标签）安装openEuler 24.03 LTS时，Anaconda安装程序强制要求创建一个BIOS boot分区，否则无法继续安装。该行为在openEuler 22.03中不存在，导致用户原有部署流程中断。复现方式为：在MBR磁盘布局下进行手动或自动分区安装，即触发“必须创建BIOS boot分区”的提示。
+
+#问题根因  
+openEuler 24.03的Anaconda安装程序在检测到MBR分区表且引导方式为BIOS时，默认强制要求存在BIOS boot分区，以确保GRUB2能正确嵌入启动代码。
+
+#解决方案  
+在kickstart配置文件（ks.cfg）中为clearpart命令显式添加--disklabel=msdos参数，以明确指定使用MBR分区表，从而绕过对BIOS boot分区的强制检查。具体操作示例：  
+clearpart --all --disklabel=msdos  
+保存配置后重新执行安装，即可正常完成部署，无需额外创建BIOS boot分区。

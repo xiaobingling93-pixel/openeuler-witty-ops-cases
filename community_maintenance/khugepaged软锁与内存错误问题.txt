@@ -1,0 +1,16 @@
+#标题
+khugepaged软锁与内存错误问题
+
+#内核版本
+2403sp2
+
+#问题现象
+系统日志中出现多个“Memory failure”记录，涉及clean和dirty LRU页的恢复操作；随后CPU#57因khugepaged进程卡住26秒触发soft lockup。在运行LLC子测试项并开启softlockup_all_cpu_backtrace后可复现并捕获完整调用栈。故障发生在华为TaiShan 200服务器上。
+
+#问题根因
+LLC测试注入0x400错误码（L2C UER错误），属于芯片设计预期行为；同时CPU 0未响应NMI中断，导致其他核心等待超时形成软锁，可能由核挂死或BIOS死循环引起。
+
+#解决方案
+1. 确认当前使用场景是否涉及LLC错误注入测试，若非必要应关闭相关测试项；  
+2. 升级BIOS至最新版本以修复潜在死循环问题；  
+3. 监控CPU 0状态，结合硬件诊断工具排查核挂死原因。

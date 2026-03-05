@@ -1,0 +1,16 @@
+#标题  
+CPU过温引发可恢复硬件错误  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+系统运行过程中出现APEI Generic Hardware Error日志，错误类型为“recoverable”，section type为未知UUID；长时间高负载运行CPU密集型任务时可能复现该错误；可能导致系统性能下降或异常重启。  
+
+#问题根因  
+CPU局部温度超过安全阈值，触发硬件层面的可恢复错误上报机制，通过APEI（ACPI Platform Error Interface）记录至系统日志。  
+
+#解决方案  
+1. 检查服务器散热系统（风扇、风道、导热硅脂等），确保散热正常；  
+2. 使用ipmitool或BMC工具监控CPU实时温度，确认是否存在持续高温；  
+3. 在BIOS中检查CPU温度阈值及过温保护策略是否合理。

@@ -1,0 +1,17 @@
+#标题
+make menuconfig无回显问题
+
+#内核版本
+22.03 SP4
+
+#问题现象
+在openEuler 22.03 SP4系统中，进入内核源码目录执行make menuconfig命令后终端无任何输出或回显，无法进入图形化配置界面，导致内核配置工作受阻。
+
+#问题根因
+系统缺少ncurses-devel开发依赖包，导致menuconfig所需的图形界面库无法正常加载，从而无回显。
+
+#解决方案
+1. 使用yum或dnf安装ncurses-devel依赖包：sudo dnf install ncurses-devel；  
+2. 确保已安装gcc、make等基础编译工具；  
+3. 重新进入内核源码目录执行make menuconfig，验证是否正常显示配置界面；  
+4. 若仍存在问题，可尝试执行make clean后重试。

@@ -1,0 +1,16 @@
+#标题
+dnf-makecache因网络超时失败
+
+#内核版本
+22.03 LTS SP4
+
+#问题现象
+系统在长稳压力测试中，定时任务执行dnf-makecache时失败，日志显示dnf-makecache.service报错“Curl error (28): Timeout was reached”；多次尝试访问https://mirrors.openeuler.org和http://repo.openeuler.org均因解析或连接超时失败，导致DNF元数据缓存无法更新。
+
+#问题根因
+系统在执行dnf-makecache时无法正常解析或连接到openEuler官方软件源地址，可能由于网络配置、DNS解析异常或防火墙策略限制导致连接超时。
+
+#解决方案
+1. 检查系统网络连通性，确认可访问外网；  
+2. 验证DNS配置是否正确（如/etc/resolv.conf）；  
+3. 测试手动访问repo地址（如curl -v https://mirrors.openeuler.org）。

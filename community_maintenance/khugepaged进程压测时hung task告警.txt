@@ -1,0 +1,17 @@
+#标题
+khugepaged进程压测时hung task告警
+
+#内核版本
+24.03
+
+#问题现象
+在Kunpeng平台执行高负载内存压力测试（`stress-ng --vm 256 --vm-bytes 442001M`）期间，系统日志报出khugepaged进程（PID 1313）阻塞超时告警，hung task检测触发，显示该进程处于不可中断睡眠状态（D状态），持续时间超过604秒。调用栈显示其卡在透明大页（THP）合并函数collapse_huge_page中，等待写信号量。
+
+#问题根因
+khugepaged内核线程在尝试合并透明大页时需获取内存映射的写锁，但在高并发内存压力下，其他进程频繁访问或修改相关内存区域，导致锁竞争激烈，khugepaged长时间阻塞，从而触发hung_task检测机制。
+
+#解决方案
+1. 确认压测结束后hung task日志不再新增，若仅在压测期间出现可视为正常现象，无需干预；  
+2. 如需临时抑制告警，可执行 `echo 0 > /proc/sys/kernel/hung_task_timeout_secs` 关闭hung task检测；  
+3. 在长期压测或性能敏感场景中，建议禁用透明大页：`echo never > /sys/kernel/mm/transparent_hugepage/enabled`；  
+4. 持续监控系统是否出现实际卡死或性能异常，若无则表明系统运行正常，告警可忽略。

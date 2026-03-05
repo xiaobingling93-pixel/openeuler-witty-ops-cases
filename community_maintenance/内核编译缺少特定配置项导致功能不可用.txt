@@ -1,0 +1,18 @@
+#标题  
+内核编译缺少特定配置项导致功能不可用  
+
+#内核版本  
+22.03sp4  
+
+#问题现象  
+用户在使用天工平台构建 openEuler 22.03 SP4 打榜镜像时，发现内核未启用以下三个关键配置项：CONFIG_NEED_PER_CPU_PAGE_FIRST_CHUNK、CONFIG_EROFS_FS_POSIX_ACL 和 CONFIG_CACHEFILES_ONDEMAND，导致相关功能（per-CPU内存管理、EROFS文件系统ACL支持、cachefiles按需加载）无法使用。  
+
+#问题根因  
+默认内核配置未启用上述三项配置选项，需在编译前手动修改 .config 或对应架构的 defconfig 文件以激活所需功能。  
+
+#解决方案  
+1. 进入内核源码目录；  
+2. 使用 make menuconfig 或直接编辑 .config 文件，将 CONFIG_NEED_PER_CPU_PAGE_FIRST_CHUNK=y、CONFIG_EROFS_FS_POSIX_ACL=y、CONFIG_CACHEFILES_ONDEMAND=y 添加或修改为 =y；  
+3. 若基于 defconfig 构建，可将上述配置追加到对应架构的 defconfig 文件中；  
+4. 重新编译内核，并检查生成的 .config 文件确认配置已生效；  
+5. 构建新镜像并验证相关功能是否正常工作。

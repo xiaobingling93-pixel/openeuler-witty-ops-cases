@@ -1,0 +1,18 @@
+#标题
+救援模式无法正常进入
+
+#内核版本
+24.03
+
+#问题现象
+在openEuler 24.03系统中，用户通过GRUB启动项添加systemd.unit=rescue.target参数后，系统无法在图形或本地终端进入可交互的救援模式；经串口连接确认系统实际已进入救援模式，但本地终端无响应。
+
+#问题根因
+内核启动参数缺少console=tty0配置，导致救援模式下控制台输出未正确绑定到本地终端，仅串口可见输出。
+
+#解决方案
+1. 编辑GRUB配置文件（通常为/etc/default/grub）；  
+2. 在GRUB_CMDLINE_LINUX行中添加console=tty0参数；  
+3. 若需同时支持串口，可保留原有console配置（如console=ttyS0,115200n8）并追加console=tty0；  
+4. 更新GRUB配置（例如执行grub2-mkconfig -o /boot/efi/EFI/openEuler/grub.cfg）；  
+5. 重启系统验证救援模式是否可通过本地终端正常进入。

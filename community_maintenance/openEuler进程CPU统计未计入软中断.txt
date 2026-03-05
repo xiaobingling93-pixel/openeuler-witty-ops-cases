@@ -1,0 +1,16 @@
+#标题  
+openEuler进程CPU统计未计入软中断  
+
+#内核版本  
+5.10.0-216.0.0.115.oe2203sp4  
+
+#问题现象  
+在openEuler 22.03 SP4系统上，使用top、ps等常规工具统计进程CPU使用率时，未包含软中断（softirq）所消耗的CPU时间。当运行高网络或I/O负载任务时，进程CPU使用率与系统整体负载明显不匹配。系统日志及/proc/stat中可观察到软中断时间被单独记录在softirq字段，未归属到触发中断的进程utime/stime中。  
+
+#问题根因  
+内核启用CONFIG_IRQ_TIME_ACCOUNTING=y后，中断（包括软中断）的CPU时间被单独记录在irq和softirq字段，不再归入对应进程的utime/stime，导致用户态监控工具无法将其计入进程CPU消耗。  
+
+#解决方案  
+1. 确认当前内核配置：检查内核.config文件中CONFIG_IRQ_TIME_ACCOUNTING是否为y；  
+2. 若需将软中断时间计入触发进程的CPU统计，需将CONFIG_IRQ_TIME_ACCOUNTING设为n，并重新编译部署内核；  
+3. 修改内核配置前，须在openEuler Kernel SIG双周例会申报议题（申报链接：https://etherpad.openeuler.org/p/Kernel-meetings）。

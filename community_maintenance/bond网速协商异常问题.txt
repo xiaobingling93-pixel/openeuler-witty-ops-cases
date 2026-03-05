@@ -1,0 +1,17 @@
+#标题  
+bond网速协商异常问题  
+
+#内核版本  
+24.03-LTS-SP1  
+
+#问题现象  
+在openEuler 24.03-LTS-SP1系统中配置bond0（mode=4，xmit_hash_policy=layer2+3）绑定两张Intel E810网卡后，实测带宽仅为25000Mb/s（约25Gbps），等同于单网卡速率；经检查发现仅一张网卡实际生效，bond未实现双链路聚合，LACP协商异常。  
+
+#问题根因  
+系统默认的ice驱动版本与Intel E810网卡或当前内核存在兼容性问题，导致LACP协商异常，bond无法正确聚合双链路。  
+
+#解决方案  
+1. 下载Intel官方ice驱动Release_30.0.1.zip；  
+2. 解压并进入ice-1.16.3/src目录；  
+3. 安装编译依赖：dnf install gcc gcc-c++ cmake rpmbuild kernel-devel-$(uname -r) kernel-headers-$(uname -r)；  
+4. 编译并安装新驱动（文档虽未完整列出后续步骤，但根据标准流程应继续执行make、make install及modprobe操作以加载新驱动）。

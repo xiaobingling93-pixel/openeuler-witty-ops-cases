@@ -1,0 +1,16 @@
+#标题  
+Java 1.8 JNI调用昇腾库触发coredump  
+
+#内核版本  
+22.03-LTS-SP3  
+
+#问题现象  
+在openEuler-22.03-LTS-SP3系统上，使用Java 1.8通过JNI调用ONNX C++接口并结合log4j记录日志时，程序崩溃并生成coredump；单独运行C++或JNI调用正常，仅在引入log4j后复现；Java 17版本无此问题。  
+
+#问题根因  
+昇腾工具包中的libascend_trace.so库注册了SIGSEGV信号处理器，覆盖了JVM原有的信号处理机制，导致Java 1.8在异常发生时无法正确捕获信号而崩溃；Java 17因信号处理机制优化未受影响。  
+
+#解决方案  
+1. 确认Ascend Toolkit版本为8.2.RC1；  
+2. 设置环境变量 ASCEND_SIGHANDLER_MODE=0，禁用昇腾库对SIGSEGV等信号的接管（参考华为3MS文档：https://3ms.huawei.com/km/blogs/details/15988082）；  
+3. 重新运行Java应用，验证coredump是否消除。

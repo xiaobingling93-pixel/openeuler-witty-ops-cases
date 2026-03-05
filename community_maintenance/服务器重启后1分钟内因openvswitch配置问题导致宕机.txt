@@ -1,0 +1,16 @@
+#标题  
+服务器重启后1分钟内因openvswitch配置问题导致宕机  
+
+#内核版本  
+6.6.0-28.0.0.34.oe2403.aarch64  
+
+#问题现象  
+服务器（型号TS200-2280，运行openEuler 24.03）在每次重启后约1分钟内必定发生系统无响应或自动重启。屏蔽openvswitch驱动后，问题不再复现。  
+
+#问题根因  
+用户环境中openvswitch发包流程存在死循环，导致内核资源耗尽或系统崩溃，属openvswitch配置不当引发的问题。  
+
+#解决方案  
+1. 暂时禁用openvswitch服务：执行 systemctl stop openvswitch && systemctl disable openvswitch；  
+2. 检查当前openvswitch的组网配置，重点排查流表、端口绑定及隧道设置是否存在环路或异常规则；  
+3. 更新openvswitch至最新稳定版本，确保兼容当前内核；

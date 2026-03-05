@@ -1,0 +1,16 @@
+#标题  
+host3节点运行bwa时系统卡死  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+在host3节点（IP: 29.204.23.112）运行bwa应用时，系统卡死无法响应；系统日志显示ccagent.service与batch-agent.service持续启动失败，重启次数超过1000次；服务启动参数包含“quiet”，导致缺乏详细错误信息。  
+
+#问题根因  
+服务启动脚本或依赖环境异常导致ccagent和batch-agent无法正常初始化，quiet参数掩盖了关键错误日志，加剧诊断难度。  
+
+#解决方案  
+1. 修改ccagent.service和batch-agent.service的启动参数，移除“quiet”选项以获取详细日志；  
+2. 使用journalctl -u <service_name> 查看完整服务日志，定位启动失败原因；  
+3. 检查服务依赖的配置文件、权限及网络连接是否正常。

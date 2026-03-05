@@ -1,0 +1,16 @@
+#标题
+重启后rc.local未执行
+
+#内核版本
+22.03 SP4
+
+#问题现象
+系统重启后，/etc/rc.local 中配置的命令未被执行，导致依赖该脚本添加的路由规则缺失，进而引发相关服务启动失败。复现方式为：配置 rc.local 内容并赋予执行权限，重启系统后观察脚本是否运行及路由是否生效。
+
+#问题根因
+rc.local 的 systemd 服务依赖软链接 /etc/systemd/system/multi-user.target.wants/rc-local.service，该软链接被意外删除，导致 rc-local.service 未被启用，脚本无法执行。
+
+#解决方案
+1. 检查软链接是否存在：ls -l /etc/systemd/system/multi-user.target.wants/rc-local.service；  
+2. 若不存在，重新启用服务：sudo systemctl enable rc-local；  
+3. 确保 /etc/rc.local 具有可执行权限：sudo chmod +x /etc/rc.local；
