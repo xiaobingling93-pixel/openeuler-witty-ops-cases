@@ -1,0 +1,19 @@
+#标题
+SELinux因启动参数禁用无法恢复
+
+#内核版本
+22.03 SP4
+
+#问题现象
+用户在openEuler 22.03 SP4系统中发现SELinux状态为Disabled且无法通过修改/etc/selinux/config配置文件恢复。系统启动后安全策略未生效，影响安全合规性要求较高的部署场景。日志或命令（如sestatus）显示SELinux处于完全禁用状态。
+
+#问题根因
+内核启动参数中配置了selinux=0，导致SELinux子系统在系统启动早期即被彻底禁用，无法通过常规配置文件（如/etc/selinux/config）重新启用。
+
+#解决方案
+1. 编辑GRUB配置文件 /etc/default/grub，从GRUB_CMDLINE_LINUX行中移除 selinux=0 参数；  
+2. 更新GRUB配置：  
+   - 对于UEFI系统，执行 grub2-mkconfig -o /boot/efi/EFI/openEuler/grub.cfg；  
+   - 对于BIOS系统，执行 grub2-mkconfig -o /boot/grub2/grub.cfg；  
+3. 确保 /etc/selinux/config 中设置 SELINUX=enforcing 或 SELINUX=permissive；  
+4. 重启系统使更改生效。

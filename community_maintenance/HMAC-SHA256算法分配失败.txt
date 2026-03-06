@@ -1,0 +1,16 @@
+#标题  
+HMAC-SHA256算法分配失败  
+
+#内核版本  
+2203sp4  
+
+#问题现象  
+在鲲鹏920Bs硬件上运行AC测试时，系统日志报出“alg: hash: failed to allocate transform for hmac(sha256-arm64-neon): -2”错误；依赖HMAC-SHA256的加密操作无法正常执行；复现方式为启动AC测试或调用相关加密接口即可触发。  
+
+#问题根因  
+错误码-2对应ENOMEM，表明内核在尝试加载hmac(sha256-arm64-neon)算法模块时内存分配失败，可能与arm64 neon加速模块初始化异常或内核crypto框架资源限制有关。  
+
+#解决方案  
+1. 确认系统是否已加载sha256-arm64-neon和hmac模块：执行 modprobe sha256-arm64-neon 和 modprobe hmac；  
+2. 检查/proc/crypto中是否存在hmac(sha256)相关条目；  
+3. 若模块缺失或加载失败，更新内核至包含修复补丁的版本（参考统一跟踪问题14）。

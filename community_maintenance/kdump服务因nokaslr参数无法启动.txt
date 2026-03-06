@@ -1,0 +1,22 @@
+#标题  
+kdump服务因nokaslr参数无法启动  
+
+#内核版本  
+24.03 SP1  
+
+#问题现象  
+- kdump服务在系统启动后无法正常启动，崩溃转储功能失效。  
+- 补充缺失配置项后问题仍存在。  
+- 手动执行kexec命令可成功加载崩溃内核，表明镜像本身无问题。  
+- 对比本地虚拟机（无nokaslr参数）发现kdump工作正常，初步定位与nokaslr参数相关。  
+
+#问题根因  
+内核启动参数中启用了nokaslr（禁用内核地址空间布局随机化），导致kdump无法正确加载或定位崩溃内核镜像，从而启动失败。  
+
+#解决方案  
+1. 编辑GRUB配置文件：vi /etc/default/grub；  
+2. 找到GRUB_CMDLINE_LINUX行，移除nokaslr参数；  
+3. 重新生成grub.cfg：  
+   - UEFI系统：grub2-mkconfig -o /boot/efi/EFI/openEuler/grub.cfg  
+   - BIOS系统：使用对应路径重新生成grub.cfg；  
+4. 重启系统使配置生效，并验证kdump服务是否正常启动。

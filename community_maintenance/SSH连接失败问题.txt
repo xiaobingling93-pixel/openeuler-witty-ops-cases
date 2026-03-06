@@ -1,0 +1,16 @@
+#标题  
+SSH连接失败问题  
+
+#内核版本  
+2403sp2  
+
+#问题现象  
+用户在2025年11月8日使用920G设备尝试通过标准SSH命令连接运行openEuler 24.03 SP2系统的主机时，连接被拒绝或超时；sshd服务已安装但无法正常接受远程连接请求。  
+
+#问题根因  
+sshd_config配置文件存在错误或关键参数未启用（如Port、PermitRootLogin、PasswordAuthentication等），导致sshd服务无法正常监听或接受连接请求。  
+
+#解决方案  
+1. 登录本地控制台，检查sshd服务状态：systemctl status sshd；  
+2. 编辑/etc/ssh/sshd_config文件，确保Port 22已启用，PermitRootLogin yes（按需），PasswordAuthentication yes；  
+3. 保存配置后重启sshd服务：systemctl restart sshd；

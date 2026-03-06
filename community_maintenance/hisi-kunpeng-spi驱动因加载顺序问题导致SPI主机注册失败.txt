@@ -1,0 +1,16 @@
+#标题  
+hisi-kunpeng-spi驱动因加载顺序问题导致SPI主机注册失败  
+
+#内核版本  
+24.03 SP2  
+
+#问题现象  
+系统启动过程中，dmesg日志中出现“hisi-kunpeng-spi HISI03E1:00: failed to register spi host, ret = -517”错误信息；该错误发生在hisi-kunpeng-spi驱动早于其依赖的gpio_hisi驱动加载时，虽后续gpio_hisi加载成功后会触发spi驱动重试并最终功能恢复正常，但初始报错会干扰自动化测试用例的判断，导致测试阻塞。  
+
+#问题根因  
+驱动加载顺序随机，导致hisi-kunpeng-spi在依赖的gpio_hisi驱动未就绪时尝试初始化，返回-EPROBE_DEFER（-517），属于内核驱动依赖管理的通用问题。  
+
+#解决方案  
+1. 在测试脚本中增加对-EPROBE_DEFER类报错的容错处理，避免因临时性延迟初始化错误导致测试误判；  
+2. 通过调整内核模块加载顺序（例如使用modprobe.d配置文件或定制initramfs）确保gpio_hisi驱动优先于hisi-kunpeng-spi加载；  
+3. 跟进上游社区是否已有相关修复补丁，如有则合入对应内核版本以从根本上解决依赖加载时序问题。

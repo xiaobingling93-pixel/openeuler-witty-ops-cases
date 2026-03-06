@@ -1,0 +1,16 @@
+#标题  
+cgroup v2下潮汐调度配置失败
+
+#内核版本  
+24.03
+
+#问题现象  
+在openEuler 24.03 LTS SP1系统中，用户启用dynamic_affinity=enabled内核参数并确认系统运行于cgroup v2模式（/sys/fs/cgroup/cgroup.controllers包含cpuset控制器），但在具体服务cgroup路径（如/system.slice/sshd.service）下执行ls /sys/fs/cgroup/system.slice/sshd.service/cpuset.pref*提示文件不存在，无法找到cpuset.preferred_cpus接口，导致无法配置潮汐调度的CPU偏好策略。
+
+#问题根因  
+cgroup v2架构下不再支持cpuset.preferred_cpus接口，该机制仅适用于cgroup v1；尽管内核启用了dynamic_affinity，但cgroup v2不兼容原有preferred_cpus逻辑，需通过cpuset.cpus直接管理CPU绑定。
+
+#解决方案  
+1. 确认系统确实运行于cgroup v2模式（检查/boot/cmdline中无systemd.unified_cgroup_hierarchy=0）；  
+2. 放弃使用cpuset.preferred_cpus，改用标准cgroup v2接口：通过向/sys/fs/cgroup/<service>/cpuset.cpus写入允许使用的CPU集合来实现绑核；  
+3. 若需实现类似“潮汐”动态绑核效果，应结合用户态调度器或脚本，定期根据系统负载动态调整cpuset.cpus的值。

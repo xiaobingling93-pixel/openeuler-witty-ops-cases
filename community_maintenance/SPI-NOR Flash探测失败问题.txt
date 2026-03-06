@@ -1,0 +1,16 @@
+#标题
+SPI-NOR Flash探测失败问题
+
+#内核版本
+22.03 SP3
+
+#问题现象
+设备启动后dmesg日志中出现“spi-nor: probe of spi-PRP0001:00 failed with error -2”错误，表明系统在探测SPI-NOR Flash设备时失败；该问题在正常开机进入系统后即可复现，影响系统对固件存储的识别与访问。
+
+#问题根因
+BIOS错误地上报了不存在的NA Flash信息，而实际硬件中NA位置并无Flash芯片，导致内核驱动在探测时因设备不存在而返回错误码-2（ENOENT）。
+
+#解决方案
+1. 联系BIOS厂商或固件团队确认当前BIOS版本是否存在Flash上报逻辑错误；  
+2. 升级至已修复该问题的BIOS版本，确保BIOS仅上报实际存在的Flash设备（如NB位置）；  
+3. 验证升级后dmesg日志中不再出现spi-nor probe失败信息。

@@ -1,0 +1,16 @@
+#标题  
+欧拉系统缺少kernel-devel导致驱动编译失败  
+
+#内核版本  
+5.10.0-216.0.0.115.oe2203sp4  
+
+#问题现象  
+在openEuler 22.03 SP4系统中编译驱动程序时失败，报错提示缺少内核头文件或构建环境；经检查，系统未安装与当前运行内核版本匹配的kernel-devel包。  
+
+#问题根因  
+系统未预装与运行内核版本完全一致的kernel-devel开发包，而该包是编译内核模块所必需的依赖。  
+
+#解决方案  
+1. 确认当前内核版本：执行 `uname -r`；  
+2. 启用openEuler官方源或对应SP版本的软件仓库；  
+3. 安装匹配的kernel-devel包：执行 `sudo dnf install kernel-devel-$(uname -r)`。

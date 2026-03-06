@@ -1,0 +1,16 @@
+#标题
+fio测试因OOM被杀导致异常中断
+
+#内核版本
+2203sp3
+
+#问题现象
+执行fio测试时进程意外终止；系统日志（/var/log/messages）显示在16:26左右fio进程被OOM killer强制终止；同时存在高内存压力（swap换出速率达2566 pgsout/s）和I/O队列异常（“High per disk average queue length”告警）。
+
+#问题根因
+系统物理内存严重不足，触发OOM killer机制，选择并终止占用内存较多的fio进程以维持系统稳定性；高swap换出速率（2566 pgsout/s）表明内存压力极大。
+
+#解决方案
+1. 检查fio测试配置，降低并发线程数或减少内存使用量；  
+2. 增加系统可用物理内存或调整swap空间；  
+3. 调整OOM killer行为（如通过oom_score_adj降低fio进程被杀优先级）。

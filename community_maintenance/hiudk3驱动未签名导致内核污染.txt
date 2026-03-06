@@ -1,0 +1,17 @@
+#标题  
+hiudk3驱动未签名导致内核污染  
+
+#内核版本  
+22.03 LTS SP4  
+
+#问题现象  
+在openEuler 22.03 LTS SP4系统上加载hiudk3驱动时，出现“module verification failed: signature and/or required key missing - tainting kernel”错误日志，同时伴随“alg: ecdh-nist-p256: test failed on vector 2, err=-14”告警。该问题在Kunpeng Board & TaiShan Server 2.11.0的aarch64设备上可稳定复现，表现为内核被污染、系统安全性和稳定性受影响。  
+
+#问题根因  
+hiudk3驱动未进行数字签名，而系统启用了内核模块签名强制验证（CONFIG_MODULE_SIG_FORCE=y），导致模块加载失败并污染内核；ECDH测试失败可能与内核完整性受损或依赖模块异常有关。  
+
+#解决方案  
+1）对hiudk3驱动使用系统认可的私钥进行签名，命令示例：`sign-file certs/signing_key.pem certs/signing_key.x509 hiudk3.ko`；  
+2）若为开发测试环境，可临时禁用模块签名强制验证（修改内核启动参数，移除`module.sig_enforce=1`）；  
+3）确认ECDH测试失败是否由模块加载异常引发，修复签名问题后重新测试；  
+4）参考相关issue跟踪已知问题进展，避免重复处理。

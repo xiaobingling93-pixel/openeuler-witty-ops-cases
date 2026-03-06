@@ -1,0 +1,17 @@
+#标题  
+oe24.03SP2源中缺失vconfig工具  
+
+#内核版本  
+24.03SP2  
+
+#问题现象  
+用户在openEuler 24.03 SP2系统中执行“dnf install vconfig”或“yum search vconfig”命令时，系统返回无匹配软件包，无法安装vconfig工具，导致原有依赖该工具的VLAN配置流程中断。  
+
+#问题根因  
+openEuler 24.03 SP2默认软件源中未包含vconfig工具包，因其已被iproute2套件中的ip link命令取代，主流发行版已逐步弃用vconfig。  
+
+#解决方案  
+1. 建议改用iproute2工具管理VLAN，例如使用命令“ip link add link eth0 name eth0.100 type vlan id 100”创建VLAN接口；  
+2. 若必须使用vconfig，可启用everything源：编辑/etc/yum.repos.d/目录下的.repo文件，确保[OS]和[Everything]源已启用；  
+3. 执行“dnf --enablerepo=everything install vconfig”进行安装；  
+4. 安装完成后验证vconfig命令是否可用。

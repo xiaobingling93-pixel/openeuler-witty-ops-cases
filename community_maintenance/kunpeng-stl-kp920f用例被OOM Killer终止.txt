@@ -1,0 +1,16 @@
+#标题  
+kunpeng-stl-kp920f用例被OOM Killer终止  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+在天工HPC环境中执行kunpeng-stl-kp920f测试用例时，进程被系统OOM Killer强制终止，日志记录显示该事件发生于2025年11月12日。问题可稳定复现，无需特殊操作；执行`echo 3 > /proc/sys/vm/drop_caches`清理缓存后可临时恢复测试。  
+
+#问题根因  
+系统可用内存不足，触发内核OOM Killer机制，选择占用内存较大的kunpeng-stl-kp920f进程终止以维持系统稳定性。  
+
+#解决方案  
+1. 执行`echo 3 > /proc/sys/vm/drop_caches`释放缓存，临时缓解内存压力；  
+2. 调整系统内存分配策略，例如增大交换空间或优化应用内存使用；  
+3. 修改OOM Killer评分参数（如通过`oom_score_adj`）降低关键测试进程被杀概率。

@@ -1,0 +1,16 @@
+#标题  
+openEuler 24.03 SP1 FIO存储性能低于RHEL  
+
+#内核版本  
+24.03sp1  
+
+#问题现象  
+在相同x86硬件环境下，使用FIO工具对openEuler 24.03 SP1进行磁盘I/O性能测试时，其吞吐量和IOPS显著低于运行RHEL（内核4.18）的相同配置系统。复现步骤包括：部署相同硬件、安装默认内核、使用一致的FIO参数（如块大小、队列深度、读写模式），多次测试结果均显示openEuler性能偏低。  
+
+#问题根因  
+可能与openEuler 24.03 SP1内核调度策略、I/O子系统调优参数或块设备驱动实现差异有关，相较于RHEL 4.18内核在存储路径上的优化不足。  
+
+#解决方案  
+1. 检查并对比两系统内核版本及I/O相关配置（如scheduler、nr_requests、read_ahead_kb）；  
+2. 尝试在openEuler中切换I/O调度器为mq-deadline或none（适用于NVMe）；  
+3. 调整内核参数（如vm.dirty_ratio、vm.swappiness）以优化I/O行为。

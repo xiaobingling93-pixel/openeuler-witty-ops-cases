@@ -1,0 +1,17 @@
+#标题
+openeuler 24.03 SP1 reboot后CPU性能计数器读取失败
+
+#内核版本
+24.03sp1
+
+#问题现象
+在openEuler 24.03 SP1系统执行reboot后，dmesg日志中出现“读取CPU 1的性能计数器失败”异常信息；可通过命令 dmesg | grep -i cppc 或 dmesg | grep -i "performance counter" 复现该日志；问题通常出现在系统启动或重启过程中，可能影响CPU频率调节、能效管理及低功耗特性。
+
+#问题根因
+内核CPPC驱动与海思920BS平台固件（如ACPI表中的_PPC或_CPPC对象）兼容性不足，导致内核无法正确读取CPU性能计数器寄存器，触发错误日志。
+
+#解决方案
+1. 确认当前BIOS/固件版本是否为最新，若非最新，请升级至海思推荐版本；  
+2. 在内核启动参数中临时添加 acpi_enforce_resources=lax 或 processor.max_cstate=0 以规避CPPC初始化问题；  
+3. 联系海思提供针对920BS平台的CPPC兼容性补丁或更新ACPI表；  
+4. 若问题不影响业务运行，可暂时忽略该dmesg警告，但建议持续跟踪内核及固件更新。

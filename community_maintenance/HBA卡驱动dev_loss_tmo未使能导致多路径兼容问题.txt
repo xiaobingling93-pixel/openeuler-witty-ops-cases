@@ -1,0 +1,19 @@
+#标题
+HBA卡驱动dev_loss_tmo未使能导致多路径兼容问题
+
+#内核版本
+20.03 SP4
+
+#问题现象
+在openEuler 20.03 SP4系统中，加载HBA卡驱动后，/sys/class/scsi_host/hostX/rport-X:X:X/ 目录下缺失 dev_loss_tmo 文件；多路径软件（如 multipath）因无法读取该文件，在路径故障时可能出现路径切换异常或 I/O 挂起。复现步骤为：加载HBA驱动 → 检查rport目录下是否存在dev_loss_tmo文件 → 验证多路径行为。
+
+#问题根因
+HBA驱动代码中未设置 show_rport_dev_loss_tmo 属性，导致SCSI子系统未向用户空间暴露 dev_loss_tmo 接口，违反了FC transport class规范，造成与多路径软件的兼容性断裂。
+
+#解决方案
+1. 获取对应HBA驱动源码；  
+2. 在驱动的rport属性定义中添加 show_rport_dev_loss_tmo 回调函数；  
+3. 重新编译并安装驱动模块；  
+4. 重启系统或重新加载驱动后验证 /sys/class/scsi_host/hostX/rport-X:X:X/dev_loss_tmo 文件是否生成；  
+5. 测试多路径软件在链路故障场景下的行为是否恢复正常。  
+建议将修复提交至 openEuler 社区以同步上游。

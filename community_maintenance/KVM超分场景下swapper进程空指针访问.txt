@@ -1,0 +1,16 @@
+#标题  
+KVM超分场景下swapper进程空指针访问  
+
+#内核版本  
+5.10.0-136.12.0.86.h1687.eulerosv2r12  
+
+#问题现象  
+在KVM 1:3超分部署环境下，系统运行过程中swapper进程（PID 0）出现异常调用栈，从hrtimer中断处理路径跳转至housekeeping_enabled函数，触发空指针解引用错误。日志显示调用链始于arch_timer中断，经kvm_bg_timer_expire唤醒vcpu，最终在update_rq_clock路径崩溃。该问题偶发但可复现于高负载超分场景。  
+
+#问题根因  
+内核在处理高精度定时器中断时，KVM后台定时器回调函数kvm_bg_timer_expire唤醒vcpu过程中，调度相关数据结构（如rq或task_struct）可能未正确初始化或已被释放，导致housekeeping_enabled读取无效指针，引发空指针访问。  
+
+#解决方案  
+1. 升级至官方修复该问题的内核版本（建议≥5.10.0-136.20.0.xxxx.eulerosv2r12）；  
+2. 若无法立即升级，临时规避措施为降低KVM超分比（如改为1:2）或关闭后台定时器相关特性（通过内核参数kvm.bg_timer=0）；  
+3. 启用内核CONFIG_DEBUG_ATOMIC_SLEEP和KASAN选项进行复现调试，确认具体内存破坏点。

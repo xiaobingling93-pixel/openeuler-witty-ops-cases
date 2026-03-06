@@ -1,0 +1,16 @@
+#标题  
+openEuler网口名称概率性变化问题  
+
+#内核版本  
+24.03 SP2  
+
+#问题现象  
+系统启动后，物理网卡接口名称（如enp2s0f5u1u3）存在概率性变化，例如变为enp34s0f5u1u3。通过ifconfig查看当前接口名与network-scripts目录下存在的多个ifcfg-配置文件（如ifcfg-enp2s0f5u1u3和ifcfg-enp34s0f5u1u3）不一致，导致网络服务无法正确加载对应配置，引发IP地址分配异常或网络中断。  
+
+#问题根因  
+Linux系统使用可预测网络接口命名规则（如基于固件、拓扑等），但在某些硬件平台或内核版本下，设备枚举顺序不稳定，导致udev生成的接口名称不一致。  
+
+#解决方案  
+1. 禁用可预测命名规则，在GRUB_CMDLINE_LINUX中添加net.ifnames=0 biosdevname=0；  
+2. 更新grub配置：执行grub2-mkconfig -o /boot/efi/EFI/openEuler/grub.cfg（UEFI）或对应BIOS路径；  
+3. 重启系统使配置生效。

@@ -1,0 +1,16 @@
+#标题  
+修改内核参数导致网卡名称乱序  
+
+#内核版本  
+20.03 SP3  
+
+#问题现象  
+在openEuler 20.03 SP3系统中，修改与PCIe或网络驱动相关的内核启动参数并重启后，有概率出现网卡名称漂移（如eth0变为eth1等）。该现象导致依赖固定网卡名的网络配置失效，影响业务连续性。  
+
+#问题根因  
+Linux系统默认使用可预测网络接口名称（Predictable Network Interface Names）机制，但在某些内核参数调整或硬件枚举顺序变化情况下，udev在初始化阶段可能按不同顺序识别网卡，导致分配的名称不一致。  
+
+#解决方案  
+1. 创建自定义udev规则文件，例如 /etc/udev/rules.d/70-persistent-net.rules；  
+2. 根据网卡MAC地址绑定固定名称，规则格式如：SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="xx:xx:xx:xx:xx:xx", NAME="eth0"；  
+3. 重新加载udev规则：执行 udevadm control --reload-rules && udevadm trigger；

@@ -1,0 +1,16 @@
+#标题  
+aarch64架构缺失CONFIG_MEM_DIRTY_TRACKING支持导致内存脏页追踪功能不可用  
+
+#内核版本  
+2403sp1  
+
+#问题现象  
+在openEuler 24.03 SP1（内核版本6.6.0-86.0.0.90.oe2403sp1.aarch64）系统上运行openFuyao时，内存脏页追踪功能不可用。检查内核配置文件.config发现CONFIG_MEM_DIRTY_TRACKING未设置为y或m。该问题可能影响虚拟机热迁移等依赖内存脏页跟踪的场景。  
+
+#问题根因  
+aarch64架构在当前内核版本中未实现或未启用内存脏页追踪机制，相关Kconfig选项可能被架构限制或未合入主线。  
+
+#解决方案  
+1. 确认内核源码中arch/arm64/Kconfig是否支持CONFIG_MEM_DIRTY_TRACKING；  
+2. 若未支持，可尝试从x86实现移植相关代码并适配aarch64内存管理机制；  
+3. 或向openEuler社区提交特性请求，推动官方支持。

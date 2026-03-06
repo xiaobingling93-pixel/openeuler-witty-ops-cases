@@ -1,0 +1,20 @@
+#标题
+ISO镜像制作后无法识别问题
+
+#内核版本
+20.03 LTS
+
+#问题现象
+用户基于openEuler-20.03-LTS-aarch64原始ISO镜像添加自定义脚本并使用genisoimage重新打包后，生成的新ISO在通过光驱挂载启动时无法被系统识别。启动过程中无有效引导行为，导致定制化部署流程中断。
+
+#问题根因
+genisoimage命令中指定的引导镜像（-b images/boot.iso）不适用于aarch64架构，且未正确构建符合ISO 9660 + El Torito + UEFI标准的混合引导结构，导致系统无法从新ISO启动。
+
+#解决方案
+1. 推荐使用openEuler官方提供的oemaker工具进行镜像定制，其对引导结构和文件系统布局有完整支持；
+2. 若仍需手动构建，请确保同时包含BIOS（isolinux）和UEFI（efiboot.img）引导文件，并使用xorriso替代genisoimage以更好支持混合引导；
+3. 参考命令示例：
+   -b isolinux/isolinux.bin -c isolinux/boot.cat \
+   -no-emul-boot -boot-load-size 4 -boot-info-table \
+   -eltorito-alt-boot -e images/efiboot.img -no-emul-boot \
+   -isohybrid-mbr /usr/share/syslinux/isohdpfx.bin

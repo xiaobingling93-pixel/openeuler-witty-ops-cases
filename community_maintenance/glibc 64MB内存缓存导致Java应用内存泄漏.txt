@@ -1,0 +1,16 @@
+#标题  
+glibc 64MB内存缓存导致Java应用内存泄漏  
+
+#内核版本  
+未知  
+
+#问题现象  
+国铁12306风控业务服务器在重启后（9月13日起）可用内存持续下降，从768G骤降至40G；pmap分析显示新增内存块以16个64MB为单位增长；复现条件为频繁分配/释放64KB–128KB内存块的Java应用，表现为物理内存（RSS）无法回收，呈现“内存泄漏”特征。  
+
+#问题根因  
+glibc的ptmalloc2在多线程环境下为每个线程维护独立Arena，并缓存最多64MB堆内存不归还OS；结合Java GC周期性大量分配/释放堆外内存，造成物理内存碎片化与RSS持续增长。  
+
+#解决方案  
+1. 调整环境变量：设置 MALLOC_MMAP_THRESHOLD_=131072（128KB），使小内存分配改用mmap，free时直接释放物理内存；  
+2. 禁用透明大页（THP）：执行 echo never > /sys/kernel/mm/transparent_hugepage/enabled，避免2MB大页加剧内存浪费；  
+3. 验证参数生效：通过 pmap -x <pid> 和 /proc/<pid>/smaps 监控内存分配模式是否改善。

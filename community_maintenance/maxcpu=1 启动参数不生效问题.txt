@@ -1,0 +1,16 @@
+#标题
+maxcpu=1 启动参数不生效问题
+
+#内核版本
+22.03 SP4
+
+#问题现象
+系统启动时添加内核参数 maxcpu=1，预期仅启用一个 CPU 核心，但实际观察到多个 CPU 核心处于 online 状态。启动日志显示除第一个核心外，其余核心由后续进程激活。
+
+#问题根因
+udev 规则文件 /usr/lib/udev/rules.d/40-openEuler.rules 中包含自动上线 CPU 的指令，在系统初始化阶段触发设备 add 事件，强制将 offline 的 CPU 设为 online，覆盖了 maxcpu=1 参数的限制效果。
+
+#解决方案
+1. 编辑 udev 规则文件：sudo vi /usr/lib/udev/rules.d/40-openEuler.rules  
+2. 找到自动上线 CPU 的规则行并在行首添加 # 注释掉该行  
+3. 保存文件并退出编辑器

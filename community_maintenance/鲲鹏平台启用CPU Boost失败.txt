@@ -1,0 +1,16 @@
+#标题  
+鲲鹏平台启用CPU Boost失败  
+
+#内核版本  
+2203sp3  
+
+#问题现象  
+在openEuler 22.03 SP3系统（内核版本5.10.0-153.12.0.92.oe2203sp3.aarch64）上执行 echo 1 > /sys/devices/system/cpu/cpufreq/boost 命令时返回“Invalid argument”错误；dmesg日志显示“CPPC Cpufreq: BOOST not supported by CPU or firmware”及“Cannot enable BOOST!”，表明系统无法启用CPU频率Boost功能。  
+
+#问题根因  
+该鲲鹏平台所用CPU（可能为海思自研型号）或其固件未实现ACPI CPPC规范中的Boost控制接口，导致Linux内核cpufreq子系统无法启用Boost功能。  
+
+#解决方案  
+1. 执行 lscpu 命令确认具体CPU型号；  
+2. 联系海思硬件接口人，核实该CPU是否支持Boost功能及所需固件版本；  
+3. 若硬件确实不支持，则无需启用Boost，可忽略该错误。

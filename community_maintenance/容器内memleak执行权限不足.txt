@@ -1,0 +1,16 @@
+#标题
+容器内memleak执行权限不足
+
+#内核版本
+22.03 SP4
+
+#问题现象
+在openEuler 22.03 SP4系统中，用户在宿主机可正常使用memleak工具，但在容器内执行memleak命令时提示权限不足，无法正常运行。复现步骤包括：部署容器后直接执行memleak，出现权限相关报错。
+
+#问题根因
+容器默认安全策略限制了对内核调试接口的访问权限，导致memleak等需要访问/proc或内核符号的工具无法正常工作。
+
+#解决方案
+1）启动容器时添加--privileged=true参数以提升权限；  
+2）或通过--cap-add=SYS_ADMIN并挂载必要目录（如/lib/modules、/usr/src）实现最小权限授权；  
+3）确保容器内已安装对应内核头文件与开发包（如kernel-devel、kernel-headers）。

@@ -1,0 +1,16 @@
+#标题  
+openEuler 22.03 CPU睿频异常问题  
+
+#内核版本  
+22.03  
+
+#问题现象  
+在Intel 8558服务器上运行openEuler 22.03系统时，CPU全核睿频仅达到2.8GHz，低于标称的3.0GHz；该现象仅在使用默认intel_cpufreq驱动时出现，切换至acpi_cpufreq驱动后睿频恢复正常；系统启用C1E节能状态，在空闲时主动降频，可能被误判为异常降频。  
+
+#问题根因  
+openEuler 22.03默认使用的intel_cpufreq驱动与Intel 8558处理器在特定配置下存在兼容性问题，导致睿频受限；同时C1E节能机制在无负载时主动降低频率，加剧了频率偏低的现象。  
+
+#解决方案  
+1. 将CPU频率驱动从intel_cpufreq切换为acpi_cpufreq，可通过内核参数processor.max_cstate=0或修改GRUB配置实现；  
+2. 若需避免空闲降频，可在BIOS中关闭C1E节能状态，或在系统中通过cpupower工具禁用相关C-state；  
+3. 关注官方内核更新，后续版本可能修复intel_cpufreq兼容性问题。

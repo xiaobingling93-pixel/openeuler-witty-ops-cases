@@ -1,0 +1,16 @@
+#标题  
+920B Pro Hadoop测试中因double free导致系统挂死  
+
+#内核版本  
+22.03 SP3  
+
+#问题现象  
+在鲲鹏920B Pro平台执行Hadoop测试用例时，系统出现call trace并挂死重启；日志中可观测到“bad page state”错误，调用栈涉及kfree、sched_grid_qos_free和free_task函数。  
+
+#问题根因  
+自研调度特性中存在竞态条件，在任务释放过程中发生double free，导致页面引用计数异常（refcount = -1），进而触发内核bad page state检查失败。  
+
+#解决方案  
+1. 升级内核至修复版本5.10.0-236.0.0或更高；  
+2. 若无法立即升级，可临时禁用相关自研调度特性（如sched_grid_qos）以规避问题；  
+3. 应用官方提供的补丁（https://gitee.com/openeuler/kernel/pulls/13173）并重新编译内核。

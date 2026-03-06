@@ -1,0 +1,17 @@
+#标题  
+openEuler动态链接器缺失debug符号导致调试困难  
+
+#内核版本  
+22.03sp4  
+
+#问题现象  
+用户在运行ior工具进行MPIIO测试后观察到内存泄漏，尝试使用gdb等调试工具分析时，因系统默认的动态链接器（如ld-linux-aarch64.so）缺少debug符号，无法有效追踪内存泄漏根源。复现行为包括执行指定ior命令后内存持续增长，且调试过程中因符号缺失导致堆栈信息不完整或无法解析关键调用路径。  
+
+#问题根因  
+openEuler为减小体积和提升性能，默认发行版中剥离了包括动态链接器在内的系统库的调试符号，调试信息单独打包在debuginfo包中。  
+
+#解决方案  
+1. 访问openEuler官方debuginfo仓库：https://dl-cdn.openeuler.openatom.cn/openEuler-22.03-LTS-SP4/debuginfo/aarch64/Packages/；  
+2. 根据系统版本（openEuler 22.03 LTS SP4）及内核版本5.10.0-250.0.0.154.oe2203sp4.aarch64，查找并下载对应的glibc-debuginfo或glibc-common-debuginfo包（动态链接器通常由glibc提供）；  
+3. 安装debuginfo包：sudo rpm -ivh glibc-debuginfo-*.rpm；  
+4. 安装完成后，调试工具（如gdb）将能正确加载动态链接器的符号信息，支持深入诊断内存泄漏等问题。

@@ -1,0 +1,16 @@
+#标题  
+CPU硬锁死与时钟中断异常  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+系统运行期间触发NMI watchdog，日志显示“NMI watchdog: Watchdog detected hard LOCKUP on cpu 287”，调用栈卡在second_overflow函数；该函数属于timekeeping子系统，在处理jiffies更新和时间推进时长时间占用CPU，导致其他任务无法调度；问题在高负载或特定硬件计时器配置下可能复现。  
+
+#问题根因  
+内核时钟处理逻辑（timekeeping_advance）中存在潜在死循环或长时间临界区，可能因硬件计时器异常、jiffies溢出处理不当或PMU相关驱动干扰导致CPU无法及时响应中断。  
+
+#解决方案  
+1. 升级至最新内核版本，确认是否已修复相关timekeeping或ARM64平台时钟问题；  
+2. 检查并更新BIOS固件至最新版本（当前为32.22E），确保硬件计时器行为正常；  
+3. 临时规避：在启动参数中添加`nowatchdog`或`nmi_watchdog=0`禁用NMI watchdog（仅限调试）。

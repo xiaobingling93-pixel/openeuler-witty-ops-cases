@@ -1,0 +1,16 @@
+#标题  
+IRQ 352亲和性修改失败  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+在openEuler 22.03 SP4系统中，执行修改IRQ 352的CPU亲和性操作时返回错误“Cannot change IRQ 352 affinity: Input/output error”。通过cat /proc/interrupts可查看该中断对应的硬件设备，但因系统已重启，原中断号可能已变化。该错误由irqbalance尝试调整不可迁移的中断引发，影响中断负载均衡。  
+
+#问题根因  
+驱动代码中为PMU中断设置了IRQF_NO_BALANCING标志，强制绑定CPU且禁止迁移，导致用户态或irqbalance修改亲和性时失败。  
+
+#解决方案  
+1. 执行 cat /proc/interrupts | column -t 查看当前系统中断分配，定位IRQ 352（或对应新中断号）所属硬件；  
+2. 联系该硬件设备的责任人（如基础软件团队）确认是否需保留IRQF_NO_BALANCING设置；  
+3. 若业务允许调整中断亲和性，需修改驱动代码移除IRQF_NO_BALANCING标志并重新编译加载。

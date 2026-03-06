@@ -1,0 +1,16 @@
+#标题  
+Flink任务在统信系统上阻塞  
+
+#内核版本  
+openEuler-20.03-LTS-SP3  
+
+#问题现象  
+Flink作业部署于运行统信操作系统（基于openEuler-20.03-LTS-SP3）的神州数码服务器后，部分Task长时间处于“RUNNING”状态但无数据处理进展，导致整个作业卡住；该现象可通过部署Flink集群、提交典型流处理作业并在Web UI及TaskManager日志中观察到，可稳定复现。  
+
+#问题根因  
+统信系统对openEuler内核的部分调度或I/O参数进行了定制化修改，可能引发Flink Task线程在特定条件下发生死锁或资源争用，尤其在高并发或网络波动场景下更易触发。  
+
+#解决方案  
+1. 检查并调整Flink配置，如taskmanager.numberOfTaskSlots、network buffers等，避免资源过载；  
+2. 在统信系统中验证并优化内核参数，特别是与CPU调度、文件句柄及网络相关的设置（如vm.swappiness、net.core.somaxconn）；  
+3. 升级Flink至兼容openEuler的稳定版本，或应用社区已知修复补丁。

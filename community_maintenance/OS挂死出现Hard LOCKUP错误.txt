@@ -1,0 +1,16 @@
+#标题  
+OS挂死出现Hard LOCKUP错误  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+系统运行中突然挂死，日志显示CPU 112触发“Hard LOCKUP”错误并导致内核panic；Call trace涉及memchr_inv、quiet_vmstat及tick_nohz_stop_tick等函数；问题在正常运行负载后复现；临时通过隔离CPU 112可避免故障发生。  
+
+#问题根因  
+CPU 112在idle过程中因硬件或固件异常导致看门狗超时，触发SDEI中断处理失败，进而引发硬锁死（Hard LOCKUP）。可能与特定CPU核心的硬件缺陷或BIOS配置有关。  
+
+#解决方案  
+1. 临时规避：在内核启动参数中添加 isolcpus=112 或 maxcpus=112 隔离故障核心；  
+2. 更新BIOS至最新版本（当前为32.22E），确认是否修复相关CPU电源管理或SDEI问题；  
+3. 联系海思硬件团队对CPU 112进行硬件诊断，排查是否存在物理缺陷。

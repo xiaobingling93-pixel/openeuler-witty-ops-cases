@@ -1,0 +1,21 @@
+#标题  
+GPT分区错误导致USB Hub配置失败及内核模块验证异常  
+
+#内核版本  
+22.03 LTS SP4  
+
+#问题现象  
+在openEuler 22.03 LTS SP4系统上运行DC测试时，dmesg日志频繁出现以下错误信息：  
+- “hub x-0:1.0: config failed, hub doesn't have any ports! (err -19)”  
+- “hiudk3: module verification failed”  
+- “alg: ecdh-nist-p256: test failed”  
+- “GPT: Use GNU Parted to correct GPT errors.”  
+上述现象导致USB设备无法正常识别、内核模块加载失败，并影响系统整体稳定性。  
+
+#问题根因  
+GPT分区表存在错误或不完整，导致系统在初始化USB控制器或相关硬件时无法正确识别端口配置；同时内核模块未正确签名或缺少必要密钥，引发模块加载失败并污染内核。  
+
+#解决方案  
+1. 使用GNU Parted工具检查并修复GPT分区表：执行 `parted /dev/sdX print`（替换为实际磁盘）查看错误，再运行 `parted /dev/sdX rescue` 或 `gdisk /dev/sdX` 进行修复。  
+2. 确保使用官方签名的内核模块；若为自编译模块，需配置内核签名密钥并重新签名。  
+3. 更新系统至最新补丁版本，参考社区Issue I28XSA（https://gitee.com/openeuler/community/issues/I28XSA）获取针对性修复。

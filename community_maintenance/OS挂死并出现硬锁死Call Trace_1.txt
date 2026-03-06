@@ -1,0 +1,16 @@
+#标题
+OS挂死并出现硬锁死Call Trace
+
+#内核版本
+22.03 SP2
+
+#问题现象
+系统运行至约107秒时，CPU 215触发NMI watchdog硬锁死（Hard LOCKUP）告警；Call Trace显示线程卡在native_queued_spin_lock_slowpath，处于drain_zone_pages和vmstat_update路径中；同时硬件日志报告“Uncorrected error, Latent or Restartable error (UEO)”；问题多发生在高负载或内存回收场景下。
+
+#问题根因
+内核在更新虚拟内存统计（vmstat）时因争用自旋锁而长时间阻塞，结合硬件上报的不可纠正错误（UEO），推测为内存子系统硬件故障或固件异常导致锁无法释放，进而引发系统挂死。
+
+#解决方案
+1. 联系硬件团队检查鲲鹏920B服务器内存模块、固件版本及BMC日志，确认是否存在物理内存错误或需升级固件；  
+2. 收集完整kdump或vmcore进行内核锁状态分析，确认是否为已知内核bug；  
+3. 若为已知问题，升级至包含对应修复的openEuler 22.03 SP2内核版本（如5.10.0-153.12.0.92之后的安全更新）。

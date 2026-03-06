@@ -1,0 +1,16 @@
+#标题  
+openEuler装机DHCP被动获取失败  
+
+#内核版本  
+22.03-LTS-SP4  
+
+#问题现象  
+在openEuler 22.03 LTS SP4装机过程中，加载Kickstart配置阶段系统无法通过DHCP被动获取IP地址；手动执行dhclient命令可成功获取IP。问题复现与使用Intel E810、XL710及e40e网卡相关，且在缺少对应光交换机的家庭环境中难以完全复现。  
+
+#问题根因  
+网卡驱动在PXE或Anaconda初始化阶段未正确激活或未及时发送DHCP Discover请求，导致被动DHCP流程失败，可能与特定Intel网卡（E810/XL710）在openEuler内核中的驱动适配有关。  
+
+#解决方案  
+1. 在Kickstart配置中添加网络接口预激活命令，例如在%pre脚本中执行ifup或dhclient；  
+2. 更新或替换为官方认证兼容的网卡驱动模块（如intel-ice或i40e）；  
+3. 在GRUB引导参数中显式指定网络接口和DHCP，例如添加ip=dhcp参数。

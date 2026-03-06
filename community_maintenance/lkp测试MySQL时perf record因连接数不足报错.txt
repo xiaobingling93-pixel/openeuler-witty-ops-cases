@@ -1,0 +1,16 @@
+#标题
+lkp测试MySQL时perf record因连接数不足报错
+
+#内核版本
+2403sp1
+
+#问题现象
+在openEuler-24.03-LTS-SP1系统上使用lkp对MySQL进行性能测试时，执行perf record命令过程中报错，导致测试任务中断。错误发生在触发perf record采集性能数据阶段，与MySQL并发连接需求相关。
+
+#问题根因
+MySQL的最大连接数配置过低，在perf工具采集期间无法满足并发连接需求，从而引发错误。
+
+#解决方案
+1. 登录MySQL数据库；  
+2. 查看当前最大连接数：SHOW VARIABLES LIKE 'max_connections';  
+3. 修改配置文件（如my.cnf）中的max_connections参数，适当增大其值（如设为500或更高）；

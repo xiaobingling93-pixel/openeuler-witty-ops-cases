@@ -1,0 +1,16 @@
+#标题  
+irqbalance修改中断亲和性失败  
+
+#内核版本  
+22.03 LTS SP4  
+
+#问题现象  
+系统日志中出现“Cannot change IRQ 154 affinity: Input/output error”错误信息；在openEuler-22.03-LTS-SP4-aarch64系统中运行irqbalance服务后，通过/var/log/messages或journalctl可稳定复现该错误，表明irqbalance无法设置IRQ 154的CPU亲和性，可能影响中断负载均衡及系统性能。  
+
+#问题根因  
+IRQ 154对应的硬件设备可能不支持动态修改中断亲和性，或其驱动未正确实现相关接口，导致内核返回I/O错误。  
+
+#解决方案  
+1. 执行命令 `cat /proc/interrupts | column -t`，定位IRQ 154对应的硬件设备；  
+2. 根据设备类型（如网卡、RAID卡等）联系对应硬件或驱动责任人确认是否支持亲和性调整；  
+3. 若设备确实不支持，可将该IRQ从irqbalance管理中排除，编辑/etc/default/irqbalance，添加 `IRQBALANCE_BANNED_INTERRUPTS="154"`。

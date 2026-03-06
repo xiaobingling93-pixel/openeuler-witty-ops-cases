@@ -1,0 +1,16 @@
+#标题  
+openEuler 24.03 SP1 multipath initramfs 引导异常  
+
+#内核版本  
+24.03sp1  
+
+#问题现象  
+在物理机最小化安装 openEuler 24.03 SP1（GPT 分区表 + BIOS 引导）后，安装 multipath-tools 软件包并执行 dracut -N 重生成 initramfs，系统重启时无法正常引导。具体表现为引导流程卡死或失败，系统不可用。  
+
+#问题根因  
+dracut 在未配置 multipath 的情况下默认将 multipath 模块打包进 initramfs，但因缺少必要配置文件（如 multipath.conf），导致 initramfs 初始化阶段 multipath 服务异常，进而阻塞系统引导流程。  
+
+#解决方案  
+避免在未配置 multipath 的环境中自动加载 multipath 模块。建议在执行 dracut 重生成 initramfs 前，通过以下方式之一规避问题：  
+1. 禁用 multipath 模块自动包含：在 /etc/dracut.conf.d/ 中创建配置文件（如 99-multipath.conf），添加 omit_dracutmodules+="multipath"；  
+2. 或在安装 multipath-tools 后，确保提供有效的 /etc/multipath.conf 配置文件，再运行 dracut -N。

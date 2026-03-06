@@ -1,0 +1,16 @@
+#标题  
+openEuler 24.03 SP1运行DPDK时因CONFIG_IO_STRICT_DEVMEM导致系统崩溃  
+
+#内核版本  
+24.03sp1  
+
+#问题现象  
+在openEuler 24.03 SP1与Kylin V10同时运行DPDK应用时，openEuler系统频繁崩溃；错误日志显示“pci_map_resource(): cannot map resource... Invalid argument”；即使增加系统内存，问题仍无法解决。  
+
+#问题根因  
+openEuler内核配置启用了CONFIG_IO_STRICT_DEVMEM=y，而Kylin V10未启用该选项。该配置限制了对设备内存的直接访问，导致DPDK在映射PCI资源时失败，从而引发系统崩溃。  
+
+#解决方案  
+1. 确认当前内核配置中CONFIG_IO_STRICT_DEVMEM是否启用（执行命令：grep CONFIG_IO_STRICT_DEVMEM /boot/config-$(uname -r)）；  
+2. 若启用，重新编译内核并将其设置为=n；  
+3. 安装新内核并重启系统。

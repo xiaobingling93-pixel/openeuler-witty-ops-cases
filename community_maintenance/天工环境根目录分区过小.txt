@@ -1,0 +1,17 @@
+#标题
+天工环境根目录分区过小
+
+#内核版本
+22.03sp4
+
+#问题现象
+在使用 isomaker 工具制作 openEuler 22.03 SP4 的 aarch64 架构打榜镜像时，生成的天工环境根目录（/）分区容量过小，系统启动后无法安装额外软件或写入必要数据。挂载生成的镜像可确认根分区未达到预期容量。
+
+#问题根因
+kickstart 配置文件 isomaker/config/aarch64/livecd/livecd_aarch64.ks 中定义的根分区 size 参数值过小，未适配天工环境的实际存储需求。
+
+#解决方案
+1. 定位配置文件 isomaker/config/aarch64/livecd/livecd_aarch64.ks；  
+2. 找到 part / 相关行，修改其 --size 参数为更大值（如 --size=8192 表示 8GB）；  
+3. 保存文件并重新执行镜像构建流程；  
+4. 验证新生成镜像的根分区大小是否符合预期。

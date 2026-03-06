@@ -1,0 +1,16 @@
+#标题  
+khugepaged软锁导致系统卡死  
+
+#内核版本  
+24.03 SP2  
+
+#问题现象  
+系统运行期间频繁出现“Memory failure”日志，随后khugepaged内核线程在执行透明大页合并时触发软锁，日志显示“CPU#57 stuck for 26s”。内核向所有CPU发送NMI中断以获取调用栈，但CPU0未响应，导致其他核心等待超时。该问题可通过运行LLC子测试项并启用softlockup_all_cpu_backtrace复现。  
+
+#问题根因  
+khugepaged在处理内存页合并时，因底层硬件（如LLC缓存）异常或海思驱动问题，引发多核同步阻塞；同时CPU0可能因挂死或陷入BIOS死循环而无法响应NMI，加剧软锁现象。  
+
+#解决方案  
+1. 临时规避：禁用透明大页功能，执行 `echo never > /sys/kernel/mm/transparent_hugepage/enabled`；  
+2. 更新固件与驱动：升级BIOS至最新版本（当前为10.27），并确认海思相关驱动（如hisi_uncore_pmu等）已修复已知问题；  
+3. 内核参数调优：添加 `softlockup_panic=1 nmi_watchdog=1` 以便快速捕获故障。

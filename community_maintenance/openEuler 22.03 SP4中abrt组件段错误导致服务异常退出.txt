@@ -1,0 +1,17 @@
+#标题  
+openEuler 22.03 SP4中abrt组件段错误导致服务异常退出  
+
+#内核版本  
+22.03sp4  
+
+#问题现象  
+在现网环境中运行boss直聘服务时，系统发生段错误（Segmentation Fault），导致进程异常退出；生成core dump文件；问题在触发异常上报机制时复现。  
+
+#问题根因  
+abrt软件包在处理某些异常信号时存在空指针解引用或内存越界访问的问题，导致段错误，属于已知bug（见Gitee issue IBV8B4）。  
+
+#解决方案  
+1. 确认当前系统abrt版本是否受该bug影响；  
+2. 升级abrt软件包至修复版本（参考Gitee issue IBV8B4提供的补丁或新版本）；  
+3. 若暂无法升级，可临时禁用abrt服务以规避问题（执行：systemctl stop abrt-ccpp && systemctl disable abrt-ccpp）；  
+4. 验证服务稳定性，确保问题已解决。

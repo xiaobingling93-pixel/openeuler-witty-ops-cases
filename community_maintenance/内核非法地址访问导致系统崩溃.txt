@@ -1,0 +1,16 @@
+#标题
+内核非法地址访问导致系统崩溃
+
+#内核版本
+2403
+
+#问题现象
+系统运行过程中（udev-worker进程）触发“Unable to handle kernel paging request”错误，访问虚拟地址 fffff8ffb394b7d8 时发生 level 0 translation fault，随后内核 panic 并无法继续运行。在使用 KASAN 内核启动时，在特定条件下偶现无法进入操作系统，可能与 BMC 注入的错误信息或 USB 虚拟设备相关。
+
+#问题根因
+内核在 __mod_memcg_lruvec_state 函数中访问了未映射或已释放的内存地址，该地址位于内核虚拟地址空间但页表项为空（pgd=0），表明存在悬空指针、内存越界或内存管理逻辑缺陷。
+
+#解决方案
+1. 使用带 KASAN 和 DEBUG_PAGEALLOC 的内核重新复现问题，捕获更详细的内存错误信息；  
+2. 检查 BMC 固件日志，确认是否向 OS 注入异常硬件事件或错误内存映射；  
+3. 审查涉及 memcg 和 lruvec 状态更新的内核代码路径，特别是 folio 释放与引用计数逻辑。

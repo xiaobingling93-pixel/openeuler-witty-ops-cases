@@ -1,0 +1,16 @@
+#标题  
+虚拟机安装openEuler 22.03 SP3时触发内核Oops导致安装失败  
+
+#内核版本  
+22.03sp3  
+
+#问题现象  
+使用virt-install安装openEuler 22.03 LTS SP3 aarch64镜像时，虚拟机成功加载vmlinuz和initrd.img并启动内核，但在初始化过程中出现“Internal error: Oops - Undefined instruction”错误，程序计数器（PC）指向__armv8pmu_probe_pmu函数，随后系统崩溃。日志显示KASLR因缺少随机种子被禁用，且ACPI NUMA初始化失败。相同环境下openEuler 20.03可正常安装。  
+
+#问题根因  
+内核在探测ARMv8 PMU（性能监控单元）时执行了未定义指令，可能因QEMU模拟的CPU特性与openEuler 22.03 SP3内核对PMU的支持不兼容所致。低版本QEMU/KVM未能正确模拟所需硬件特性，触发内核异常。  
+
+#解决方案  
+1. 升级宿主机QEMU/KVM至较新版本（建议QEMU ≥ 6.2），确保对ARMv8 PMU特性的完整支持；  
+2. 若无法升级，可在virt-install命令中添加--cpu参数，显式指定兼容CPU模型，如：--cpu host 或 --cpu cortex-a72；  
+3. 或在内核启动参数中禁用PMU探测，通过修改ISO或使用--extra-args传递"arm_pmu.disable=1"。

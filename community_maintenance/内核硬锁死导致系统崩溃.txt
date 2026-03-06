@@ -1,0 +1,16 @@
+#标题
+内核硬锁死导致系统崩溃
+
+#内核版本
+2403sp2
+
+#问题现象
+系统运行过程中 watchdog 检测到 CPU 1 发生硬锁死（Hard LOCKUP），调用栈显示卡在 __memcpy 函数，位于 load_balance 负载均衡路径中；随后触发 kernel panic 并导致系统重启。该问题在长时间高负载运行或特定调度压力下可复现。日志中可见内核版本为 6.6.0-98.0.0.103.oe2403sp2.aarch64。
+
+#问题根因
+内核调度器在 NO_HZ（动态 tick）模式下执行 idle balance 时，因内存拷贝操作（__memcpy）未及时响应中断，导致 watchdog 超时。社区已有补丁修复类似 __memcpy 在调度路径中的性能与中断响应问题。
+
+#解决方案
+1. 升级至最新 openEuler 24.03 SP2 内核版本，确认是否包含相关调度器及 memcpy 优化补丁；  
+2. 若问题仍复现，临时禁用 NO_HZ 特性（启动参数添加 nohz=off）以规避 idle balance 路径；  
+3. 收集完整 crash 日志（如通过 kdump），提交至内核团队比对已知 issue。

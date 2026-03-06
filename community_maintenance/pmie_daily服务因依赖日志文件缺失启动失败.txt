@@ -1,0 +1,16 @@
+#标题  
+pmie_daily服务因依赖日志文件缺失启动失败  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+在920B SD5005环境中执行AC100次测试时，系统日志频繁记录pmie_daily.service启动失败，错误代码为exit-code 1。systemd报告主进程退出，pcp日志提示“pmie_daily failed”，并指向日志文件/var/log/pcp/pmie/pmie_daily.log。进一步排查发现服务无法读取依赖文件/var/log/pcp/pmie/localhost.localdomain/pmie.log，该文件缺失。  
+
+#问题根因  
+pmie_daily服务依赖的日志文件/var/log/pcp/pmie/localhost.localdomain/pmie.log缺失，导致服务启动失败。而pmie本身在openEuler系统中默认未安装且不自启，仅在用户手动启用开机自启后暴露此问题。  
+
+#解决方案  
+1. 确认是否需要使用PCP（Performance Co-Pilot）性能监控功能，若无需使用，建议禁用并停止pmie相关服务；  
+2. 若需保留该服务，应确保/var/log/pcp/pmie/目录结构及权限正确，并创建缺失的日志文件；  
+3. 重启服务验证：systemctl restart pmie_daily.service，并检查状态：systemctl status pmie_daily.service。

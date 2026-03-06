@@ -1,0 +1,18 @@
+#标题
+本地YUM源配置错误导致dnf失败
+
+#内核版本
+22.03 LTS SP4
+
+#问题现象
+系统日志显示dnf尝试从file:///mnt/repodata/repomd.xml下载元数据失败，报错“Couldn't open file”；dnf-makecache.service启动失败，影响依赖此服务的其他操作；复现步骤为配置本地repo指向/mnt目录后执行dnf makecache或相关命令。
+
+#问题根因
+本地YUM源配置中baseurl指向的/mnt目录下缺少repodata子目录或repomd.xml文件，或/mnt未正确挂载ISO镜像。
+
+#解决方案
+1. 确认是否已将系统ISO镜像挂载至/mnt，执行 mount | grep mnt 检查；  
+2. 若未挂载，使用 mount -o loop /path/to/openEuler-xxx.iso /mnt 挂载；  
+3. 检查 /mnt/repodata/repomd.xml 是否存在；  
+4. 若无需本地源，可禁用对应repo：dnf config-manager --disable local；  
+5. 重新运行 dnf makecache 验证修复。

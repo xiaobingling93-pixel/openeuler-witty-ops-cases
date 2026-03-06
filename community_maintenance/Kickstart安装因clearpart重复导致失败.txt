@@ -1,0 +1,16 @@
+#标题  
+Kickstart安装因clearpart重复导致失败  
+
+#内核版本  
+未知  
+
+#问题现象  
+在openEuler 22.03-LTS系统中，使用包含重复clearpart指令的kickstart配置文件（ks.cfg）通过PXE进行自动化安装时，安装程序在分区阶段报错“insufficient kickstart”，无法完成自动分区，导致安装失败。该问题在已有LVM分区的qcow2镜像上覆盖安装时可稳定复现。  
+
+#问题根因  
+ks.cfg配置文件中存在两个clearpart指令，导致Anaconda安装程序在解析kickstart文件时发生冲突或语法错误，无法正确执行磁盘清理与分区操作。  
+
+#解决方案  
+1. 检查kickstart配置文件（ks.cfg）内容；  
+2. 定位到重复的clearpart行（例如 clearpart --all 或 clearpart --linux）；  
+3. 注释掉其中一行（在行首添加 #）以确保仅保留一个有效的clearpart指令。

@@ -1,0 +1,16 @@
+#标题  
+MySQL在openEuler上因glibc内存分配器导致OOM  
+
+#内核版本  
+20.03-LTS-SP2  
+
+#问题现象  
+MySQL在现网高负载运行时频繁触发系统OOM（Out of Memory），导致mysqld进程被OOM Killer强制终止。即使升级至MySQL 8.0.40版本并参照调优方案调整glibc内存管理参数，仍无法彻底避免OOM发生。客户已提供memleak和pmap内存分析数据，确认存在内存无法及时释放的现象。  
+
+#问题根因  
+MySQL在高负载或特定查询模式下，因使用glibc默认内存分配器（ptmalloc）产生严重内存碎片或缓存未及时释放，叠加系统整体内存压力，最终触发内核OOM Killer机制。  
+
+#解决方案  
+1. 使用jemalloc或tcmalloc替换默认glibc内存分配器，以降低内存碎片并提升释放效率；  
+2. 根据实际物理内存资源合理调整MySQL关键配置参数，如innodb_buffer_pool_size、max_connections等，避免内存超配；  
+3. 通过systemd或内核cgroup机制为mysqld进程设置内存使用上限（如MemoryMax或memory.limit_in_bytes），防止其耗尽系统内存而触发全局OOM。

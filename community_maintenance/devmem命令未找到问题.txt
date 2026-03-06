@@ -1,0 +1,17 @@
+#标题  
+devmem命令未找到问题  
+
+#内核版本  
+22.03 SP3  
+
+#问题现象  
+用户在终端执行 devmem 命令时，系统返回错误：“-bash: /usr/bin/devmem: No such file or directory”。该问题在天工HPC环境中复现，表现为命令完全不可用，无相关可执行文件存在于默认路径中。  
+
+#问题根因  
+devmem 并非系统默认安装的工具，需通过额外软件包（如 busybox 或 devmem2）提供。当前系统未安装包含 devmem 的软件包，导致命令不可用。  
+
+#解决方案  
+1. 使用 dnf 或 yum 搜索提供 devmem 的软件包，例如执行 “dnf provides devmem”；  
+2. 安装对应软件包，如 “sudo dnf install busybox” 或专门的 devmem2 工具；  
+3. 若无可用包，可从源码编译安装 devmem2；  
+4. 安装完成后验证命令是否可用：“devmem --help”。

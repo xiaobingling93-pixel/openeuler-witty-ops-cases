@@ -1,0 +1,16 @@
+#标题
+安装OS失败缺少kernel包
+
+#内核版本
+5.10.0-250
+
+#问题现象
+在deepseek适配过程中，执行操作系统安装流程失败，报错信息为“missing packages: kernel”。使用该自定义镜像进行安装时可稳定复现此错误，导致系统部署中断。
+
+#问题根因
+制作本地yum源镜像时，遗漏了复制normal.xml及执行createrepo更新元数据的操作，造成仓库中kernel包信息丢失，安装程序无法从仓库元数据中找到必需的kernel软件包。
+
+#解决方案
+1. 进入本地镜像目录，执行命令：cp /local_repo/repodata/normal.xml /local_repo_1/repodata/；  
+2. 在目标目录下更新仓库元数据：createrepo -g /local_repo_1/repodata/normal.xml /local_repo_1；  
+3. 验证repodata目录下comps.xml或group文件是否关联正确。

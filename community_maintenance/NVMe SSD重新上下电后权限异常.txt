@@ -1,0 +1,16 @@
+#标题
+NVMe SSD重新上下电后权限异常
+
+#内核版本
+未知
+
+#问题现象
+在openEuler 22.09或22.03 SP3系统中，对NVMe SSD执行重新上下电操作后，设备节点（如/dev/nvme0n1）的文件类型和权限有概率从块设备（brw-rw----）错误变为普通文件（-rw-rw----）。该异常导致系统及上层应用无法将其识别为块设备，进而无法挂载或访问SSD。复现步骤包括：插入NVMe SSD、正常识别后断电再上电，观察/dev下对应设备节点属性变化。
+
+#问题根因
+udev规则或内核设备驱动在设备热插拔过程中未能正确重建块设备节点，可能因设备初始化时序异常或udev事件处理冲突，导致mknod创建了普通文件而非块设备文件。
+
+#解决方案
+1. 检查并更新系统内核及udev至最新稳定版本，确保包含相关热插拔修复补丁；  
+2. 手动触发udev重载：执行 udevadm control --reload-rules && udevadm trigger；  
+3. 若问题仍存在，可添加自定义udev规则（如 /etc/udev/rules.d/99-nvme-fix.rules），强制指定NVMe设备为块设备，例如：KERNEL=="nvme[0-9]*", MODE="0660", GROUP="disk", OPTIONS+="link_priority=10"。

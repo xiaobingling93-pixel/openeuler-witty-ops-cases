@@ -1,0 +1,19 @@
+#标题
+内核Oops导致系统崩溃
+
+#内核版本
+22.03 SP4
+
+#问题现象
+同一台设备在运行过程中先后触发两次内核Oops：  
+1. 第一次Oops日志包含“FPAC: 0000000072000000”，发生在dracut进程执行write系统调用时；  
+2. 第二次Oops日志为“Unable to handle kernel paging request at virtual address 000000000003c868”，发生在swapper/42上下文中的refresh_cpu_vm_stats函数中。  
+两次均导致系统异常崩溃，当前未提供vmcore文件。
+
+#问题根因
+第一次Oops可能与ARM64的指针认证（PAC）机制校验失败有关（autiasp指令异常）；第二次为内核访问了无效虚拟地址（接近NULL），可能由内存损坏、内核模块bug或硬件问题引发。
+
+#解决方案
+1. 配置并启用kdump，确保系统崩溃时能生成完整的vmcore文件；  
+2. 使用crash工具加载vmcore和对应vmlinux，分析两个Oops的完整调用栈及寄存器状态；  
+3. 检查是否为已知内核bug，对比openEuler 22.03 SP4的内核补丁情况，必要时升级到包含相关修复的内核版本。

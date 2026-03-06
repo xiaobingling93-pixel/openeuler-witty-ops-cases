@@ -1,0 +1,16 @@
+#标题  
+pmie_daily.service启动失败导致性能监控中断  
+
+#内核版本  
+22.03 SP4  
+
+#问题现象  
+在鲲鹏920B硬件平台上运行iTestSmart执行AC测试时，系统日志显示pmie_daily.service服务启动失败，主进程异常退出，状态码为1。该故障导致PCP（Performance Co-Pilot）的每日性能指标评估功能无法正常运行，影响系统性能监控。问题需在相同环境再次运行iTestSmart触发AC测试流程方可复现。  
+
+#问题根因  
+pmie_daily.service是PCP用于每日性能指标评估的服务，其启动失败可能由配置错误、依赖缺失、权限问题或脚本内部逻辑异常导致主进程退出。  
+
+#解决方案  
+1. 等待问题复现，在复现时立即收集系统日志（journalctl -u pmie_daily.service）和相关配置文件（/etc/pcp/pmlogger/*）。  
+2. 检查pmie_daily.service的Unit文件及ExecStart指定的脚本是否存在语法或路径错误。  
+3. 验证PCP相关软件包是否完整安装，必要时重装pcp、pcp-pmie等组件。

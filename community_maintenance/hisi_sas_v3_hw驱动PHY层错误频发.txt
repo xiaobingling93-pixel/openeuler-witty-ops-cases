@@ -1,0 +1,16 @@
+#标题  
+hisi_sas_v3_hw驱动PHY层错误频发  
+
+#内核版本  
+22.03 LTS SP4  
+
+#问题现象  
+系统日志和dmesg中持续出现“hisi_sas_v3_hw ... phyX disparity error cnt”错误，其中phy2和phy5多次尝试上线失败（日志显示“failed to come up 10 times, giving up”）。错误计数持续增长，在部署TaiShan服务器并运行存储负载时可稳定复现，可能引发存储设备掉线或I/O异常。  
+
+#问题根因  
+PHY层disparity error由SAS链路信号质量差引起，可能原因包括硬件连接不良（如线缆松动、背板故障）、硬盘兼容性问题、固件版本不匹配或SAS控制器驱动异常。  
+
+#解决方案  
+1. 检查SAS线缆、硬盘托架及背板连接是否牢固，更换可疑硬件；  
+2. 更新硬盘及SAS控制器固件至最新版本；  
+3. 升级openEuler内核或安装hisi_sas驱动补丁（参考华为官方公告）。

@@ -1,0 +1,16 @@
+#标题  
+kdump因OOM失败  
+
+#内核版本  
+24.03  
+
+#问题现象  
+系统触发kdump时发生OOM（Out of Memory），内核日志显示oom-killer杀死了(udev-worker)等关键进程，导致kdump流程中断、崩溃转储失败。系统无swap空间，Normal区域free内存（32408kB）低于low水位（40788kB）。  
+
+#问题根因  
+crashkernel预留内存过小，在系统内存紧张时无法为kdump提供足够空间，触发OOM killer终止相关进程，导致kdump流程中断。  
+
+#解决方案  
+1. 编辑GRUB配置文件（/etc/default/grub），调整crashkernel参数，例如设为crashkernel=2G；  
+2. 更新grub配置：执行sudo grub2-mkconfig -o /boot/efi/EFI/openEuler/grub.cfg（UEFI）或对应BIOS路径；  
+3. 重启系统使配置生效。
