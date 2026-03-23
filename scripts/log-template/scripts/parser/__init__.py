@@ -43,4 +43,3 @@ def get_supported_extensions() -> list[str]:
 from .parser_txt import parse_txt
 from .parser_md import parse_md
 from .parser_xlsx import parse_xlsx
-from .parser_pdf import parse_pdf
