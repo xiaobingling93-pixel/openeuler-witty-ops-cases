@@ -29,4 +29,4 @@ oe_test_service_sysSentry
 1. oe_test_service_cpupower，oe_test_service_sysSentry这两个服务测试用例执行失败
 
 # 解决方案
-1. 单独执行失败用例，查看oe_test_service_cpupower，oe_test_service_sysSentry这两个服务测试用例的具体执行日志，根据报错日志，解决失败问题
+1. 在./mugen/logs目录下查看kernel/oe_test_service_cpupower和sysSentry/oe_test_service_sysSentry这两个测试用例的具体执行日志，根据报错日志，解决失败问题
