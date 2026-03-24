@@ -1,0 +1,26 @@
+# 标题
+pkgcmd “Testing cannot be performed if NODE1_FRAME not x86_64.”
+
+# 基本信息
+- 测试用例: oe_test_tboot_txt-stat
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+
+# 问题现象
+测试执行过程中，检测到测试环境不满足要求，非x86架构，用例跳过。
+
+# 错误日志
+```
+Tue Jan 13 11:37:26 2026 - INFO  - Start to prepare the test environment.
++ '[' aarch64 '!=' x86_64 ']'
++ LOG_WARN 'Testing cannot be performed if NODE1_FRAME not x86_64.'
++ message='Testing cannot be performed if NODE1_FRAME not x86_64.'
++ python3 /opt/os-autotest/libs/locallibs/mugen_log.py --level warn --message 'Testing cannot be performed if NODE1_FRAME not x86_64.'
+Tue Jan 13 11:37:26 2026 - WARN  - Testing cannot be performed if NODE1_FRAME not x86_64.
++ exit 255
+```
+
+# 问题根因
+1、测试环境架构检查不匹配，x86架构的测试用例，在arm架构下执行，环境不满足要求，导致用例跳过。
+
+# 解决方案
+1、非问题，以x86机器执行结果为准。

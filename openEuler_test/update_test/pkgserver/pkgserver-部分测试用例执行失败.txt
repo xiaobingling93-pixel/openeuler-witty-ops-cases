@@ -1,0 +1,32 @@
+# 标题
+pkgserver “Adapted testcase execution failed”
+
+# 基本信息
+- 测试用例: oe_test_service_restart
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+
+# 问题现象
+pkgserver测试执行过程中，检查到有测试用例执行失败。
+
+# 错误日志
+```
++ grep oe_test /root/mugen/failed_case
+oe_test_service_cpupower
+oe_test_service_sysSentry
++ CHECK_RESULT 0 1 0 'Adapted testcase execution failed'
++ actual_result=0
++ expect_result=1
++ mode=0
++ error_log='Adapted testcase execution failed'
++ exit_mode=0
++ '[' -z '0 1 0 Adapted testcase execution failed' ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 1x
++ test -n 'Adapted testcase execution failed'
+```
+
+# 问题根因
+1. oe_test_service_cpupower，oe_test_service_sysSentry这两个服务测试用例执行失败
+
+# 解决方案
+1. 单独执行失败用例，查看oe_test_service_cpupower，oe_test_service_sysSentry这两个服务测试用例的具体执行日志，根据报错日志，解决失败问题

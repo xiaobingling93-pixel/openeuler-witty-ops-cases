@@ -1,0 +1,39 @@
+# 标题
+pkgcmd “缺少 Ruby 的开发环境依赖，需要安装依赖ruby-devel”
+
+# 基本信息
+- 测试用例: oe_test_zentest_autotest
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+
+# 问题现象
+multigem命令执行失败
+
+# 错误日志
+```
++ multigem
+/usr/share/gems/gems/ZenTest-4.12.1/bin/multiruby:13:in `chdir': No such file or directory @ dir_chdir - /root/.rubies (Errno::ENOENT)
+	from /usr/share/gems/gems/ZenTest-4.12.1/bin/multiruby:13:in `<main>'
++ sed -i '/root_dir / aroot_dir = File.expand_path('\''..'\'',__FILE__)' /usr/share/gems/gems/ZenTest-4.12.1/bin/multiruby
++ gem install autotest
+Building native extensions. This could take a while...
+ERROR:  Error installing autotest:
+	ERROR: Failed to build gem native extension.
+
+    current directory: /usr/local/share/gems/gems/prism-1.8.0/ext/prism
+/usr/bin/ruby -I/usr/share/rubygems extconf.rb
+mkmf.rb can't find header files for ruby at /usr/share/include/ruby.h
+
+You might have to install separate package for the ruby development
+environment, ruby-dev or ruby-devel for example.
+
+extconf failed, exit code 1
+
+Gem files will remain installed in /usr/local/share/gems/gems/prism-1.8.0 for inspection.
+Results logged to /usr/local/lib64/gems/ruby/prism-1.8.0/gem_make.out
+```
+
+# 问题根因
+1、测试环境缺少 Ruby 的开发环境依赖
+
+# 解决方案
+1、在测试环境添加安装依赖ruby-devel，执行 oe_test_zentest_autotest 用例。

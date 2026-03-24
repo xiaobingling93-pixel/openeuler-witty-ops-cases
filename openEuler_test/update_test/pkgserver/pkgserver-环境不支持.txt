@@ -1,0 +1,20 @@
+# 标题
+pkgserver “The test environment don't meet the requirements, please check your environment.”
+
+# 基本信息
+- 测试用例: oe_test_service_cpupower
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+
+# 问题现象
+oe_test_service_cpupower测试执行过程中，检查到执行环境不支持，用例未执行。
+
+# 错误日志
+```
+The test environment don't meet the requirements, please check your environment.
+```
+
+# 问题根因
+1. oe_test_service_cpupower用例需要在物理机环境上执行，在虚拟机环境中执行就会跳过，提示环境不支持
+
+# 解决方案
+1. 在相同版本和架构的物理机环境中执行用例oe_test_service_cpupower

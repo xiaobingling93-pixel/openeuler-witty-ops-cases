@@ -1,0 +1,25 @@
+# 标题
+pkgcmd “axel does not exist”
+
+# 基本信息
+- 测试用例: oe_test_axel_01
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+
+# 问题现象
+测试环境中，axel软件包不存在，用例跳过。
+
+# 错误日志
+```
++ yum list axel
+Last metadata expiration check: 0:00:18 ago on Tue 13 Jan 2026 11:03:45 AM CST.
+Error: No matching Packages to list
++ echo 'axel does not exist'
+axel does not exist
++ exit 255
+```
+
+# 问题根因
+1、axel软件包不存在，导致用例跳过。
+
+# 解决方案
+1、添加存在axel软件包的repo源到测试环境， 重新执行 oe_test_axel_01 用例进行验证。如果openEuler-24.03-LTS-SP3所有的repo源中都没有axel软件包，需跳过 oe_test_axel_01 用例。
