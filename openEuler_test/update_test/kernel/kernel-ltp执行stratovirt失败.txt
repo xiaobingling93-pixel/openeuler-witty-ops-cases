@@ -1,0 +1,29 @@
+# 标题
+kernel “ltp执行starvation失败”
+
+# 基本信息
+- 测试用例: starvation
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64、x86_64)
+
+# 问题现象
+ltp测试执行过程中，报错：tst_test.c:1630: TBROK: Test killed! (timeout?)
+
+# 错误日志
+```
+tst_test.c:1690: TINFO: LTP version: 20230929
+tst_test.c:1576: TINFO: Timeout per run is 0h 01m 30s
+starvation.c:57: TPASS: sched_setaffinity(0, sizeof(mask), &mask) returned 0
+tst_test.c:1583: TINFO: Updating max runtime to 0h 04m 00s
+tst_test.c:1576: TINFO: Timeout per run is 0h 05m 30s
+Test timeouted, sending SIGKILL!
+tst_test.c:1622: TINFO: Killed the leftover descendant processes
+tst_test.c:1629: TINFO: If you are running on slow machine, try exporting LTP_TIMEOUT_MUL > 1
+tst_test.c:1630: TBROK: Test killed! (timeout?)
+
+```
+
+# 问题根因
+1. 合入了一个上游未合入的补丁"sched/eevdf: Skip eligibility check for current entity during wakeup preemption"导致的
+
+# 解决方案
+1. 通过echo NO_RUN_TO_PARITY_WAKEUP > /sys/kernel/debug/sched/features 临时关闭补丁功能，关闭后可以测试通过

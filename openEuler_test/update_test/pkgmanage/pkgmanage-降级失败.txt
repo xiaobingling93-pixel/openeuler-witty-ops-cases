@@ -1,0 +1,34 @@
+# 标题
+pkgmanage “Downgrade packages error !”
+
+# 基本信息
+- 测试用例: oe_test_pkg_manager02
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+
+# 问题现象
+pkgmanage测试执行过程中，检查软件包的升级之后降级检查，降级失败。
+
+# 错误日志
+```
++ test -s /home/pkg_manager_folder/downgrade_fail_list
++ CHECK_RESULT 0 1 0 'Downgrade packages error !'
++ actual_result=0
++ expect_result=1
++ mode=0
++ error_log='Downgrade packages error !'
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 1x
++ test -n 'Downgrade packages error !'
+
+```
+
+# 问题根因
+1. 软件包被体现卸载未安装导致降级失败
+2. 降级过程中会执行脚本，执行脚本有warnning，error，failed信息
+3、软件包第一次发布，无法进行降级
+
+# 解决方案
+1. 排查/home/pkg_manager_folder/downgrade_fail_list，排查具体是哪个软件包降级失败，查看失败具体log
+2. 从案例库中搜索对应软件包的案例来分析日志

@@ -1,0 +1,28 @@
+# 标题
+pkgcmd “测试环境默认selinux状态为disable，无法打开，跳过测试”
+
+# 基本信息
+- 测试用例: oe_test_selinux_audit
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+
+# 问题现象
+测试执行过程中，强制打开selinux开关失败，用例跳过。
+
+# 错误日志
+```
++ setenforce 1
+setenforce: SELinux is disabled
+++ getenforce
++ '[' Disabled == Disabled ']'
++ LOG_WARN 'Testing cannot be performed if selinux cannot be enabled.'
++ message='Testing cannot be performed if selinux cannot be enabled.'
++ python3 /opt/os-autotest/libs/locallibs/mugen_log.py --level warn --message 'Testing cannot be performed if selinux cannot be enabled.'
+Tue Jan 13 11:31:06 2026 - WARN  - Testing cannot be performed if selinux cannot be enabled.
++ exit 255
+```
+
+# 问题根因
+1、测试环境默认selinux状态为disable，无法打开。
+
+# 解决方案
+1、切换 SELinux 开关能够强制打开的测试环境，执行 oe_test_selinux_audit 用例。

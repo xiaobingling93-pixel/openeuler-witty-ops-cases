@@ -1,0 +1,38 @@
+# 标题
+kernel “ltp执行cpufreq_boost失败”
+
+# 基本信息
+- 测试用例: cpufreq_boost
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64、x86_64)
+
+# 问题现象
+ltp测试执行过程中，报错：cpufreq_boost: TBROK: cpufreq_boost.c:175:Remaining cases broken
+
+# 错误日志
+```
+<<<test start>>>
+tag=cpufreq_boost stime=1631022271
+cmdline="cpufreq_boost"
+contacts=""
+analysis=exit
+<<<test_output>>>
+incrementing stop
+cpufreq_boost TINFO: found 'acpi_cpufreq' driver,sysfs knb'/sys/devices/system/cpu/cpufreq/boost'
+cpufreq_boost0 TINFO: maximum speed is 2600000 KHzTBROKcpufreq_boost.c:175: Failed to close 
+cpufreq_boost:  '/sys/devices/system/cpu/cpufreq/boost': errno=EINVAL(22): Invaid argument
+cpufreq_boost.c:175: Remaining casescpufreq_boost2 broken
+<<<execution status>>>
+
+```
+
+# 问题根因
+1. 由于Kunpeng920 arm64服务器不支持boost, 直接echo 1 > /sys/devices/system/cpu/cpufreq/boost就会报无效参数
+
+# 解决方案
+1. 可修改用例: 判断加载的驱动为cppc_cpufreq，返回不支持
+static const struct cpufreq_driver_info cdrv[] = {
+        { "acpi_cpufreq", 0, "1", "0", SYSFS_CPU_DIR "cpufreq/boost" },
+        { "intel_pstate", 0, "1", "0", SYSFS_CPU_DIR "intel_pstate/no_turbo" },
+        { "cppc_cpufreq", 0, "1", "0", SYSFS_CPU_DIR "cpufreq/boost" }
+
+};

@@ -1,0 +1,11 @@
+# 标题
+ltp “ltp执行***用例失败”
+
+#失败用例统计
+1. 通过grep -i fail /opt/ltp/results/*.log过滤出失败的用例
+2. 在/opt/ltp.log中通过用例名查找失败用例的执行过程和日志
+
+# 问题分析
+1. 判断是否存在案例：在https://atomgit.com/src-openeuler/kernel/issues和https://atomgit.com/openeuler/kernel/issues中搜索失败用例名称，根据搜索结论解决当前问题；
+2. 若未找到对应案例库，则上网查找问题根因和解决方法；如果解决不了，寻求开发人员定位，kernel版本6.0以上找李楠定位，kernel版本6.0以下找吴腾达。
+

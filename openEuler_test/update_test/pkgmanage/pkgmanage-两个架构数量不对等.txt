@@ -1,0 +1,39 @@
+# 标题
+pkgmanage “The two architectures are not equal in number”
+
+# 基本信息
+- 测试用例: oe_test_pkg_manager01
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+
+# 问题现象
+pkgmanage测试执行过程中，检查两个架构的软件包数量失败，提示两个架构的软件包数量不一致。
+
+# 错误日志
+```
+grep -ci .rpm repo_packages_arm
++ arm_pkgs_num=286
+++ grep -ci .rpm repo_packages_x86
++ x86_pkgs_num=269
++ [[ 286 -eq 269 ]]
++ echo 'The update two architectures are not equal in number'
++ grep 'The update two architectures are not equal in number' /home/pkg_manager_folder/check_pkg_num.log
+The update two architectures are not equal in number
++ CHECK_RESULT 0 1 0 'The two architectures are not equal in number'
++ actual_result=0
++ expect_result=1
++ mode=0
++ error_log='The two architectures are not equal in number'
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 1x
++ test -n 'The two architectures are not equal in number'
+
+```
+
+# 问题根因
+1. 个别软件包只构建单架构，所以会不一致
+2. eulermaker构建只有单个架构构建成功，另一个架构未构建出包
+
+# 解决方案
+1. 对比update的repo源，排查具体是哪个软件包导致数量不一致，排查spec确认是只单架构出包

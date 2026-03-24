@@ -1,0 +1,31 @@
+# 标题
+kernel “ltp执行swapon03失败”
+
+# 基本信息
+- 测试用例: swapon03
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64、x86_64)
+
+# 问题现象
+ltp测试执行过程中，报错：swapon03.c:56:swapon(filename,0) failed:EPERM(1)
+
+# 错误日志
+```
+swapon03.c:53:TINF0: create a swapfile size of 1 megabytes(MB)
+swapon03.c:53:TINFO:createaswapfile size ofmeaabvtes(MB)
+swapon03.c:56:TFAIL: swapon(filename,0) failed:EPERM(1)
+swapon03.c:65:TINFO:Successtully created 22 swapTiles
+swapon03.c:66:TINF0: create a swapfile size of 1 megabytes(MB)
+swapon03.c:107: TPASS: swapon (mntpoint/testswap, 0) : EPERM(1)tst 
+
+```
+
+# 问题根因
+1. 在ltp测试代码中加打印信息，发现测试代码计算获得的最大maximum number of swap为23；系统初始化话后会使用1个swap file；而ltp测试代码会创建22个 swap file，最终导致产生告警
+
+# 解决方案
+1. 修改测试用例，重新编译后执行通过。/root/ltp-20250530/testcases/kernel/syscalls/swapon//swapon3.c中修改代码为：
+if (pid == 0) {
+++)(
+/*create and turn on remaining swapfiles */
+for (j = 0;j swapfiles-1;
+/* Create the swapfile */snprintf(filename, sizeof(filename), "%s%02d", TEST_FILE, j + 2);MAKE SMALL SWAPFILE(filename);
