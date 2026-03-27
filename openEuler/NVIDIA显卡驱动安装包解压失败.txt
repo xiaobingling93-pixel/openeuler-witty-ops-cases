@@ -1,0 +1,18 @@
+#标题
+NVIDIA显卡驱动安装包解压失败
+
+#内核版本
+5.10.0-182.0.0.95.oe2203sp3.x86_64
+
+#问题现象
+执行 NVIDIA-Linux-x86_64-535.230.02.run 安装脚本时，报错“Extraction failed. Signal caught, cleaning up”，未输出更详细的错误信息。
+
+#问题根因
+使用的 NVIDIA 驱动版本 535.230.02 与 openEuler 22.03 (LTS-SP3) 系统不兼容，导致安装包解压失败。
+
+#解决方案
+1. 使用 openEuler 官方验证过的驱动版本：NVIDIA-Linux-x86_64-535.54.03.run。
+2. 从 openEuler 软件源下载并安装该兼容驱动：https://repo.oepkgs.net/openEuler/rpm/openEuler-22.03-LTS/contrib/drivers/x86_64/Packages/NVIDIA-Linux-x86_64-535.54.03.run。
+
+#来源
+https://forum.openeuler.org/t/topic/7095

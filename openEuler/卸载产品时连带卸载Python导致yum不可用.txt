@@ -1,0 +1,18 @@
+#标题
+卸载产品时连带卸载Python导致yum不可用
+
+#内核版本
+20.03-LTS-SP2
+
+#问题现象
+在openEuler-20.03上卸载产品时，yum命令无法使用，提示缺少模块。
+
+#问题根因
+卸载产品时连带卸载了python、python3-rpm和python3-dnf等依赖包，导致yum缺少必要模块而无法运行。
+
+#解决方案
+1. 手动下载并安装python、python3-rpm、python3-dnf包以恢复yum功能。
+2. 卸载产品时使用--nodeps选项避免自动卸载依赖包。
+
+#来源
+https://forum.openeuler.org/t/topic/695

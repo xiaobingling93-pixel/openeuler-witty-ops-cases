@@ -1,0 +1,17 @@
+#标题
+SELinux禁用状态下XFS文件系统触发remount警告
+
+#内核版本
+22.03-LTS
+
+#问题现象
+在openEuler 22.03-LTS系统中，当/etc/selinux/config配置文件中将SELinux设为disabled状态，并使用XFS文件系统时，系统日志/var/log/messages中出现XFS remount警告；登录系统或重启systemd-hostnamed服务时均可复现该告警。
+
+#问题根因
+该现象由systemd与内核机制交互引起，在SELinux禁用且使用XFS文件系统时触发文件系统频繁remount行为，属于已知非bug行为。
+
+#解决方案
+1. 将XFS文件系统类型改为ext4。
+
+#来源
+https://forum.openeuler.org/t/topic/696

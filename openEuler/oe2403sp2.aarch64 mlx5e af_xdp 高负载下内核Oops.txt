@@ -1,0 +1,17 @@
+#标题
+oe2403sp2.aarch64 mlx5e af_xdp 高负载下内核Oops
+
+#内核版本
+6.6.0-101.0.0.107.oe2403sp2.aarch64
+
+#问题现象
+使用AF_XDP收取指定UDP端口报文并在高负载（接近满负载）时触发内核Oops，日志显示“Unable to handle kernel NULL pointer dereference at virtual address 0000000000000034”，调用栈指向mlx5e_xsk_free_rx_wqe.part.0.isra.0函数，位于mlx5_core驱动模块中。
+
+#问题根因
+mlx5_core驱动在AF_XDP高负载场景下访问空指针，导致内核发生NULL pointer dereference异常。
+
+#解决方案
+升级至包含修复该空指针解引用问题的mlx5_core驱动版本或内核版本。
+
+#来源
+https://forum.openeuler.org/t/topic/18380

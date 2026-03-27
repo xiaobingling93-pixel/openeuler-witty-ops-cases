@@ -1,0 +1,21 @@
+#标题
+安装麒麟桌面后无法登录系统
+
+#内核版本
+未知
+
+#问题现象
+安装 ukui 桌面环境并设置 graphical.target 后重启，系统仅显示 openGauss Server 账号登录界面，无法选择 root 或其他用户登录；即使修改 GRUB 重置 root 密码后仍无法成功认证登录。
+
+#问题根因
+lightdm 配置未启用手动登录选项，导致登录界面不显示用户名输入框，仅展示默认账号，阻碍用户以 root 或其他非默认用户身份登录。
+
+#解决方案
+1. 在登录界面按组合键 Ctrl+Fn+Alt+F2 切换到终端；
+2. 编辑 /etc/lightdm/lightdm.conf 文件，添加或修改以下两行：
+   greeter-show-manual-login=true
+   all-guest=false；
+3. 返回图形界面，在用户图标处点击头像即可手动输入 root 用户名和密码登录。
+
+#来源
+https://forum.openeuler.org/t/topic/6404

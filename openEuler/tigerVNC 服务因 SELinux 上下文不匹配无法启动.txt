@@ -1,0 +1,17 @@
+#标题
+tigerVNC 服务因 SELinux 上下文不匹配无法启动
+
+#内核版本
+未知
+
+#问题现象
+使用 systemd 启动 tigerVNC 时失败；用户目录下的 .vnc 目录 SELinux 上下文与 /usr/lib/systemd/system/vncserver@.service 中定义的 SELinuxContext=system_u:system_r:vnc_session_t:s0 不匹配；执行 restorecon -RFv /home/username/.vnc 无效；尝试通过 semanage 添加 fcontext 规则时报错“类型 vnc_session_t 无效，必须是文件或设备类型”；将 SELinux 设为宽容模式仍无法启动服务；关闭 SELinux 后服务可正常使用。
+
+#问题根因
+SELinux 策略中缺少对 vnc_session_t 类型作为文件上下文的有效定义，导致 .vnc 目录无法获得正确的 SELinux 文件类型上下文，从而阻止 tigerVNC 服务正常启动。
+
+#解决方案
+关闭 SELinux 后可正常使用服务。
+
+#来源
+https://forum.openeuler.org/t/topic/7503

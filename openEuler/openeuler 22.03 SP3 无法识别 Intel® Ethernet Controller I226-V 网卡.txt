@@ -1,0 +1,18 @@
+#标题
+openeuler 22.03 SP3 无法识别 Intel® Ethernet Controller I226-V 网卡
+
+#内核版本
+22.03sp3
+
+#问题现象
+在 openEuler 22.03 SP3 系统中，Intel® Ethernet Controller I226-V 网卡无法被识别；使用 lspci 可识别硬件型号，但系统未加载对应驱动；其他型号如 I219、I350、X710 均可正常识别，仅 I226-V 异常；同一硬件在 Windows 系统下可正常识别和工作。
+
+#问题根因
+系统缺少适用于 Intel I226-V 网卡的 igc 驱动，当前仅加载了 igb 驱动，而 I226-V 需要 igc 驱动支持。
+
+#解决方案
+1. 安装或编译适配当前内核版本的 igc 驱动（igc.ko）。
+2. 参考华为云论坛提供的方法，在 openEuler 22.03 SP3 版本下编译 igc 驱动模块。
+
+#来源
+https://forum.openeuler.org/t/topic/4570

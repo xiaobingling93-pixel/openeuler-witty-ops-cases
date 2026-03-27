@@ -1,0 +1,20 @@
+#标题
+openEuler 22.03 SP2 sudo命令因libldap依赖EVP_md2符号缺失而失败
+
+#内核版本
+22.03sp2
+
+#问题现象
+执行sudo命令时报错：  
+sudo: error in /etc/sudo.conf, line 0 while loading plugin “sudoers_policy”  
+sudo: unable to load /usr/libexec/sudo/sudoers.so: /usr/lib64/libldap.so.2: undefined symbol: EVP_md2, version OPENSSL_1_1_0  
+sudo: fatal error, unable to load plugins
+
+#问题根因
+openGauss 5.0安装后在/etc/profile中设置了环境变量，导致系统加载了与当前OpenSSL版本不兼容的libldap库，该库引用了OpenSSL 1.1.0中已移除的EVP_md2符号。
+
+#解决方案
+1. 编辑/etc/profile文件，注释掉openGauss相关的环境变量设置。
+
+#来源
+https://forum.openeuler.org/t/topic/18269

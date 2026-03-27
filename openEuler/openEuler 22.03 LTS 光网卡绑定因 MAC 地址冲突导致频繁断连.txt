@@ -1,0 +1,22 @@
+#标题
+openEuler 22.03 LTS 光网卡绑定因 MAC 地址冲突导致频繁断连
+
+#内核版本
+openEuler 22.03 LTS
+
+#问题现象
+配置 bond1（mode=1）并叠加 VLAN 510 后，网络连接频繁中断，表现为：
+- CIFS 挂载超时（"\\10.6.228.71 has not responded in 180 seconds"）
+- NetworkManager 日志显示 bond1 激活失败，原因为 "ip-config-unavailable"
+- 内核日志反复出现 bond1 释放从设备时的错误信息："the permanent HWaddr of slave - b8:5d:c3:38:27:6a - is still in use by bond - set the HWaddr of slave to a different address to avoid conflicts"
+- 每次故障后需手动重启 NetworkManager 才能临时恢复
+
+#问题根因
+bond 主接口与其从属物理接口 enp189s0f0 使用了相同的永久 MAC 地址，违反了 Linux bonding 驱动要求：bond 接口激活期间，其从属接口的永久 MAC 地址不得与 bond 接口正在使用的 MAC 地址冲突。
+
+#解决方案
+1. 在创建 bond 连接前，确保物理网卡（enp189s0f0 和 enp189s0f1）未被其他网络配置文件管理，已按原文操作将其 ifcfg 文件移至 bak 目录。
+2. 显式为 bond 接口指定一个不同于物理接口永久 MAC 的 MAC 地址，或配置 NetworkManager 在 enslaving 前自动更改从属接口的 MAC 地址以避免冲突。
+
+#来源
+https://forum.openeuler.org/t/topic/18891

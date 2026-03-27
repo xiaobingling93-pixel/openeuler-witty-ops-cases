@@ -1,0 +1,19 @@
+#标题
+gala-gopher 返回 HTTP 204 无 metrics 数据
+
+#内核版本
+未知
+
+#问题现象
+在 openEuler 22.03 ARM 架构及 24.03 系统上安装 gala-gopher-2.0.1-1.oe2203sp3 后，访问 http://localhost:8888/metrics 返回 HTTP 204 状态码，无任何 metrics 数据；/var/log/gala-gopher/metrics 目录可能不存在或为空。
+
+#问题根因
+gala-gopher 2.0.1 版本存在 bug，导致无法正常生成 metrics 日志数据，且默认配置未启用必要的探针，使得 Prometheus 拉取时无数据可返回。
+
+#解决方案
+1. 确保 /var/log/gala-gopher/metrics 目录存在。
+2. 修改 /etc/gala-gopher/probes.init 配置文件以启用必要探针（具体配置内容需参考有效回帖中的截图或说明）。
+3. 将 Prometheus 的拉取间隔配置为至少 15 秒，以等待 gala-gopher 生成初始数据。
+
+#来源
+https://forum.openeuler.org/t/topic/4407

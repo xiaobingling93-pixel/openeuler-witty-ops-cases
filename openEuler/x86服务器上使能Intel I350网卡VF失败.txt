@@ -1,0 +1,18 @@
+#标题
+x86服务器上使能Intel I350网卡VF失败
+
+#内核版本
+未知
+
+#问题现象
+在x86服务器上使用 echo 1 > /sys/class/net/eno1/devices/sriov_numvfs 方式使能I350网卡的VF功能失败，而相同网卡在ARM服务器上该方式可成功使能VF。
+
+#问题根因
+x86服务器上的I350网卡驱动不支持通过 sysfs 接口动态设置 sriov_numvfs，必须通过加载 igb 驱动时指定 max_vfs 参数来启用VF功能。
+
+#解决方案
+1. 卸载 igb 驱动：modprobe -r igb  
+2. 重新加载 igb 驱动并指定各端口的VF数量，例如：modprobe igb max_vfs=2,2,2,2（参数按实际端口需求调整，I350每个PF最多支持8个VF）
+
+#来源
+https://forum.openeuler.org/t/topic/2646

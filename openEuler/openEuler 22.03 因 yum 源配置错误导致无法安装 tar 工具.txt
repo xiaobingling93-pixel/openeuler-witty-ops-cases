@@ -1,0 +1,19 @@
+#标题
+openEuler 22.03 因 yum 源配置错误导致无法安装 tar 工具
+
+#内核版本
+22.03
+
+#问题现象
+执行 dnf install tar 报错：Failed to download metadata for repo ‘OS’: repomd.xml parser error: Parse error at line: 11 (xmlParseEntityRef: no name)
+
+#问题根因
+系统默认的 openEuler 软件源 URL 配置错误或镜像站未同步，导致 repomd.xml 解析失败，无法下载软件包元数据。
+
+#解决方案
+1. 修改 /etc/yum.repos.d/openEuler.repo，将 repo.openeuler.org 替换为 mirrors.huaweicloud.com/openeuler/
+2. 或将 repo 文件中的 http 协议改为 https
+3. 或使用 CentOS 的 yum 源，手动将 $releasever 替换为相近的 CentOS 版本（如 8.9），再安装所需工具
+
+#来源
+https://forum.openeuler.org/t/topic/1061

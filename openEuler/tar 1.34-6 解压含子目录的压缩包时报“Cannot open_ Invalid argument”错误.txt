@@ -1,0 +1,18 @@
+#标题
+tar 1.34-6 解压含子目录的压缩包时报“Cannot open: Invalid argument”错误
+
+#内核版本
+未知
+
+#问题现象
+使用 tar -xvf 解压包含子目录的 .tar.tz 压缩包时，报错“tar: tmp/test.txt: Cannot open: Invalid argument”并以失败状态退出。
+
+#问题根因
+tar 软件包在版本 1.34-6 中为修复 CVE-2025-45582 引入的变更导致解压含子目录的压缩包时无法正确创建文件。
+
+#解决方案
+1. 降级 tar 至 1.34-6 之前的版本以规避该问题。
+2. 等待官方发布修复该问题的新版本 tar 软件包。
+
+#来源
+https://forum.openeuler.org/t/topic/19108

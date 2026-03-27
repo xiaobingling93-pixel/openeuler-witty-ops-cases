@@ -1,0 +1,21 @@
+#标题
+openEuler-22.03-LTS 无法识别 Intel i350 网卡
+
+#内核版本
+5.10.0-60.18.0.50.002203
+
+#问题现象
+安装 openEuler-22.03-LTS 后，系统无法识别 Intel i350-T2V2 网卡，执行 `lspci -nn | grep -i ethernet` 未列出该网卡；网卡指示灯为绿色，但操作系统未检测到设备。
+
+#问题根因
+物理网卡存在硬件故障，导致操作系统无法检测到 Intel i350-T2V2 网卡。
+
+#解决方案
+1. 更换为正常工作的 Intel i350-T2V2 网卡。
+2. 确认 `lspci -nn | grep -i ethernet` 能正确列出网卡。
+3. 手动配置网络接口文件 `/etc/sysconfig/network-scripts/ifcfg-enpXXXX`。
+4. 重启 NetworkManager 服务：`systemctl restart NetworkManager`。
+5. 使用 nmcli 连接网卡：`nmcli device connect enpXXXX`。
+
+#来源
+https://forum.openeuler.org/t/topic/7984

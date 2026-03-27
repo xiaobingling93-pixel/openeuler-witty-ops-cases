@@ -1,0 +1,21 @@
+#标题
+libzstd.so.1.5.0 版本不兼容导致 librpmio.so.9 符号解析失败
+
+#内核版本
+22.03 (LTS-SP3)
+
+#问题现象
+执行 yum、rpm、cmake 等命令时出现 symbol lookup error，具体报错为：
+- /usr/lib64/librpmio.so.9: undefined symbol: ZSTD_CCtx_setParameter
+- /usr/lib64/libarchive.so.13: undefined symbol: ZSTD_minCLevel
+系统基础包管理工具（如 yum、rpm）及依赖 libarchive 的工具（如 cmake）均无法使用。
+
+#问题根因
+系统中 /usr/lib64/libzstd.so.1.5.0 库文件被替换为不兼容版本，导致 librpmio.so.9 在运行时无法解析 ZSTD_CCtx_setParameter 等符号。
+
+#解决方案
+1. 将 /usr/lib64/libzstd.so.1.5.0 替换为 openEuler 22.03 (LTS-SP3) 官方提供的正确版本。
+2. 验证替换后执行 yum --version 等命令恢复正常。
+
+#来源
+https://forum.openeuler.org/t/topic/4448

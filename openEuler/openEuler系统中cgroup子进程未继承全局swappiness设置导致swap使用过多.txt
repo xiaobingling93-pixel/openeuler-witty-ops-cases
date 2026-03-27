@@ -1,0 +1,30 @@
+#标题
+openEuler系统中cgroup子进程未继承全局swappiness设置导致swap使用过多
+
+#内核版本
+未知
+
+#问题现象
+鲲鹏服务器上业务进程大量使用swap分区，导致系统操作卡顿；而相同应用在x86平台运行时swap使用极少。检查发现vm.swappiness全局参数已设为5，但部分运行中的进程实际swappiness仍为默认值60，修改未生效。
+
+#问题根因
+openEuler系统中，运行在/sys/fs/cgroup/memory/system.slice或user.slice下的进程在创建时继承根目录的swappiness值，后续修改全局vm.swappiness仅更新根目录值，不会影响已存在的子cgroup，导致这些进程仍使用默认swappiness=60；而centOS在修改全局参数时会同步更新所有进程。
+
+#解决方案
+1. 调整透明大页配置：  
+   - 编辑 /etc/default/grub，在 GRUB_CMDLINE_LINUX 行添加 transparent_hugepage=madvise  
+   - 执行 grub2-mkconfig -o /boot/efi/EFI/openEuler/grub.cfg  
+   - 重启系统  
+
+2. 设置全局 swappiness=0：  
+   - 在 /etc/sysctl.conf 中添加 vm.swappiness=0  
+   - 执行 sysctl -p  
+
+3. 修改 systemd 配置以禁用 per-slice memory accounting：  
+   - 在 /etc/systemd/system.conf 中取消注释 DefaultMemoryAccounting=yes 并改为 no  
+   - 编辑 /usr/lib/systemd/system/user@.service，从 Delegate=pids,memory 中移除 memory  
+   - 检查 /usr/lib/systemd/system 下其他 service 文件，将包含 memory 的 Delegate 行改为 Delegate=no 或移除 memory  
+   - 执行 systemctl daemon-reload 使配置生效
+
+#来源
+https://forum.openeuler.org/t/topic/2800

@@ -1,0 +1,18 @@
+#标题
+openEuler-24.03-LTS-SP3-DevStation 使用 Ventoy 启动安装失败
+
+#内核版本
+openEuler-24.03-LTS-SP3
+
+#问题现象
+使用 Ventoy 启动 openEuler-24.03-LTS-SP3-DevStation-x86_64-dvd.iso 安装时，系统无法正常进入安装界面，直接显示“Reached target system halt”并停止，无其他明显报错信息。
+
+#问题根因
+Ventoy 启动 DevStation 版本的 ISO 文件存在兼容性问题，导致系统无法正常引导安装流程。
+
+#解决方案
+1. 改用 Rufus 工具将 openEuler-24.03-LTS-SP3-DevStation-x86_64-dvd.iso 写入 U 盘；
+2. 通过该 U 盘启动进行安装。
+
+#来源
+https://forum.openeuler.org/t/topic/19103

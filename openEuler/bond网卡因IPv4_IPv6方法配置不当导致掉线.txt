@@ -1,0 +1,20 @@
+#标题
+bond网卡因IPv4/IPv6方法配置不当导致掉线
+
+#内核版本
+4.19
+
+#问题现象
+使用nmcli创建bond0和bond1网卡后，bond接口断开不展示；执行nmcli d查看设备状态显示bond0和bond1处于connecting状态，持续卡在连接中；通过nmcli c show bond-bond0发现ipv4.method值为disabled，ipv6.method值为auto。
+
+#问题根因
+openEuler-20.03-LTS-SP2使用的4.19内核bond不支持IPv6，而创建bond接口时未显式禁用IPv6，导致ipv6.method默认为auto，与ipv4.method=disabled共同造成网卡卡在获取IP地址阶段无法正常激活。
+
+#解决方案
+1. 在使用nmcli创建bond接口时，显式设置ipv4.method和ipv6.method均为disabled，例如：  
+   nmcli con add type bond ifname bond0 bond.options "miimon=100,mode=1" ipv6.method disabled ipv4.method disabled  
+2. 删除/etc/sysconfig/network-scripts目录下已有的bond配置文件；  
+3. 重新执行修正后的脚本生成bond配置。
+
+#来源
+https://forum.openeuler.org/t/topic/681

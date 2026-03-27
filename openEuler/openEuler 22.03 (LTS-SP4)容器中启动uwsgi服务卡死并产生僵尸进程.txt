@@ -1,0 +1,17 @@
+#标题
+openEuler 22.03 (LTS-SP4)容器中启动uwsgi服务卡死并产生僵尸进程
+
+#内核版本
+22.03-LTS-SP4
+
+#问题现象
+在openEuler 22.03 (LTS-SP4)作为Kubernetes 1.30集群工作节点时，Python应用启动uwsgi服务过程中卡死，出现僵尸进程，导致Pod运行异常；相同应用在CentOS 7.9工作节点上可正常运行。
+
+#问题根因
+openEuler 22.03 (LTS-SP4)系统环境下容器中运行uwsgi时存在兼容性问题，导致进程无法正常初始化并形成僵尸进程。
+
+#解决方案
+将工作节点操作系统更换为CentOS 7.9以规避该问题。
+
+#来源
+https://forum.openeuler.org/t/topic/8093

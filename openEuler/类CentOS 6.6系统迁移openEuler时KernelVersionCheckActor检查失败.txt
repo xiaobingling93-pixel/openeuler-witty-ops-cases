@@ -1,0 +1,17 @@
+#标题
+类CentOS 6.6系统迁移openEuler时KernelVersionCheckActor检查失败
+
+#内核版本
+2.6.32-504.el6.isoft.x86_64
+
+#问题现象
+在使用x2openEuler工具迁移类CentOS 6.6系统（内核版本为2.6.32-504.el6.isoft.x86_64）至openEuler 20.03时，选择高级方案2后KernelVersionCheckActor检查不通过；而标准CentOS 6.6系统在相同操作下可正常通过检查。日志显示工具无法识别该类CentOS系统为方案2。
+
+#问题根因
+x2openEuler工具的KernelVersionCheckActor检查逻辑依赖/etc/redhat-release文件内容判断系统类型，类CentOS系统因该文件内容非标准CentOS格式导致识别失败。
+
+#解决方案
+将/etc/redhat-release文件内容手动修改为“CentOS release 6.6 (Final)”以通过检查。
+
+#来源
+https://forum.openeuler.org/t/topic/4133

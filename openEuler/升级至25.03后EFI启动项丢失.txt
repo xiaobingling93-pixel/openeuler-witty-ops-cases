@@ -1,0 +1,20 @@
+#标题
+升级至25.03后EFI启动项丢失
+
+#内核版本
+25.03
+
+#问题现象
+系统从24.03升级到25.03后重启无法找到启动项，需在BIOS的EFI启动中手动选择EFI文件才能启动系统。
+
+#问题根因
+EFI中安全启动所需的shimx64.efi文件丢失，导致固件无法自动识别openEuler启动项。
+
+#解决方案
+1. 关闭BIOS中的安全启动，直接使用grubx64.efi启动。
+2. 使用efibootmgr命令重新创建启动项：  
+   efibootmgr -c -d /dev/sda -p 1 -L "openEuler" -l \\EFI\\openEuler\\grubx64.efi
+3. 安装shim包，重新建立EFI启动环境并配置GRUB。
+
+#来源
+https://forum.openeuler.org/t/topic/18447

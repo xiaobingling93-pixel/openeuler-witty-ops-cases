@@ -1,0 +1,18 @@
+#标题
+openEuler 22.03 SP3 编译安装 OpenSSH 9.9p1 时 GSSAPIKexAlgorithms 配置项报错
+
+#内核版本
+22.03sp3
+
+#问题现象
+编译安装 OpenSSH 9.9p1 后，sshd 启动时报错 “Bad configuration option: GSSAPIKexAlgorithms”；配置文件中包含 GSSAPIKexAlgorithms gss-group14-sha256-,gss-group16-sha512-,gss-curve25519-sha512- 时无法启动，注释该行后可正常启动。
+
+#问题根因
+GSSAPIKexAlgorithms 是 openEuler 自身对 OpenSSH 的扩展配置项，上游 OpenSSH 9.9p1 源码中未包含该选项，因此使用官方源码编译的版本不支持此配置。
+
+#解决方案
+1. 注释或移除 /etc/ssh/sshd_config 中的 GSSAPIKexAlgorithms 配置行。
+2. 若需使用该功能，应使用 openEuler 官方提供的 OpenSSH 包而非自行编译上游源码。
+
+#来源
+https://forum.openeuler.org/t/topic/6306

@@ -1,0 +1,17 @@
+#标题
+华为TM280网卡在OpenEuler 22.03上启用tx-checksum导致geneve报文内层包头封装错误
+
+#内核版本
+5.10.0-60.18.0.50.oe2203.aarch64
+
+#问题现象
+在使用华为TM280 25G 4port光纤网卡的Atlas800T A2服务器上，通过交换机互联运行kube-ovn网络系统时，开启tx-checksum功能后，geneve报文内层IP包头中protocol字段与Header checksum出现不对齐错误；两端均出现校验错误，复现命令为 ethtool -K eth0 tx-checksumming。
+
+#问题根因
+内建驱动与华为TM280网卡在tx-checksum功能下的适配存在问题，导致geneve报文内层包头封装错误。
+
+#解决方案
+暂无明确可执行的解决方案在原文中给出。
+
+#来源
+https://forum.openeuler.org/t/topic/3511

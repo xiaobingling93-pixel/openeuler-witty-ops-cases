@@ -1,0 +1,31 @@
+#标题
+OpenSSH SIGALRM 信号处理竞争条件漏洞
+
+#内核版本
+5.10.0-60.36.0.59
+
+#问题现象
+攻击者通过快速连续发送特定数据包可触发 sshd 的 SIGALRM 信号处理函数中的异步竞争条件，导致内存破坏；系统运行受影响版本的 OpenSSH（如 8.5p1）时存在被利用风险。
+
+#问题根因
+sshd 的 SIGALRM 信号处理函数未正确处理异步竞争条件，导致攻击者可通过特定数据包触发内存破坏。
+
+#解决方案
+1. 通过 openEuler 官方源升级 OpenSSH：  
+   - 执行 `sudo dnf clean all && sudo dnf makecache`  
+   - 执行 `sudo dnf update openssh-server openssh-clients openssh-askpass`  
+2. 或手动编译安装 OpenSSH 9.8p1：  
+   - 下载并验证源码包签名  
+   - 解压后进入目录执行 `./configure --prefix=/usr --sysconfdir=/etc/ssh --with-ssldir=/usr/lib64/openssl`  
+   - 执行 `make && sudo make install`  
+3. 若无法立即升级，可采取临时缓解措施：  
+   - 在 `/etc/ssh/sshd_config` 中设置 `UseLogin no` 和 `MaxSessions 2`  
+   - 使用 firewalld 限制 SSH 源 IP  
+   - 配置 TCP Wrapper 拒绝非信任网段访问  
+4. 启用深度加固措施（需 kernel 5.10+）：  
+   - 设置 `kernel.kptr_restrict=2`  
+   - 启用 UsePAM 和 SELinux 策略  
+   - 部署 auditd 监控 SSH 进程
+
+#来源
+https://forum.openeuler.org/t/topic/7914

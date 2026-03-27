@@ -1,0 +1,18 @@
+#标题
+x2工具升级检查因磁盘空间不足中断
+
+#内核版本
+未知
+
+#问题现象
+x2工具执行升级检查时中断，日志显示“Abnormal exit, error: Not enough space on /opt/x2openEuler”；df -h 显示 /opt 分区可用空间为4.9G，低于升级所需的5G最小可用空间要求。
+
+#问题根因
+x2工具升级检查失败的直接原因是 /opt/x2openEuler 所在分区可用磁盘空间不足5G，无法满足升级前置检查的空间要求。
+
+#解决方案
+1. 清理 /opt 目录，确保其可用空间大于5G。
+2. 重新执行升级前检查即可通过。
+
+#来源
+https://forum.openeuler.org/t/topic/846

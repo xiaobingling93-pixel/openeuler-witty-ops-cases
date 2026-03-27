@@ -1,0 +1,18 @@
+#标题
+IPv6地址获取失败因NDP邻居通告未响应
+
+#内核版本
+20.03-LTS-SP3
+
+#问题现象
+服务器通过bond1接口的本地链路地址发送DHCPv6请求报文，DHCP服务器收到后发送NS（Neighbor Solicitation）报文查询bond1的MAC地址，但客户端未回应NA（Neighbor Advertisement）报文，导致DHCPv6交互中断，无法获取IPv6地址。
+
+#问题根因
+icmp6_dst_alloc函数因dst entries数量超过net.ipv6.route.max_size限制而分配失败，导致NDP处理流程中断，无法发送NA报文。
+
+#解决方案
+1. 执行命令：sysctl -w net.ipv6.route.max_size=24456  
+2. 执行命令：sysctl -w net.ipv6.route.gc_thresh=12228
+
+#来源
+https://forum.openeuler.org/t/topic/2471

@@ -1,0 +1,19 @@
+#标题
+IPA镜像制作因CentOS 8镜像源失效失败
+
+#内核版本
+未知
+
+#问题现象
+使用disk-image-create工具制作IPA镜像时失败，报错显示无法解析mirrorlist.centos.org域名，导致AppStream仓库元数据下载失败，具体错误为“Curl error (6): Couldn’t resolve host name”和“Error: Failed to download metadata for repo ‘appstream’”。
+
+#问题根因
+CentOS Linux 8已于2021年底停止维护，其官方镜像源mirrorlist.centos.org已失效，导致构建过程中无法获取AppStream仓库元数据。
+
+#解决方案
+1. 更换为可用的CentOS Vault镜像源（如华为云）：修改/etc/yum.repos.d/CentOS-AppStream.repo，将baseurl指向http://mirrors.huaweicloud.com/centos-vault/8.5.2111/AppStream/x86_64/os/。
+2. 迁移到仍在维护的操作系统作为构建基础，例如使用Rocky Linux 8、AlmaLinux 8或CentOS Stream 8，并确保diskimage-builder支持对应发行版的element。
+3. 在内网环境中可搭建本地HTTP服务器提供CentOS 8 Vault镜像资源，并在构建时指定baseurl为本地镜像地址。
+
+#来源
+https://forum.openeuler.org/t/topic/19082

@@ -1,0 +1,18 @@
+#标题
+openEuler安装后网卡未自动启用导致无法网络访问
+
+#内核版本
+未知
+
+#问题现象
+安装openEuler 20.03-SP3后，执行ip addr命令发现enp0s3网卡无IP地址；无法ping通虚拟机，也无法通过SSH访问；检查/etc/sysconfig/network-scripts/ifcfg-enp0s3文件发现ONBOOT选项为NO。
+
+#问题根因
+安装过程中虽选择了启用enp0s3网卡，但系统生成的网卡配置文件中ONBOOT参数被设为NO，导致网卡在开机时未自动激活。
+
+#解决方案
+1. 使用vim编辑/etc/sysconfig/network-scripts/ifcfg-enp0s3文件，将ONBOOT=no修改为ONBOOT=yes。  
+2. 执行ifdown enp0s3和ifup enp0s3命令重启网卡使配置生效。
+
+#来源
+https://forum.openeuler.org/t/topic/620

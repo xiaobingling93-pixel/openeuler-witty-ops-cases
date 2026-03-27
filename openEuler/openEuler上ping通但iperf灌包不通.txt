@@ -1,0 +1,19 @@
+#标题
+openEuler上ping通但iperf灌包不通
+
+#内核版本
+未知
+
+#问题现象
+ping包通信正常，但使用iperf进行网络灌包测试时连接不通。
+
+#问题根因
+系统防火墙默认开启，阻止了iperf使用的端口通信。
+
+#解决方案
+1. 执行 systemctl stop firewalld 停止防火墙服务  
+2. 执行 iptables -F 清空iptables规则  
+3. 执行 setenforce 0 关闭SELinux强制模式
+
+#来源
+https://forum.openeuler.org/t/topic/2519

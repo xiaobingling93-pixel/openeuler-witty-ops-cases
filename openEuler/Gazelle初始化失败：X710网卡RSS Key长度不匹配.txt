@@ -1,0 +1,18 @@
+#标题
+Gazelle初始化失败：X710网卡RSS Key长度不匹配
+
+#内核版本
+未知
+
+#问题现象
+在openEuler 22.03 LTS SP3系统上使用Gazelle用户态协议栈启动lstack程序时，初始化DPDK网卡设备失败。日志显示关键错误信息：“Ethdev port_id=0 invalid RSS key len: 40, valid value: 52”和“cannot config eth dev at port 0: Invalid argument”，导致程序退出。
+
+#问题根因
+Gazelle代码中硬编码使用了40字节长度的RSS Key，而X710网卡的PMD驱动要求RSS Key长度必须为52字节，导致DPDK设备配置失败。
+
+#解决方案
+1. 修改Gazelle源码中RSS Key长度为52字节以适配X710网卡；
+2. 或等待官方修复该兼容性问题并升级到包含修复的Gazelle版本。
+
+#来源
+https://forum.openeuler.org/t/topic/6340

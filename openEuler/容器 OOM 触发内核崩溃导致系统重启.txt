@@ -1,0 +1,17 @@
+#标题
+容器 OOM 触发内核崩溃导致系统重启
+
+#内核版本
+6.6.0-28.0.0.34.oe2403
+
+#问题现象
+当应用容器发生 OOM（Out-Of-Memory）时，系统触发 oom-killer 机制杀死进程 controller-mana，但随后系统发生内核崩溃并自动重启。日志显示多次重复的 Memory cgroup out of memory 事件，内存使用达到 memory.limit_in_bytes 设置的 5120000kB（5GB），failcnt 持续增长。调用栈显示在 page fault 处理路径中（如 filemap_fault、do_anonymous_page）触发 OOM，且 RIP 指向用户态地址，表明内核在处理缺页异常过程中因无法分配内存而崩溃。
+
+#问题根因
+内核在处理容器内存超限时，于缺页异常路径中触发 memcg OOM，但未能正确处理该异常场景，导致内核崩溃。
+
+#解决方案
+升级至已修复该问题的 openEuler 内核版本，或临时调高容器 memory.limit_in_bytes 避免频繁触发 OOM。
+
+#来源
+https://forum.openeuler.org/t/topic/5710

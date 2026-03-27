@@ -1,0 +1,22 @@
+#标题
+欧拉22.03镜像中Java应用读取中文文件名乱码
+
+#内核版本
+未知
+
+#问题现象
+使用欧拉22.03作为基础镜像运行Java应用时，读取包含中文的本地文件列表出现乱码，即使已设置file.encoding为UTF-8，并尝试配置LANG、LANGUAGE和LC_ALL环境变量，系统仍无法正确显示中文文件名。
+
+#问题根因
+欧拉22.03基础镜像中缺少zh_CN.UTF-8语言环境支持，导致即使设置LANG为zh_CN.UTF-8，系统仍无法正确处理中文字符编码。
+
+#解决方案
+1. 将相同版本主机上的/usr/lib/locale目录复制到Dockerfile所在目录；
+2. 在Dockerfile中执行以下操作：
+   - RUN rm -rf /usr/lib/locale
+   - COPY locale /usr/lib/locale
+   - ENV LANG zh_CN.UTF-8
+3. 重新构建镜像并运行。
+
+#来源
+https://forum.openeuler.org/t/topic/2951

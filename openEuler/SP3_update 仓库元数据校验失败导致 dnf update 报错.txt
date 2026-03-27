@@ -1,0 +1,19 @@
+#标题
+SP3_update 仓库元数据校验失败导致 dnf update 报错
+
+#内核版本
+未知
+
+#问题现象
+执行 `sudo dnf update -y` 时，SP3_update 仓库下载元数据成功但校验和不匹配，报错信息显示 calculated 与 expected 的 sha512 值不一致，并最终提示“为仓库 ‘SP3_update’ 下载元数据失败 : Cannot download repomd.xml”。
+
+#问题根因
+metalink 机制自动选择了不可用的俄罗斯节点，导致下载的元数据与预期校验和不符。
+
+#解决方案
+1. 注释掉仓库配置文件中的 metalink 行。
+2. 更换为可用的镜像源（如阿里源）。
+3. 或临时关闭 SP3_update 仓库以继续部署其他软件。
+
+#来源
+https://forum.openeuler.org/t/topic/4325

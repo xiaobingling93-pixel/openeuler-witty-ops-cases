@@ -1,0 +1,18 @@
+#标题
+su - 切换普通用户时因目录权限不足导致 Permission denied
+
+#内核版本
+未知
+
+#问题现象
+执行 su - 切换至普通用户时，报错：su: failed to execute /bin/bash：Permission denied
+
+#问题根因
+/usr/lib64 和 /usr/sbin 目录缺少其他用户（others）的读和执行（o+rx）权限，导致非 root 用户无法通过 su - 正常启动 shell
+
+#解决方案
+1. 为 /usr/lib64 目录添加 o+rx 权限  
+2. 为 /usr/sbin 目录添加 o+rx 权限
+
+#来源
+https://forum.openeuler.org/t/topic/3010

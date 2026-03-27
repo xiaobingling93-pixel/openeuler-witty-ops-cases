@@ -1,0 +1,20 @@
+#标题
+openEuler软件包下载速度慢
+
+#内核版本
+未知
+
+#问题现象
+使用默认源下载openEuler软件包时速度缓慢。
+
+#问题根因
+默认配置未启用Metalink技术，且未使用地理位置较近的镜像源，导致下载效率低下。
+
+#解决方案
+1. 替换为国内镜像源，例如执行以下命令修改repo文件：
+   sed -i 's|http://repo.openeuler.org|https://mirrors.jxust.edu.cn/openeuler/|g' /etc/yum.repos.d/openEuler.repo
+2. 在/etc/yum.repos.d/openEuler.repo中为各仓库添加metalink配置，启用Metalink自动选择最优镜像并支持断点续传。
+3. 执行sudo yum clean all和sudo yum makecache刷新缓存。
+
+#来源
+https://forum.openeuler.org/t/topic/5986

@@ -1,0 +1,18 @@
+#标题
+supermin编译因ocaml库缺少-fPIC参数失败
+
+#内核版本
+未知
+
+#问题现象
+在openEuler 20.03-LTS-SP3环境中使用OBS编译supermin软件包时，链接阶段报错：/usr/bin/ld提示/usr/lib64/ocaml/libasmrun.a中的fail.o存在relocation R_AARCH64_ADR_PREL_PG_HI21错误，要求“recompile with -fPIC”，最终导致supermin链接失败，RPM构建退出状态为2。
+
+#问题根因
+ocaml软件包提供的静态库libasmrun.a未使用-fPIC参数编译，导致在supermin链接生成位置无关可执行文件（PIE）时因重定位类型不兼容而失败。
+
+#解决方案
+1. 修改ocaml.spec文件，在%build阶段的configure命令中添加-fPIC参数，重新编译并安装ocaml软件包。
+2. 安装gcc_secure软件包，为gcc启用安全编译选项。
+
+#来源
+https://forum.openeuler.org/t/topic/697

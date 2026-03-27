@@ -1,0 +1,19 @@
+#标题
+SFTP配置ChrootDirectory后普通用户Shell登录失败
+
+#内核版本
+未知
+
+#问题现象
+配置SSH的ChrootDirectory为/flash并限制用户sysadmin使用internal-sftp后，该用户通过SSH尝试登录shell时连接被立即断开；系统日志显示“/dev/pts/4: No such file or directory”、“open /dev/tty failed - could not set controlling tty: No such file or directory”；客户端提示“/bin/bash: No such file or directory”。
+
+#问题根因
+ChrootDirectory指定的目录（/flash）中未包含必要的/dev、/bin/bash等基本文件系统结构和可执行文件，导致用户登录时无法加载shell及设备节点。
+
+#解决方案
+1. 在ChrootDirectory指定的目录（如/flash）中创建完整的必要目录结构，包括/bin、/dev、/etc等。
+2. 将/bin/bash及相关依赖库复制到/flash/bin目录下。
+3. 使用mknod或mount --bind方式在/flash/dev下提供必要的设备节点（如pts、tty）。
+
+#来源
+https://forum.openeuler.org/t/topic/7050

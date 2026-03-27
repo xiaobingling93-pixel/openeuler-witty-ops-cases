@@ -1,0 +1,19 @@
+#标题
+Swift代理服务因keystonemiddleware配置项不兼容导致认证失败
+
+#内核版本
+6.6.0-83.0.0.77.oe2403
+
+#问题现象
+执行 swift stat 命令返回 401 未授权错误；swift-proxy-server 日志显示多个配置项（如 swift_dir、log_name、auth_url、project_domain_id、user_domain_id、project_name、username、password、name）被 keystonemiddleware 报为“未知选项”。
+
+#问题根因
+proxy-server.conf 中为 keystonemiddleware 配置了其不支持的选项，导致 Keystone 认证中间件无法正确加载认证参数，从而引发认证失败。
+
+#解决方案
+1. 检查 /etc/swift/proxy-server.conf 中 [filter:keystone] 或相关 keystonemiddleware 配置段；
+2. 移除或注释掉日志中提示“未知”的配置项（如 swift_dir、log_name 等），仅保留 keystonemiddleware 官方文档支持的参数；
+3. 重启 openstack-swift-proxy 服务使配置生效。
+
+#来源
+https://forum.openeuler.org/t/topic/7698

@@ -1,0 +1,22 @@
+#标题
+openEuler 22.03 LTS安装高版本Docker CE失败因缺少依赖包
+
+#内核版本
+22.03 LTS
+
+#问题现象
+在openEuler 22.03 LTS系统上执行 yum install docker-ce-20.10.0 命令时，报错提示无法安装 docker-ce-rootless-extras，因为系统缺少 fuse-overlayfs >= 0.7 和 slirp4netns >= 0.4 两个依赖包。
+
+#问题根因
+openEuler 22.03 LTS官方软件源中未提供 docker-ce-rootless-extras 所需的 fuse-overlayfs 和 slirp4netns 依赖包。
+
+#解决方案
+1. 从 CentOS 8 Stream 仓库下载兼容的 RPM 包：
+   - fuse-overlayfs-1.7-1.module_el8.5.0+877+1c30e0c9.x86_64.rpm
+   - libslirp-4.3.1-1.module_el8.4.0+786+4668b267.x86_64.rpm
+   - slirp4netns-1.1.8-1.module_el8.4.0+786+4668b267.x86_64.rpm
+2. 使用 rpm -ivh 命令依次安装上述三个 RPM 包。
+3. 安装完成后，执行 dnf install docker-ce 完成 Docker CE 安装。
+
+#来源
+https://forum.openeuler.org/t/topic/1631

@@ -1,0 +1,18 @@
+#标题
+list_add corruption 导致系统崩溃
+
+#内核版本
+4.19.90-2107.6.0.0220.22.oe1.bclinux.x86_64
+
+#问题现象
+系统重启时出现内核警告：list_add corruption，具体信息为“prev->next should be next (ffff8d8989d574c8), but was 0000000000000000”，同时伴随 list_del corruption 错误（next 指向 LIST_POISON1）。错误发生在 lib/list_debug.c 的 __list_add_valid 和 __list_del_entry_valid 函数中，调用栈显示与 ZFS 模块（z_wr_int 线程）及 spl taskq_thread 相关。
+
+#问题根因
+ZFS 文件系统模块（zfs(POE)）与内核链表操作存在兼容性缺陷，导致在高负载或特定 I/O 路径下触发链表结构破坏。
+
+#解决方案
+1. 升级 openEuler 内核至已修复该链表损坏问题的版本（需确认是否包含对应 Red Hat RHEL 8.4 中已修复的补丁）。
+2. 若无法立即升级，临时规避措施为避免在生产环境中使用 ZFS(POE) 模块，或限制其高并发写入负载。
+
+#来源
+https://forum.openeuler.org/t/topic/6707

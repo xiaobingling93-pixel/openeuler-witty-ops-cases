@@ -1,0 +1,30 @@
+#标题
+openEuler 22.03 SP4 安装时无法通过内核参数固定网卡名称为 eth0
+
+#内核版本
+未知
+
+#问题现象
+在使用 openeuler22.03-sp4.iso 安装操作系统时，即使在内核启动参数中添加 net.ifnames=0 biosdevname=0，系统安装后网卡名称仍未固定为 eth0、eth1 等传统命名，而是采用基于硬件拓扑的新命名规则，导致依赖传统网卡名的脚本无法运行。
+
+#问题根因
+仅设置内核参数 net.ifnames=0 和 biosdevname=0 不足以在安装阶段持久化固定网卡名称，必须配合 udev 规则、GRUB 配置更新及首次启动脚本才能实现 ethX 命名。
+
+#解决方案
+1. 在 ks.cfg 中创建 /etc/udev/rules.d/70-persistent-net.rules 文件，内容为：  
+   SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="?*", KERNEL!="lo", NAME="eth%n"  
+2. 在 /etc/default/grub 中添加内核参数 net.ifnames=0 biosdevname=0，并执行 grub2-mkconfig 更新 GRUB 配置  
+3. 在 ks.cfg 中定义一个 firstboot.service 的 systemd 服务（Type=oneshot），在系统首次重启时执行以下脚本：  
+   ```bash
+   INDEX=0
+   for NETDEV in $(ls /sys/class/net | grep -E -v 'lo'); do
+     ip link set $NETDEV down
+     ip link set $NETDEV name eth$INDEX
+     INDEX=$((INDEX + 1))
+   done
+   systemctl disable firstboot.service
+   rm -f /root/myscript.sh
+   ```
+
+#来源
+https://forum.openeuler.org/t/topic/7144

@@ -1,0 +1,17 @@
+#标题
+RPM包签名校验失败因缺少对应公钥
+
+#内核版本
+未知
+
+#问题现象
+在进行软件包兼容性扫描并解压RPM包时，系统提示“Header V3 RSA/SHA256 Signature, key ID f4a80eb5: NOKEY”错误，表明缺少ID为f4a80eb5的GPG公钥用于校验RPM包签名。
+
+#问题根因
+当前环境中未导入ID为f4a80eb5的GPG公钥，导致RPM在解压时无法验证包签名。
+
+#解决方案
+从软件源（repo）下载对应的GPG公钥，并使用命令 rpm --import 导入该公钥。
+
+#来源
+https://forum.openeuler.org/t/topic/1811

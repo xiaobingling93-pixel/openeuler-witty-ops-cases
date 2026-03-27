@@ -1,0 +1,18 @@
+#标题
+openEuler 24.03 注释 fstab 无法永久关闭交换分区
+
+#内核版本
+24.03
+
+#问题现象
+在 /etc/fstab 中注释掉交换分区后重启系统，执行 free -h 仍显示交换分区处于启用状态。
+
+#问题根因
+openEuler 系统在启动过程中未正确处理 /etc/fstab 中被注释的交换分区条目，导致 swap 分区仍被激活。
+
+#解决方案
+1. 在 /etc/rc.local 文件中添加命令 swapoff -a。
+2. 确保 /etc/rc.local 具有可执行权限并已启用（如通过 systemctl enable rc-local）。
+
+#来源
+https://forum.openeuler.org/t/topic/5188

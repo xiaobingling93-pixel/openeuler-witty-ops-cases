@@ -1,0 +1,17 @@
+#标题
+openEuler 24.03 LTS SP2 上 nginx 启动失败：ssi_command_hash 构建错误
+
+#内核版本
+24.03 LTS SP2
+
+#问题现象
+在 Proxmox VE 8.4.0 虚拟机中安装 openEuler 24.03 LTS SP2（海光 CPU）后，通过 yum 安装 nginx 1.24.0，启动时失败，报错：“nginx: [emerg] could not build ssi_command_hash, you should increase ssi_command_hash_bucket_size: 1”。尝试多种网上提供的增大 bucket size 配置方法均无效。相同问题也出现在 Ubuntu 24.04 系统及自编译 nginx 1.28 版本中，且即使未显式启用 SSI 模块也会触发该错误。
+
+#问题根因
+nginx 在海光 CPU 平台上默认启用了 http_ssi_module 模块，但其内部 ssi_command_hash 初始化逻辑在该架构下无法正确构建哈希表，导致启动失败。
+
+#解决方案
+1. 重新编译 nginx 时添加 --without-http_ssi_module 参数禁用 SSI 模块，即可正常启动。
+
+#来源
+https://forum.openeuler.org/t/topic/18762

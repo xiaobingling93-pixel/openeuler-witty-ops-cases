@@ -1,0 +1,26 @@
+#标题
+升级过程中因 elfutils-libelf 被删除导致 rpmdb 重建失败
+
+#内核版本
+未知
+
+#问题现象
+在从 RHEL8 升级到 openEuler 过程中，系统日志显示：
+- 成功移除了 PackageKit-glib、createrepo_c-libs 和 elfutils-libelf 等冲突 RPM 包；
+- 随后报错 “[ ERROR ] - [initramfs]: rebuild rpmdb error”；
+- 升级流程终止，提示 “failed to upgrade system”。
+
+#问题根因
+elfutils-libelf 被删除后导致 rpm 工具无法正常运行，从而引发 rpmdb 重建失败。
+
+#解决方案
+1. 将备份目录中的 libelf 相关库文件复制回系统路径：  
+   cp /.osback/usr/lib64/libelf* /usr/lib64/
+2. 若 dnf 命令报错提示缺少 libgnutls.so.30，则执行：  
+   cp /.osbak/usr/lib64/libgnutls.so.30* /usr/lib64/
+3. 清理 yum 源配置，删除 /etc/yum.repos.d/ 目录中非 migrate 的 repo 文件；
+4. 使用 rpm -e --nodeps 重新删除日志中列出的冲突包（如 PackageKit-glib、createrepo_c-libs、elfutils-libelf），忽略可能的报错；
+5. 点击重试继续升级流程。
+
+#来源
+https://forum.openeuler.org/t/topic/3038

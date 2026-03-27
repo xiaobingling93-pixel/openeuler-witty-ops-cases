@@ -1,0 +1,17 @@
+#标题
+openEuler 22.03-LTS 回退失败导致 yum 和 rpm 无法使用
+
+#内核版本
+未知
+
+#问题现象
+系统在执行回退重启时卡住，强制重启后进入救援模式；恢复 /etc/os-release 后系统可启动但未完成回退，yum 报错“/usr/lib64/librpm.so.3: undefined symbol: rpm_execcon”，rpm 报错“/usr/lib64/liblzma.so.5: version ‘XZ_5.2’ not found (required by /usr/lib64/librpmio.so.9)”
+
+#问题根因
+回退过程中系统库文件版本不一致，导致 librpm 依赖的符号 rpm_execcon 未定义，且 liblzma 版本低于 rpm 所需的 XZ_5.2 版本
+
+#解决方案
+将正常系统的 /etc/os-release 文件拷贝到故障机器以恢复基本系统识别（注：原文仅提及此操作使系统可启动，但未提供完整回退或修复 yum/rpm 的明确方案）
+
+#来源
+https://forum.openeuler.org/t/topic/1590

@@ -1,0 +1,23 @@
+#标题
+openEuler 2203 网卡名称漂移导致网络配置失效
+
+#内核版本
+未知
+
+#问题现象
+系统中原本名为 enp6s0 的网卡在运行时被重命名为 rename3，导致通过原名称无法启动或管理该网卡；ip addr show 显示 rename3 拥有原 enp6s0 的 IP 地址（192.168.7.200）和 MAC 地址（cc:82:7f:35:12:68），但 NetworkManager 中 enp6s0 连接未绑定到任何设备，DEVICE 字段为空。
+
+#问题根因
+udev 在系统运行过程中因网卡命名冲突或规则缺失，将原网卡 enp6s0 临时重命名为 rename3，而 NetworkManager 和网络配置文件仍引用原始名称 enp6s0，导致连接无法正确绑定到实际设备。
+
+#解决方案
+1. 永久解决：创建 /etc/udev/rules.d/70-persistent-net.rules 文件，按 MAC 地址显式绑定网卡名称，内容如下：
+   SUBSYSTEM=="net",ACTION=="add",ATTR{address}=="cc:82:7f:35:12:66",NAME="eno1"
+   SUBSYSTEM=="net",ACTION=="add",ATTR{address}=="cc:82:7f:35:12:67",NAME="enp5s0"
+   SUBSYSTEM=="net",ACTION=="add",ATTR{address}=="cc:82:7f:35:12:68",NAME="enp6s0"
+   SUBSYSTEM=="net",ACTION=="add",ATTR{address}=="cc:82:7f:35:12:69",NAME="enp7s0"
+   然后重启系统。
+2. 临时解决（无需重启）：编辑 /etc/sysconfig/network-scripts/ifcfg-enp6s0，注释掉 DEVICE=enp6s0 行，然后执行 ifup enp6s0 激活连接，使 NetworkManager 将配置应用到当前设备 rename3。
+
+#来源
+https://forum.openeuler.org/t/topic/3156

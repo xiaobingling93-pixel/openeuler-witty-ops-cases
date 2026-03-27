@@ -1,0 +1,18 @@
+#标题
+/tmp/hsperfdata_root/pid 文件不更新导致 Java 进程被清理
+
+#内核版本
+未知
+
+#问题现象
+在 openEuler 22.03 LTS 系统中，Java 进程在 /tmp/hsperfdata_root/pid 下生成的性能数据文件仅在进程启动时创建一次，后续不再更新其时间戳；由于系统临时文件清理机制（如 systemd-tmpclean）会清理长时间未更新的文件，导致该文件被误删，进而使 jstack、jps 等 JDK 工具无法获取堆栈或进程信息。
+
+#问题根因
+/tmp 使用 tmpfs 文件系统，而 Java 进程在 openEuler 中不会定期更新 /tmp/hsperfdata_root/pid 文件的时间戳，导致系统临时文件清理任务将其视为过期文件予以删除。
+
+#解决方案
+1. 修改 Java 性能数据文件的存储路径，将其指向非 tmpfs 文件系统目录。
+2. 定期执行 jps 命令以触发 hsperfdata 文件的时间戳更新，防止被清理。
+
+#来源
+https://forum.openeuler.org/t/topic/3051

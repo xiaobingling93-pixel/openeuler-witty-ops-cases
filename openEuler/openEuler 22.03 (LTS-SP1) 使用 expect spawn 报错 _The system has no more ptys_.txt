@@ -1,0 +1,18 @@
+#标题
+openEuler 22.03 (LTS-SP1) 使用 expect spawn 报错 "The system has no more ptys"
+
+#内核版本
+未知
+
+#问题现象
+运行 expect 脚本执行 spawn 命令时，提示错误信息：“The system has no more ptys. Ask your system administrator to create more.”；通过查看内核参数发现 kernel.pty.nr = 1。
+
+#问题根因
+系统中 kernel.pty.nr 参数值过小（为1），导致可用 PTY 数量不足，无法创建新的终端会话。
+
+#解决方案
+1. 将 kernel.pty.nr 参数调大（例如设为 2048）以增加系统可用 PTY 数量。
+2. 在 expect 脚本中确保使用 expect eof 正确关闭 spawn 会话，释放 PTY 资源。
+
+#来源
+https://forum.openeuler.org/t/topic/3019

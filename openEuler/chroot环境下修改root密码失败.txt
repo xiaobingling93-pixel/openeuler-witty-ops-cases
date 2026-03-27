@@ -1,0 +1,17 @@
+#标题
+chroot环境下修改root密码失败
+
+#内核版本
+5.10
+
+#问题现象
+在openEuler 21.09的arm64鲲鹏服务器上，执行chroot /root/rootfs /bin/bash后，运行passwd命令修改root密码时失败，报错“passwd: Authentication token manipulation error”。已确认/etc/shadow、/etc/passwd、/etc/group及/usr/bin/passwd权限均正确，但问题仍存在。
+
+#问题根因
+SELinux在主系统中启用，导致chroot环境中的passwd操作被安全策略阻止。
+
+#解决方案
+在执行chroot之前，关闭主系统中的SELinux。
+
+#来源
+https://forum.openeuler.org/t/topic/195

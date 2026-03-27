@@ -1,0 +1,20 @@
+#标题
+自编译 OpenSSH 导致升级过程中 scp 命令因缺少 libcrypto.so.10 失败
+
+#内核版本
+未知
+
+#问题现象
+在 CentOS 7.9 升级至 openEuler 过程中，进度达到 100% 点击“重启”按钮后，系统未重启，工具页面报错“自适应脚本执行失败，请定位失败原因。”；通过 SSH 可正常连接待升级主机，但前端重试无效。日志显示 scp 命令执行失败，报错：scp: error while loading shared libraries: libcrypto.so.10: cannot open shared object file: No such file or directory。
+
+#问题根因
+待升级主机上存在自编译安装的 openssh-clients（位于 /usr/local/bin/scp），其依赖的 libcrypto.so.10 在系统升级过程中被移除，而该自编译版本未被包管理器管理，导致 scp 命令无法加载所需库文件。
+
+#解决方案
+1. 备份或重命名自编译的 scp 命令（如 mv /usr/local/bin/scp /usr/local/bin/scp.bak）。
+2. 确认系统使用由 openssh-clients RPM 包提供的 scp 命令：执行 which scp 并验证 rpm -qf $(which scp) 返回正确包名。
+3. 在前端页面点击重试继续升级流程。
+4. 建议在系统升级前检查并卸载所有自编译软件（如 openssh-clients、Python 等），避免与系统包冲突。
+
+#来源
+https://forum.openeuler.org/t/topic/4599

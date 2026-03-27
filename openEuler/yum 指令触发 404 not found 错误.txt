@@ -1,0 +1,19 @@
+#标题
+yum 指令触发 404 not found 错误
+
+#内核版本
+2003sp4
+
+#问题现象
+执行 yum 指令时返回 404 not found 错误，无法访问 yum 源；服务器架构为 arm64，系统版本为 openEuler 2003sp4。
+
+#问题根因
+/etc/yum.repos.d/*.repo 文件中配置的源路径无法访问。
+
+#解决方案
+1. 检查并更新 /etc/yum.repos.d/ 目录下的 .repo 文件，使用可访问的 openEuler 官方 repo 源。
+2. 参考官方提供的「openEuler常用repo源」汇总贴重新配置 yum 源。
+3. 确保服务器具备公网访问能力。
+
+#来源
+https://forum.openeuler.org/t/topic/5067

@@ -1,0 +1,25 @@
+#标题
+container-selinux 安装因 SELinux 策略文件写入被拒绝而失败
+
+#内核版本
+24.03
+
+#问题现象
+在 openEuler 24.03 (LTS) 上强制安装 container-selinux-2.230.0-1.oe2403.noarch.rpm 时，rpm 报错：  
+“Access denied: renameat blocked for log_container.cil;690f6053 → log_container.cil”  
+随后提示 “cpio: rename failed - No such file or directory”，导致安装失败。
+
+#问题根因
+在 openEuler 系统上安装了不兼容的 CentOS EL9 版本的 container-selinux 包，其构建依赖与 openEuler 不一致，导致 SELinux 策略文件写入被系统拒绝。
+
+#解决方案
+1. 不使用 el9 版本的 Docker 相关 RPM 包；
+2. 改为下载并安装与 openEuler 兼容的 CentOS EL8 版本的 Docker 组件包，包括：
+   - docker-ce-26.1.3-1.el8.x86_64.rpm
+   - docker-ce-cli-26.1.3-1.el8.x86_64.rpm
+   - containerd.io-1.6.32-3.1.el8.x86_64.rpm
+   - docker-buildx-plugin-0.14.0-1.el8.x86_64.rpm
+   - docker-compose-plugin-2.27.0-1.el8.x86_64.rpm
+
+#来源
+https://forum.openeuler.org/t/topic/18782

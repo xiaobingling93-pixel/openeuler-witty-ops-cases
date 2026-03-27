@@ -1,0 +1,19 @@
+#标题
+linux-firmware-iwlwifi 更新后导致 Intel AX200 无线网卡失效
+
+#内核版本
+24.03 LTS sp1
+
+#问题现象
+系统在升级 @update 源中的 linux-firmware-iwlwifi 包后，Intel AX200 无线网卡无法使用，显示 "wifi-hw (missing)"；从本地 OS 源重新安装旧版 linux-firmware-iwlwifi 和 NetworkManager-wifi 包并重启后，网卡恢复正常。
+
+#问题根因
+@update 源中提供的 linux-firmware-iwlwifi 包（版本号约为 202503xx）存在缺陷，导致 Intel AX200 无线网卡固件加载失败。
+
+#解决方案
+1. 卸载已升级的 linux-firmware-iwlwifi 和 NetworkManager-wifi 包；
+2. 从本地 OS 源重新安装这两个包；
+3. 重启系统使无线网卡恢复正常。
+
+#来源
+https://forum.openeuler.org/t/topic/7341

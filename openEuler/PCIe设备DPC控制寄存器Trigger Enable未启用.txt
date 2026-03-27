@@ -1,0 +1,18 @@
+#标题
+PCIe设备DPC控制寄存器Trigger Enable未启用
+
+#内核版本
+22.03 SP4
+
+#问题现象
+在openEuler 22.03 SP4系统中，BIOS已设置"IIO eDPC Support"为"On Fatal Error"，但进入操作系统后通过lspci查询PCIe设备配置空间的DPC控制寄存器（DpcCtl）显示Trigger Enable为0（Disabled），即DPC触发功能未启用。对比CentOS 8（内核4.18）相同设置下该功能正常启用。
+
+#问题根因
+openEuler 22.03 LTS SP4所用5.10内核默认未启用CONFIG_PCIE_EDR配置选项，导致DPC（Downstream Port Containment）触发功能无法激活。
+
+#解决方案
+1. 启用内核配置选项CONFIG_PCIE_EDR。
+2. 应用openEuler/kernel仓库中已提交的相关PR修复。
+
+#来源
+https://forum.openeuler.org/t/topic/5640

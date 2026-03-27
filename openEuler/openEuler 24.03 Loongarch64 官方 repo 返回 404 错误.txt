@@ -1,0 +1,17 @@
+#标题
+openEuler 24.03 Loongarch64 官方 repo 返回 404 错误
+
+#内核版本
+24.03
+
+#问题现象
+执行 yum update 时，系统尝试从 http://repo.openeuler.org/openEuler-24.03-LTS/everything/loongarch64/repodata/repomd.xml 下载元数据失败，返回 HTTP 404 错误，提示“All mirrors were tried”。
+
+#问题根因
+openEuler 24.03 LTS 官方仓库未提供 Loongarch64 架构的软件源。
+
+#解决方案
+1. 使用社区提供的龙芯架构专用 repo 地址：https://eulermaker.compass-ci.openeuler.openatom.cn/api/ems3/repositories/openEuler-24.03-LTS-everything:loongarch/openEuler%3A24.03-LTS/loongarch64/
+
+#来源
+https://forum.openeuler.org/t/topic/6160

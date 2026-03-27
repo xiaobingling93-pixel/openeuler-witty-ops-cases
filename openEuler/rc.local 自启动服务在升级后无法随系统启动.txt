@@ -1,0 +1,19 @@
+#标题
+rc.local 自启动服务在升级后无法随系统启动
+
+#内核版本
+2003sp3
+
+#问题现象
+从 CentOS 7.4 通过 x2openEuler 升级到 openEuler 2003 SP3 后，在 /etc/rc.local 中添加的自启动服务无法随系统启动，尽管 rc.local 文件具有执行权限。
+
+#问题根因
+升级后 /etc/rc.local 的软链接不正确。
+
+#解决方案
+1. 删除错误的 /etc/rc.local 软链接  
+2. 重新将 /etc/rc.d/rc.local 软链接到 /etc/rc.local  
+3. 启用并启动 rc-local 服务：systemctl enable rc-local && systemctl start rc-local
+
+#来源
+https://forum.openeuler.org/t/topic/1593

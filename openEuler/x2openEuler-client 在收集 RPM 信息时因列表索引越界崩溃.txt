@@ -1,0 +1,18 @@
+#标题
+x2openEuler-client 在收集 RPM 信息时因列表索引越界崩溃
+
+#内核版本
+未知
+
+#问题现象
+执行 x2openEuler-client upgrade-check-collect 命令时，在收集 RPM 信息阶段报错“IndexError: 列表索引超出范围”，导致收集冲突信息失败。日志显示在处理第 2053 项（总数为 2052）时发生异常，且重复出现 current/total 计数溢出。
+
+#问题根因
+x2openEuler-client 在解析单个 RPM 包返回结果时，代码中存在数组访问越界错误，当处理的 RPM 项数超过预期总数时触发 IndexError。
+
+#解决方案
+1. 升级 x2openEuler-client 至修复该索引越界问题的版本。
+2. 若暂无新版本，可临时避免在包含异常 RPM 包的系统上运行 upgrade-check-collect 命令。
+
+#来源
+https://forum.openeuler.org/t/topic/18818

@@ -1,0 +1,18 @@
+#标题
+Qualcomm Atheros AR9485 无线网卡未被识别
+
+#内核版本
+24.03
+
+#问题现象
+系统无法识别 Qualcomm Atheros AR9485 无线网卡，nmcli g 命令显示 wifi-hw missing
+
+#问题根因
+系统缺少支持该无线网卡所需的固件（firmware）
+
+#解决方案
+1. 安装 linux-firmware 包
+2. 可参考 22.03 版本使用 CentOS 8 源安装 firmware-ath10k 包以使系统识别无线网卡
+
+#来源
+https://forum.openeuler.org/t/topic/4611

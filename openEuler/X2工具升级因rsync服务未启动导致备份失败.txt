@@ -1,0 +1,19 @@
+#标题
+X2工具升级因rsync服务未启动导致备份失败
+
+#内核版本
+未知
+
+#问题现象
+执行x2openEuler-upgrade升级时，在备份阶段报错：rsync files error, returned 20，具体错误信息包括“file has vanished”及“rsync error: received SIGINT, SIGTERM, or SIGHUP (code 20)”，最终导致备份操作失败，升级中断。
+
+#问题根因
+待升级节点上的rsync服务未启动，导致x2openEuler-upgrade在执行文件备份时无法正常调用rsync完成同步操作。
+
+#解决方案
+1. 回退当前升级任务；
+2. 在待升级节点上启动rsync服务；
+3. 重新执行升级任务。
+
+#来源
+https://forum.openeuler.org/t/topic/932

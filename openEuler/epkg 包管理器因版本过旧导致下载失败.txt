@@ -1,0 +1,23 @@
+#标题
+epkg 包管理器因版本过旧导致下载失败
+
+#内核版本
+未知
+
+#问题现象
+在 openEuler Embedded（oee24.03）环境中使用 epkg install 下载软件包时失败；执行 epkg init upgrade 或 epkg init update 无法完成升级，系统提示已安装但实际仍为旧版本。
+
+#问题根因
+用户使用的 epkg 版本过旧，不支持当前软件源的下载协议或路径结构，导致安装命令无法正常下载软件包。
+
+#解决方案
+1. 卸载旧版 epkg：运行 https://repo.oepkgs.net/openeuler/epkg/rootfs/epkg-uninstaller.sh 脚本，或使用新版本内置命令 `epkg deinit`。
+2. 安装新版 epkg：执行以下命令  
+   ```bash
+   wget https://gitee.com/openeuler/epkg/releases/download/v0.2.0/epkg-$(arch)
+   ./epkg-$(arch) init
+   ```
+3. 使用新版 epkg 安装软件包，例如：`epkg install htop`。
+
+#来源
+https://forum.openeuler.org/t/topic/18612

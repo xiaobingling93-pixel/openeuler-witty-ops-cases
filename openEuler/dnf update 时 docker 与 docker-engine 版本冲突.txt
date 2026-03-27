@@ -1,0 +1,20 @@
+#标题
+dnf update 时 docker 与 docker-engine 版本冲突
+
+#内核版本
+24.03
+
+#问题现象
+执行 dnf update 命令时报错，提示无法同时安装 docker-engine-25.0.3-10.oe2403 与 docker-engine-2:18.09.0-340.oe2403；错误信息显示已安装的 docker-25.0.3-10.oe2403.x86_64 要求依赖 docker-engine = 25.0.3-10.oe2403，但仓库中存在 Epoch=2 的 docker-engine-2:18.09.0 包，导致更新冲突。
+
+#问题根因
+官方仓库中存在 Epoch=2 的 docker-engine-2:18.09.0-340.oe2403 包，其优先级高于已安装的 docker-engine-25.0.3-10.oe2403，导致 dnf update 时试图降级安装旧版本，从而与系统已安装的 docker-25.0.3-10 冲突。
+
+#解决方案
+1. 执行 dnf update 时排除相关包：  
+   dnf update --exclude=docker-25.0.3-10.oe2403.x86_64,docker-client-25.0.3-10.oe2403.x86_64,docker-engine-25.0.3-10.oe2403.x86_64  
+2. 或使用 --nobest 参数跳过最佳候选包选择：  
+   dnf update --nobest
+
+#来源
+https://forum.openeuler.org/t/topic/6257

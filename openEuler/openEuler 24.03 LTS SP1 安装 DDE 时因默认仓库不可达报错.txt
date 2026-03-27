@@ -1,0 +1,18 @@
+#标题
+openEuler 24.03 LTS SP1 安装 DDE 时因默认仓库不可达报错
+
+#内核版本
+24.03 LTS SP1
+
+#问题现象
+安装 DDE 时默认使用 repo.openeuler.org 仓库，连接失败导致报错
+
+#问题根因
+/etc/yum.repos.d/openEuler.repo 文件中配置了不可用的 metalink 行，导致 yum 无法连接默认仓库
+
+#解决方案
+1. 注释掉 /etc/yum.repos.d/openEuler.repo 文件中所有以 metalink 开头的行  
+2. 可替换为华为提供的可用 repo 源
+
+#来源
+https://forum.openeuler.org/t/topic/6907

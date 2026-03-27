@@ -1,0 +1,19 @@
+#标题
+Zabbix安装时因php-json依赖问题失败
+
+#内核版本
+未知
+
+#问题现象
+安装Zabbix时提示缺少php-json依赖；dnf错误地尝试安装el9的软件包；系统实际使用的是openEuler，但yum源中包含不兼容的RPM包
+
+#问题根因
+openEuler部分版本（如20.03）仍保留php-json包，而其他版本已将其合并至php-common；但el9编译的Zabbix包强制依赖php-json，导致在非对应系统上安装失败
+
+#解决方案
+1. 重新在openEuler上编译el9的Zabbix包，编译前注释掉对php-json的依赖声明  
+2. 在openEuler上自行编译并安装php-json包  
+3. 使用已适配openEuler的Zabbix版本（可通过OEPKGS-SEARCH查询）
+
+#来源
+https://forum.openeuler.org/t/topic/3432

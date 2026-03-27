@@ -1,0 +1,18 @@
+#标题
+x2openEuler升级因大文件备份失败
+
+#内核版本
+未知
+
+#问题现象
+执行x2openEuler-upgrade时备份失败，报错信息为“x2openEuler-upgrade backup failed please check”
+
+#问题根因
+备份目录（/etc、/usr、/boot、/var、/run）中存在大文件，导致备份过程失败
+
+#解决方案
+1. 使用tree命令分别检查上述5个备份目录，识别异常大文件  
+2. 删除/usr/test目录下的大体积mp4文件后重试升级任务
+
+#来源
+https://forum.openeuler.org/t/topic/931

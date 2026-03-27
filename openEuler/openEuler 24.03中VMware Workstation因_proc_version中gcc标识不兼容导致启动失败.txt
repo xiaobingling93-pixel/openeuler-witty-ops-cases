@@ -1,0 +1,19 @@
+#标题
+openEuler 24.03中VMware Workstation因/proc/version中gcc标识不兼容导致启动失败
+
+#内核版本
+24.03
+
+#问题现象
+在openEuler 24.03系统中启动VMware Workstation时提示“gcc找不到”；检查发现/proc/version中使用了“gcc_old (GCC)”格式，而非VMware可识别的标准gcc版本格式。
+
+#问题根因
+openEuler 24.03的/proc/version文件中使用了“gcc_old (GCC)”字符串，导致VMware无法正确识别编译器版本，从而拒绝编译内核模块。
+
+#解决方案
+1. 临时替换/proc/version内容：使用脚本将“gcc_old (GCC)”替换为“gcc version”，通过bind mount覆盖/proc/version后运行vmware-modconfig --console --install-all重新编译模块，完成后恢复原文件。
+2. 手动编译vmmon和vmnet模块：解压/usr/lib/vmware/modules/source中的vmmon.tar和vmnet.tar，使用make编译生成ko文件并复制到/lib/modules/$(uname -r)/misc/，然后执行depmod -a更新依赖。
+3. 配置开机自动编译：创建systemd服务（vmware-manual-build.service）和对应脚本（/usr/local/bin/vmware-manual-build.sh），在系统启动时自动检测并编译适配当前内核的VMware模块。
+
+#来源
+https://forum.openeuler.org/t/topic/19062

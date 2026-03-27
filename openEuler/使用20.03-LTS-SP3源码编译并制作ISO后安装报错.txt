@@ -1,0 +1,20 @@
+#标题
+使用20.03-LTS-SP3源码编译并制作ISO后安装报错
+
+#内核版本
+20.03-LTS-SP3
+
+#问题现象
+使用20.03-LTS-SP3的源码搭建OBS工程编译，并通过oemaker制作ISO后，在安装过程中报错。
+
+#问题根因
+换标导致shim等包未同步，/etc/anaconda/product.d/XXX.conf 中字段仍为openEuler。
+
+#解决方案
+1. 按 Ctrl + Alt + F2 切换到后台终端。
+2. 使用 vi 编辑 /etc/anaconda/product.d/XXX.conf 文件，修改其中对应字段。
+3. 修改完成后，执行 restart-anaconda 命令重启 anaconda。
+4. 等待 anaconda 重启完成。
+
+#来源
+https://forum.openeuler.org/t/topic/694

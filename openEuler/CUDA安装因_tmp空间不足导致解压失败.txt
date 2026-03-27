@@ -1,0 +1,18 @@
+#标题
+CUDA安装因/tmp空间不足导致解压失败
+
+#内核版本
+未知
+
+#问题现象
+执行CUDA安装脚本（cuda_12.2.0_535.54.03_linux.run）时出现“Extraction failed”错误，提示“Ensure there is enough space in /tmp and that the installation package is not corrupt”，随后进程被信号中断并清理。
+
+#问题根因
+CUDA安装过程需要在/tmp目录下解压临时文件，而系统/tmp空间不足导致解压失败。
+
+#解决方案
+1. 创建一个位于有充足空闲空间分区下的临时目录（例如：sudo mkdir /opt/temp）。
+2. 在运行CUDA安装脚本时通过--tmpdir参数指定该目录（例如：sudo sh ./cuda_12.2.0_535.54.03_linux.run --tmpdir=/opt/temp）。
+
+#来源
+https://forum.openeuler.org/t/topic/3567

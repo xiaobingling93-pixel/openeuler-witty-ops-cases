@@ -1,0 +1,20 @@
+#标题
+grub2-common 版本过低导致升级前检查失败
+
+#内核版本
+20.03 LTS SP1
+
+#问题现象
+从 CentOS 7.8 升级至 openEuler 20.03 LTS SP1 时，x2openeuler 工具提示 grub2-common 检查不通过；手动安装镜像中自带的 grub2-common 2.04-5.oe.1 版本报冲突；使用纯净 CentOS 系统复现相同问题。
+
+#问题根因
+openEuler 20.03 LTS SP1 镜像中的 grub2-common 版本为 2.04-5，低于升级检查要求的最低版本 2.04-8。
+
+#解决方案
+1. 从官方 update 源（repo.huaweicloud.com/openeuler/openEuler-20.03-LTS-SP1/update/x86_64/Packages/）下载 grub2-common 高版本包（≥2.04-8）  
+2. 将下载的包放入本地 repo 源目录  
+3. 执行 createrepo 重建 repo 源元数据信息  
+4. 重新执行升级操作
+
+#来源
+https://forum.openeuler.org/t/topic/4136

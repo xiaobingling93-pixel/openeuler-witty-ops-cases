@@ -1,0 +1,19 @@
+#标题
+openEuler 24.03 LTS kabi 测试失败
+
+#内核版本
+24.03 LTS
+
+#问题现象
+执行 kabi 测试时测试不通过
+
+#问题根因
+当前系统使用的内核源码版本过低，导致 kabi 测试无法通过
+
+#解决方案
+1. 手动从 https://repo.openeuler.org/openEuler-24.03-LTS/update/source/Packages/ 路径下载更高级的内核源码 RPM 包  
+2. 安装该内核源码包  
+3. 安装完成后重新执行 kabi 测试
+
+#来源
+https://forum.openeuler.org/t/topic/5127

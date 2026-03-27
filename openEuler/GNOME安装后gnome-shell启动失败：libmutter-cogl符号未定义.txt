@@ -1,0 +1,17 @@
+#标题
+GNOME安装后gnome-shell启动失败：libmutter-cogl符号未定义
+
+#内核版本
+未知
+
+#问题现象
+执行 gnome-shell --replace 命令时报错：gnome-shell: symbol lookup error: /usr/lib64/mutter-7/libmutter-cogl-7.so.0: undefined symbol: sysprof_clock
+
+#问题根因
+libmutter-cogl-7.so.0 依赖的 sysprof_clock 符号在运行时未找到，表明 sysprof 相关库缺失或版本不匹配。
+
+#解决方案
+1. 安装 sysprof 软件包以提供缺失的符号依赖。
+
+#来源
+https://forum.openeuler.org/t/topic/7267

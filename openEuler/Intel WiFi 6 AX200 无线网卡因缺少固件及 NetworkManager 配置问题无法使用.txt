@@ -1,0 +1,27 @@
+#标题
+Intel WiFi 6 AX200 无线网卡因缺少固件及 NetworkManager 配置问题无法使用
+
+#内核版本
+24.03
+
+#问题现象
+- dmesg 显示系统识别到 Intel AX200 无线网卡设备，但报错缺少固件。
+- 手动复制 Ubuntu 的 .ucode 固件文件至 /lib/firmware 后，ip link 可见接口 wlp1s0（原名 wlan0）。
+- nmcli device 显示该接口状态为 “wifi unmanaged”。
+- 修改 /etc/NetworkManager/NetworkManager.conf 设置 managed=true 无效。
+- 存在 unmanaged-devices 配置项干扰设备管理。
+- nmcli radio 显示 “wifi-hw (missing) wifi (enabled)”，表明硬件未被正确识别或启用。
+
+#问题根因
+系统默认未安装 linux-firmware-iwlwifi 软件包，导致 AX200 网卡缺少必要固件；同时 NetworkManager-wifi 组件未安装或配置不当，致使网卡虽被内核识别但未被 NetworkManager 管理。
+
+#解决方案
+1. 安装 linux-firmware-iwlwifi.noarch 和 NetworkManager-wifi.x86_64 软件包：
+   ```bash
+   dnf install linux-firmware-iwlwifi NetworkManager-wifi
+   ```
+2. 若无法联网，可从其他系统下载对应 RPM 包并手动安装，注意处理依赖关系。
+3. 安装完成后重启 NetworkManager 服务或重启系统以使无线网卡正常受管。
+
+#来源
+https://forum.openeuler.org/t/topic/6194

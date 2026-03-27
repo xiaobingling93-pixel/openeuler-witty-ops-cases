@@ -1,0 +1,18 @@
+#标题
+pam_access.so模块将IPv4地址识别为IPv6格式导致访问被拒
+
+#内核版本
+5.10.0-182.0.0.95.oe2203sp3
+
+#问题现象
+在vsftpd中启用pam_access.so模块并配置IPv4地址（如192.168.1.1）的访问控制规则后，从该IPv4地址登录FTP时被拒绝。系统日志显示pam_access模块将源地址识别为“::ffff:192.168.1.1”，与access.conf中配置的纯IPv4地址不匹配，导致访问被拒。
+
+#问题根因
+vsftpd默认使用IPv6 socket监听，即使客户端使用IPv4连接，内核也会通过IPv4映射IPv6地址（::ffff:x.x.x.x）形式传递给PAM模块，而pam_access.so按字面匹配access.conf中的IPv4规则，导致匹配失败。
+
+#解决方案
+1. 修改vsftpd.conf配置文件，设置 listen=YES 和 listen_ipv6=NO，强制vsftpd使用IPv4 socket监听。
+2. 或者在access.conf中使用IPv4映射的IPv6格式编写规则，例如将192.168.0.0/16写为::ffff:192.168.0.0/112。
+
+#来源
+https://forum.openeuler.org/t/topic/4771

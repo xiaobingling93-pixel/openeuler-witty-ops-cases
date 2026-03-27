@@ -1,0 +1,18 @@
+#标题
+Docker与iSulad因runc文件冲突无法共存
+
+#内核版本
+24.03
+
+#问题现象
+系统更新时提示：试图安装 docker-engine-2:18.09.0-340.oe2403.x86_64 和 runc-1.1.8-19.oe2403.x86_64 会导致文件 /usr/bin/runc 冲突；新版本 iSulad（2.1.5）默认依赖 runc，与 Docker 安装包存在文件冲突，导致二者无法在同一系统中共存。
+
+#问题根因
+新版本 iSulad（2.1.5）默认容器引擎变更为 runc，而 Docker-engine 也提供 /usr/bin/runc 文件，两者在安装时因提供相同路径的文件产生 RPM 包冲突。
+
+#解决方案
+1. 先安装 iSulad；
+2. 使用华为云镜像站提供的 docker-ce repo 文件（https://mirrors.huaweicloud.com/mirrorDetail/5ea14d84b58d16ef329c5c13?mirrorName=docker-ce&catalog=docker）安装 docker-ce，避免直接通过 yum 安装 docker-engine。
+
+#来源
+https://forum.openeuler.org/t/topic/5185

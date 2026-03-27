@@ -1,0 +1,19 @@
+#标题
+2203 LTS 5.10.0-126 执行 yum update 后新内核无法启动
+
+#内核版本
+5.10.0-126
+
+#问题现象
+执行 yum update 后系统无法使用新内核启动，报错 "dependency failed for initrd root file system"
+
+#问题根因
+新安装的内核在 initrd 阶段因依赖缺失导致根文件系统无法挂载
+
+#解决方案
+1. 重启时选择旧内核版本进入系统  
+2. 执行 dracut --force 重新生成 initramfs  
+3. 确认 /etc/dracut.conf 或相关配置中未错误排除必要模块后再次更新内核
+
+#来源
+https://forum.openeuler.org/t/topic/5024

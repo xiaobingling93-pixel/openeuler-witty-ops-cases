@@ -1,0 +1,18 @@
+#标题
+EMQX 启动失败因 Erlang crypto 模块加载错误
+
+#内核版本
+24.03-LTS
+
+#问题现象
+执行 ./bin/emqx start 后提示“EMQ X Broker 4.2.14 failed to start within 15 seconds”；运行 ./bin/emqx console 显示 Erlang 启动失败，报错信息为：“{application_start_failure,kernel,{{shutdown,{failed_to_start_child,kernel_safe_sup,{on_load_function_failed,crypto}}},{kernel,start,[normal,]}}}”，并生成 crash.dump 文件。
+
+#问题根因
+Erlang/OTP 的 crypto 模块在加载时失败，导致 kernel 应用无法启动，进而使 EMQX 启动中断。
+
+#解决方案
+1. 安装或更新系统所需的 OpenSSL 兼容库（如 openssl11 或 libxcrypt-compat），以满足 Erlang/OTP 22 对加密库的依赖。
+2. 确保系统中存在与 Erlang crypto 模块兼容的 OpenSSL 版本，并设置正确的动态库路径。
+
+#来源
+https://forum.openeuler.org/t/topic/7214

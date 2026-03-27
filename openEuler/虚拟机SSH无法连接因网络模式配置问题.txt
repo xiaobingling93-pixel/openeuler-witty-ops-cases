@@ -1,0 +1,18 @@
+#标题
+虚拟机SSH无法连接因网络模式配置问题
+
+#内核版本
+未知
+
+#问题现象
+SSH无法连接到openEuler虚拟机，虚拟机默认仅配置host-only模式网卡，导致外部无法访问。
+
+#问题根因
+虚拟机默认安装openEuler后仅启用host-only模式的虚拟网卡，未配置桥接或NAT网络，导致主机与虚拟机之间网络不通。
+
+#解决方案
+1. 关闭openEuler虚拟机，在虚拟机设置中将网卡模式改为桥接，然后启动系统。
+2. 或关闭openEuler虚拟机，在虚拟机设置中添加一块新网卡并设置为NAT模式，启动后在/etc/sysconfig/network-scripts/目录下为新网卡创建对应的配置文件。
+
+#来源
+https://forum.openeuler.org/t/topic/1320

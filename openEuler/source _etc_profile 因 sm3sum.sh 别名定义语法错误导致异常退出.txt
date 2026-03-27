@@ -1,0 +1,17 @@
+#标题
+source /etc/profile 因 sm3sum.sh 别名定义语法错误导致异常退出
+
+#内核版本
+24.03
+
+#问题现象
+在 shell 脚本中执行 source /etc/profile 时，脚本在该语句处异常退出。
+
+#问题根因
+/etc/profile.d/sm3sum.sh 文件中 alias 定义使用了中文单引号‘’，导致语法错误。
+
+#解决方案
+修改 /etc/profile.d/sm3sum.sh 文件，将 alias 行中的中文单引号替换为英文单引号，例如：alias sm3sum='cksum -a sm3' 2>/dev/null
+
+#来源
+https://forum.openeuler.org/t/topic/5812

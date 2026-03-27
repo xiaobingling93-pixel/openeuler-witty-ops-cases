@@ -1,0 +1,19 @@
+#标题
+SMB挂载下vdbench使用o_direct标志打开文件失败
+
+#内核版本
+20.03-SP2（内核4.19.90）
+
+#问题现象
+在openEuler 20.03-SP2系统中，通过SMB协议（Samba 4.11.2）挂载文件存储后，使用vdbench性能测试工具并配置参数"openflags=o_direct"时，出现open file失败的报错。
+
+#问题根因
+内核PAGESIZE设置为64KB导致vdbench在SMB挂载点上使用O_DIRECT标志打开文件失败。
+
+#解决方案
+1. 将内核PAGESIZE修改为4KB；
+2. 重新编译并安装内核；
+3. 重启系统后运行vdbench，测试恢复正常。
+
+#来源
+https://forum.openeuler.org/t/topic/555

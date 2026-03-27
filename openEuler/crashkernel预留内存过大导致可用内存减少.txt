@@ -1,0 +1,17 @@
+#标题
+crashkernel预留内存过大导致可用内存减少
+
+#内核版本
+openEuler22.03 LTS
+
+#问题现象
+在分配相同物理内存（4GB）的情况下，openEuler系统显示的可用内存（约3.3GB）明显少于CentOS（约3.7GB）；dmesg日志显示openEuler预留了512MB内存用于crashkernel，而CentOS仅预留161MB。
+
+#问题根因
+openEuler默认配置的crashkernel预留内存为512MB，大于CentOS的161MB，导致系统可用内存减少。
+
+#解决方案
+在grub配置文件（/boot/grub2/grub.cfg）中将crashkernel参数从512M修改为256M。
+
+#来源
+https://forum.openeuler.org/t/topic/2797

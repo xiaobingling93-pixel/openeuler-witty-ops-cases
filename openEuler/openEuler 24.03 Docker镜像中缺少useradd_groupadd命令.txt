@@ -1,0 +1,17 @@
+#标题
+openEuler 24.03 Docker镜像中缺少useradd/groupadd命令
+
+#内核版本
+24.03
+
+#问题现象
+在openEuler 24.03 Docker镜像中执行useradd或groupadd命令时提示命令不存在
+
+#问题根因
+openEuler 24.03 Docker镜像默认未安装shadow-utils软件包，该软件包提供useradd和groupadd命令
+
+#解决方案
+执行命令：dnf install -y shadow-utils
+
+#来源
+https://forum.openeuler.org/t/topic/5936

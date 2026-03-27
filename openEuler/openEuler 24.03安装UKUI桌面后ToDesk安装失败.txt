@@ -1,0 +1,18 @@
+#标题
+openEuler 24.03安装UKUI桌面后ToDesk安装失败
+
+#内核版本
+24.03
+
+#问题现象
+在openEuler 24.03系统中安装UKUI桌面环境后，无法成功安装或启动ToDesk远程控制软件。
+
+#问题根因
+缺少依赖包libappindicator-gtk3导致ToDesk无法正常安装或启动。
+
+#解决方案
+1. 安装依赖包：sudo yum install libappindicator-gtk3  
+2. 使用rpm命令安装ToDesk安装包：sudo rpm -Uvh todesk-v4.7.2.0-x86_64.rpm
+
+#来源
+https://forum.openeuler.org/t/topic/7044

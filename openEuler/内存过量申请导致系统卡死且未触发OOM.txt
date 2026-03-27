@@ -1,0 +1,17 @@
+#标题
+内存过量申请导致系统卡死且未触发OOM
+
+#内核版本
+20.03-SP3
+
+#问题现象
+业务运行时系统因内存不足卡死，无法登录但可ping通；系统日志在正常记录处突然中断，随后为重启日志，且未生成vmcore文件。
+
+#问题根因
+/proc/sys/vm/overcommit_memory被设为1，导致内核不对内存申请进行过量提交检查，业务进程成功申请过量内存，使系统资源耗尽而挂起，无法触发OOM killer。
+
+#解决方案
+将/proc/sys/vm/overcommit_memory的值从1改回默认值0，使内核重新启用内存过量提交检查，确保在内存不足时能正常触发OOM killer终止异常进程。
+
+#来源
+https://forum.openeuler.org/t/topic/690

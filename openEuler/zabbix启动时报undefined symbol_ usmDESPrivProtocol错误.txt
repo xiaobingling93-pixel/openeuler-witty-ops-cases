@@ -1,0 +1,17 @@
+#标题
+zabbix启动时报undefined symbol: usmDESPrivProtocol错误
+
+#内核版本
+未知
+
+#问题现象
+执行 /usr/sbin/zabbix_server -c /etc/zabbix/zabbix-server.conf 时，报错：symbol lookup error: /usr/sbin/zabbix_server: undefined symbol: usmDESPrivProtocol
+
+#问题根因
+系统缺少或未正确安装 net-snmp 相关库，导致 zabbix_server 无法找到符号 usmDESPrivProtocol
+
+#解决方案
+1. 执行命令：dnf install net-snmp net-snmp-devel net-snmp-utils --nogpgcheck
+
+#来源
+https://forum.openeuler.org/t/topic/2906

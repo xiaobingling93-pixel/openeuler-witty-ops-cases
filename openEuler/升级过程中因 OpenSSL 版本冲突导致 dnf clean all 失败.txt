@@ -1,0 +1,20 @@
+#标题
+升级过程中因 OpenSSL 版本冲突导致 dnf clean all 失败
+
+#内核版本
+未知
+
+#问题现象
+在系统升级过程中报错 “can not clean repo info before upgrade”。手动执行 dnf clean all 命令时，出现与 OpenSSL 相关的错误，提示 libldap 库试图调用 EVP_md2 函数，但该函数在当前使用的 OpenSSL 版本中不存在或未定义。
+
+#问题根因
+系统中同时存在多个 OpenSSL 版本（安装版本为 1.0.2k，运行版本为 1.1.1w），高版本 OpenSSL 为编译安装且通过 /etc/ld.so.conf、/etc/ld.so.conf.d/ 或 LD_LIBRARY_PATH 指定了库路径，导致 dnf 加载了不兼容的 OpenSSL 库，从而无法调用已废弃的 EVP_md2 函数。
+
+#解决方案
+1. 确定编译安装的 OpenSSL 库文件所在目录。
+2. 若该目录被添加至 /etc/ld.so.conf 或 /etc/ld.so.conf.d/ 中，则从对应配置文件中注释掉该路径，并执行 ldconfig 刷新动态链接库。
+3. 若该目录被设置在 LD_LIBRARY_PATH 环境变量中，则从该变量中移除该路径。
+4. 执行 dnf clean all 命令验证是否仍有报错；若无报错，返回前端点击“重试”继续升级。
+
+#来源
+https://forum.openeuler.org/t/topic/3959

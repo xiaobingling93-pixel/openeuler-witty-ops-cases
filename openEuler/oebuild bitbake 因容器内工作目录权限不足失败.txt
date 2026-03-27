@@ -1,0 +1,18 @@
+#标题
+oebuild bitbake 因容器内工作目录权限不足失败
+
+#内核版本
+未知
+
+#问题现象
+执行 oebuild bitbake 构建 openEuler 时，容器启动失败，报错：“OCI runtime exec failed: exec failed: container_linux.go:345: starting container process caused “chdir to cwd ("/home/openeuler") set in config.json failed: permission denied”: unknown”
+
+#问题根因
+容器内工作目录 /home/openeuler 所属用户未正确设置为 openeuler 用户，导致切换至该用户时无权访问工作目录。
+
+#解决方案
+1. 将构建目录（如 /usr1）所属用户改为 openeuler：执行 chown -R openeuler:users /usr1  
+2. 切换至 openeuler 用户后再执行构建：执行 su openeuler
+
+#来源
+https://forum.openeuler.org/t/topic/6437

@@ -1,0 +1,21 @@
+#标题
+openEuler 23.09 PXE+Kickstart 安装失败：/boot/efi 分区格式错误
+
+#内核版本
+23.09
+
+#问题现象
+使用 Kickstart 自动化安装 openEuler 23.09 时，在 PXE 引导阶段报错：
+error: …/…/grub-core/net/tftp.c:281:File not found.
+error: …/…/grub-core/loader/i386/efi/linux.c:93:you need to load the kernel first.
+即使通过 iPXE 或其他方式成功加载 ks.cfg，仍无法完成自动安装，回退到手动安装流程。
+
+#问题根因
+ks.cfg 中将 /boot/efi 分区指定为 xfs 文件系统，而 EFI 系统分区必须使用 FAT 系列文件系统（如 FAT32），因为 systemd 启动早期阶段尚未加载 xfs 模块，无法识别 xfs 格式的 EFI 分区。
+
+#解决方案
+1. 修改 ks.cfg 文件，将 /boot/efi 分区的 fstype 从 "xfs" 改为 "vfat"（或 "fat32"）。
+2. 确保实际部署环境中 /boot/efi 分区格式为 FAT32，可通过 lsblk -f 验证。
+
+#来源
+https://forum.openeuler.org/t/topic/4691

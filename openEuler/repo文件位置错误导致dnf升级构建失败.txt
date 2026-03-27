@@ -1,0 +1,18 @@
+#标题
+repo文件位置错误导致dnf升级构建失败
+
+#内核版本
+未知
+
+#问题现象
+升级构建dnf环境时报错：failed to install rpms required by dnf
+
+#问题根因
+repo文件被错误地放置在/etc/yum目录下，而非标准的/etc/yum.repos.d目录中，导致dnf无法正确识别仓库配置
+
+#解决方案
+1. 升级前将/etc/yum下的repo文件移动到/etc/yum.repos.d目录
+2. 若repo文件不在上述两个目录中，可通过yum repoinfo命令定位其具体位置
+
+#来源
+https://forum.openeuler.org/t/topic/1309

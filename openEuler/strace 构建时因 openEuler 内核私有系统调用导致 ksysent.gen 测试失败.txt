@@ -1,0 +1,18 @@
+#标题
+strace 构建时因 openEuler 内核私有系统调用导致 ksysent.gen 测试失败
+
+#内核版本
+24.03sp2
+
+#问题现象
+使用 strace@6.19 源码构建时，ksysent.gen.test 测试失败，报错显示系统调用编号 454 至 470 被标记为 "kabi_reserved" 或“未知系统调用”，其中 #469 对应 "file_setattr"、#470 对应 "listns"，而标准 Linux 6.6 内核中不存在这些调用编号。
+
+#问题根因
+openEuler 24.03 SP2 内核在标准 Linux 6.6 基础上通过私有补丁扩展了系统调用表，引入了包括 file_setattr 和 listns 在内的实验性系统调用，并将部分编号预留为 kabi_reserved，导致通用工具 strace 无法识别这些非主线内核的调用编号。
+
+#解决方案
+1. 使用 openEuler 官方仓库提供的 strace 包（如通过 dnf install strace），该版本已适配发行版内核的系统调用表。
+2. 若需从源码构建 strace，可跳过相关测试：使用 ./configure --disable-tests 或 make -k 忽略 ksysent.gen.test 失败继续安装。
+
+#来源
+https://forum.openeuler.org/t/topic/19024

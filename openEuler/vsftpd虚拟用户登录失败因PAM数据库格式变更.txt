@@ -1,0 +1,21 @@
+#标题
+vsftpd虚拟用户登录失败因PAM数据库格式变更
+
+#内核版本
+5.10.0-136.15.0.91.oe2203sp1.x86_64
+
+#问题现象
+使用虚拟账户登录vsftpd时客户端返回530 permission denied错误；/var/log/secure日志显示：pam_userdb(vsftpd:auth): user_lookup: could not open database `/etc/vsftpd/virtusers.db’: No such file or directory；即使调整/etc/pam.d/vsftpd中db路径是否带.db后缀，问题仍必现。
+
+#问题根因
+openEuler系统中pam软件包已将pam_userdb所依赖的数据库后端从Berkeley DB（bdb）切换为GDBM，导致使用db_load生成的.bdb格式数据库无法被pam_userdb识别。
+
+#解决方案
+1. 安装gdbm工具包；
+2. 使用gdbmtool命令创建GDBM格式的用户数据库：
+   - 执行 gdbmtool -n /etc/vsftpd/virtusers.pag open 创建数据库文件；
+   - 执行 gdbmtool /etc/vsftpd/virtusers.pag store ${FtpUserName} ${FtpUserPass} 添加用户凭证；
+3. 在/etc/pam.d/vsftpd配置中指定db路径时不加.db后缀，保持为 db=/etc/vsftpd/virtusers。
+
+#来源
+https://forum.openeuler.org/t/topic/710

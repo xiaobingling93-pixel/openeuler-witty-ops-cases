@@ -1,0 +1,21 @@
+#标题
+Cangjie编译器链接时找不到crtbeginS.o和crtendS.o文件
+
+#内核版本
+24.03 LTS
+
+#问题现象
+使用Cangjie编译器（0.56、0.59版本）在openEuler 24.03 LTS x86-64系统上编译时，链接阶段报错：/usr/bin/ld: 找不到 crtendS.o: No such file or directory。编译命令中直接引用了crtbeginS.o和crtendS.o，但未提供完整路径，导致链接失败。
+
+#问题根因
+openEuler 24.03 LTS安装gcc后生成的库目录为/usr/lib/gcc/x86_64-openEuler-linux/12/，而Cangjie编译器默认查找的是标准Linux路径x86_64-linux-gnu下的crtbeginS.o和crtendS.o文件，路径不匹配导致链接器无法找到所需文件。
+
+#解决方案
+1. 在当前工作目录下为缺失文件创建符号链接：
+   ln -s /usr/lib/gcc/x86_64-openEuler-linux/12/crtendS.o crtendS.o
+   （同理可处理crtbeginS.o）
+2. 或在/usr/lib/gcc目录下创建兼容性符号链接：
+   ln -s x86_64-openEuler-linux x86_64-linux-gnu
+
+#来源
+https://forum.openeuler.org/t/topic/7546

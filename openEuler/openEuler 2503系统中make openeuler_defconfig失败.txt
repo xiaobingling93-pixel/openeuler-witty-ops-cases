@@ -1,0 +1,19 @@
+#标题
+openEuler 2503系统中make openeuler_defconfig失败
+
+#内核版本
+6.6.0-72.6.0.56.oe2503
+
+#问题现象
+在/usr/src/kernels/6.6.0-72.6.0.56.oe2503.aarch64目录下执行make openeuler_defconfig命令时，报错“Can’t find default configuration ‘arch/arm64/configs/openeuler_defconfig’!”，并返回Makefile错误。
+
+#问题根因
+通过yum安装的内核包仅提供头文件用于编译链接，不包含完整的内核源码，因此缺少openeuler_defconfig配置文件。
+
+#解决方案
+1. 下载对应版本的完整内核源码包（如kernel-6.6.0-72.7.0.57.oe2503.src.rpm）进行编译。
+2. 可从以下地址获取25.03版本的完整内核源码包：  
+   eulermaker.compass-ci.openeuler.openatom.cn/repositories/devstation-25.03/openEuler:25.03/x86_64/current/Packages/
+
+#来源
+https://forum.openeuler.org/t/topic/7773

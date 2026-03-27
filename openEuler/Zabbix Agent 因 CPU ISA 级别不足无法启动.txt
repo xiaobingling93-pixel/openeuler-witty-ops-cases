@@ -1,0 +1,17 @@
+#标题
+Zabbix Agent 因 CPU ISA 级别不足无法启动
+
+#内核版本
+22-03 sp3
+
+#问题现象
+执行 systemctl start zabbix-agent 后服务启动失败，报错信息为 "Job for zabbix-agent.service failed because the control process exited with error code"。通过 journalctl -xe 查看日志，显示 "/usr/sbin/zabbix_agentd: CPU ISA level is lower than required"，且 zabbix-agent.service 以状态码 127 退出。
+
+#问题根因
+Zabbix Agent 二进制程序编译时要求的 CPU 指令集架构（ISA）级别高于当前虚拟机 CPU 所支持的级别。
+
+#解决方案
+使用与当前 CPU ISA 级别兼容的 Zabbix Agent 版本，或在支持所需指令集的硬件/虚拟机配置上运行该程序。
+
+#来源
+https://forum.openeuler.org/t/topic/5478

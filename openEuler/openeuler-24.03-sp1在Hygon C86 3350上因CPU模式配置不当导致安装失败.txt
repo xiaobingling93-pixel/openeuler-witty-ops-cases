@@ -1,0 +1,17 @@
+#标题
+openeuler-24.03-sp1在Hygon C86 3350上因CPU模式配置不当导致安装失败
+
+#内核版本
+24.03-sp1
+
+#问题现象
+安装过程中出现“Fatal glibc error: CPU does not support x86-64-u2”错误，导致系统安装失败。
+
+#问题根因
+安装时默认CPU模式为none，未启用透传模式，导致glibc检测到CPU不支持x86-64-u2指令集而报错。
+
+#解决方案
+1. 安装时将CPU模式从默认的none改为透传模式。
+
+#来源
+https://forum.openeuler.org/t/topic/6916

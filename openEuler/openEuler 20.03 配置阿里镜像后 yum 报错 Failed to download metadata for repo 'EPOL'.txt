@@ -1,0 +1,17 @@
+#标题
+openEuler 20.03 配置阿里镜像后 yum 报错 Failed to download metadata for repo 'EPOL'
+
+#内核版本
+未知
+
+#问题现象
+执行 yum update 时提示 "Error: Failed to download metadata for repo 'EPOL'"，配置的 EPOL 仓库 baseurl 为 https://mirrors.aliyun.com/openeuler/openEuler-20.03-LTS/EPOL/main/$basearch/
+
+#问题根因
+阿里云镜像中 openEuler-20.03-LTS/EPOL 路径下不存在 main 目录，导致 yum 无法下载仓库元数据
+
+#解决方案
+将 EPOL 仓库配置中的 baseurl 路径中的 "/main" 部分移除
+
+#来源
+https://forum.openeuler.org/t/topic/3196

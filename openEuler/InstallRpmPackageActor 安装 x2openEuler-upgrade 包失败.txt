@@ -1,0 +1,17 @@
+#标题
+InstallRpmPackageActor 安装 x2openEuler-upgrade 包失败
+
+#内核版本
+未知
+
+#问题现象
+迁移环境检查不通过，提示 "install rpm package Failed"；目标服务器未能成功安装 x2openEuler-upgrade-3.0.0-20230703.x86_64 软件包。
+
+#问题根因
+x2openEuler-upgrade-3.0.0-20230703.x86_64 软件包依赖 efibootmgr，而 CentOS 8 系统默认未配置可用软件源，导致依赖无法满足，安装失败。
+
+#解决方案
+1. 在待升级节点上修改原系统软件源配置，确保可访问包含 efibootmgr 的软件源。
+
+#来源
+https://forum.openeuler.org/t/topic/2134

@@ -1,0 +1,19 @@
+#标题
+openEuler 24.03 LTS GRUB 缺失 NTFS 文件系统支持
+
+#内核版本
+24.03 LTS
+
+#问题现象
+系统安装后进入 GRUB 命令行，无法查看或读取 NTFS 文件系统分区；执行 insmod ntfs 后仍无法识别 NTFS 分区；GRUB 启动目录中缺少必要的模块文件。
+
+#问题根因
+GRUB 默认未包含 ntfs 模块，且 /boot/efi/EFI/openEuler 目录中缺少 grub2-efi-x64-modules 提供的模块文件，导致无法加载 NTFS 文件系统驱动。
+
+#解决方案
+1. 安装 grub2-efi-x64-modules 软件包。
+2. 将 /usr/lib/grub/x86_64-efi 目录下的所有模块文件复制到 GRUB 配置所在目录（如 /boot/efi/EFI/openEuler）。
+3. 在 GRUB 命令行中使用 insmod ntfs 加载 NTFS 驱动。
+
+#来源
+https://forum.openeuler.org/t/topic/7367
