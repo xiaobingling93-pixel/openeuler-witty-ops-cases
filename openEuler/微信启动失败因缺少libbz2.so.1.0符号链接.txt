@@ -1,0 +1,17 @@
+#标题
+微信启动失败因缺少libbz2.so.1.0符号链接
+
+#内核版本
+6.6.0-50.0.0.55.oe2403
+
+#问题现象
+安装微信RPM包后启动闪退，系统日志显示错误：/usr/bin/wechat: error while loading shared libraries: libbz2.so.1.0: cannot open shared object file: No such file or directory。系统已安装bzip2-1.0.8-7.oe2403.x86_64和bzip2-devel包，/lib64目录下存在libbz2.so.1.0.8及指向它的libbz2.so.1符号链接，但缺少libbz2.so.1.0。
+
+#问题根因
+openEuler 24.03系统中bzip2库未提供libbz2.so.1.0符号链接，而微信二进制依赖该特定版本的符号链接。
+
+#解决方案
+执行命令创建缺失的符号链接：ln -s /lib64/libbz2.so.1.0.8 /lib64/libbz2.so.1.0
+
+#来源
+https://forum.openeuler.org/t/topic/6097

@@ -1,0 +1,19 @@
+#标题
+22.03 LTS SP3 缺失 soelim 命令导致 openLDAP 编译失败
+
+#内核版本
+22.03sp3
+
+#问题现象
+在 openEuler 22.03 LTS SP3 系统上安装 openLDAP 2.5.17 时，执行 make 命令报错“soelim：未找到命令”
+
+#问题根因
+系统未预装提供 soelim 命令的 groff-base 软件包
+
+#解决方案
+1. 执行 `yum install groff-base` 安装缺失的软件包  
+2. 或执行 `sudo dnf install groff` 安装 groff 软件包  
+3. 或升级系统至 SP4 版本
+
+#来源
+https://forum.openeuler.org/t/topic/3610

@@ -1,0 +1,21 @@
+#标题
+Intel I225-V网卡驱动缺失导致openEuler 24.03无法识别有线网络
+
+#内核版本
+6.6.0-37
+
+#问题现象
+openEuler 24.03安装完成后无法检测到有线网卡（Intel® Ethernet Controller I225-V），导致系统无网络连接，仅能通过USB传输文件。
+
+#问题根因
+Intel I225-V网卡驱动（igc.ko）未包含在openEuler 24.03默认内核包中，需手动编译并安装。
+
+#解决方案
+1. 编译Intel I225网卡驱动（igc.ko）。
+2. 执行命令安装驱动：  
+   install -D -m 644 igc.ko /lib/modules/6…/updates/driver/net/ethernet/intel/igc.ko
+3. 更新模块依赖：  
+   depmod -A
+
+#来源
+https://forum.openeuler.org/t/topic/5606

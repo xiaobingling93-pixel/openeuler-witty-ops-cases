@@ -1,0 +1,17 @@
+#标题
+安装新内核后系统仍启动旧内核
+
+#内核版本
+20.03-LTS-SP2
+
+#问题现象
+在 openEuler 20.03-LTS-SP2 系统中安装新内核并重启后，系统仍使用原有内核启动；尽管新内核已正确写入 /boot/efi/EFI/xxxx/grub.cfg 且 grub2-editenv 显示默认项已更新，但启动菜单未显示新内核选项。
+
+#问题根因
+系统启动时实际读取的是 /boot/grub2/grub.cfg 而非 /boot/efi/EFI/xxxx/grub.cfg，而 /boot/grub2/grub.cfg 未包含新内核条目；该行为由遗留的 BIOS boot 分区导致系统以 legacy 模式引导，尽管存在 /sys/firmware/efi 目录。
+
+#解决方案
+将 /boot/efi/EFI/xxxx/grub.cfg 的内容覆盖到 /boot/grub2/grub.cfg，使 legacy 引导路径也能加载新内核配置。
+
+#来源
+https://forum.openeuler.org/t/topic/682

@@ -1,0 +1,19 @@
+#标题
+误删 /usr/lib64 导致系统命令无法执行
+
+#内核版本
+未知
+
+#问题现象
+删除 /usr/lib64 后，所有命令均无法使用，例如执行 scp 时提示 “-bash: /usr/bin/scp: No such file or directory”
+
+#问题根因
+/usr/lib64 被删除导致系统依赖的共享库文件丢失，且 /lib64 是指向 /usr/lib64 的软链接，因此删除后影响所有依赖这些库的命令执行
+
+#解决方案
+1. 进入救援模式  
+2. 执行 mount -o rw,remount / 将根分区重新以可读写模式挂载  
+3. 从外部设备或相同环境的主机拷贝 /usr/lib64 目录恢复至原位置
+
+#来源
+https://forum.openeuler.org/t/topic/1745

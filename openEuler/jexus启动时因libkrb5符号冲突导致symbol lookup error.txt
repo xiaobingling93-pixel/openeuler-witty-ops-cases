@@ -1,0 +1,17 @@
+#标题
+jexus启动时因libkrb5符号冲突导致symbol lookup error
+
+#内核版本
+24.03
+
+#问题现象
+安装jexus后缺少libkrb5库；安装krb5-devel后启动jexus报错：/usr/jexus/jwss: symbol lookup error: /usr/lib64/libkrb5.so.3: undefined symbol: krb5int_c_deprecated_enctype, version k5crypto_3_MIT
+
+#问题根因
+jexus runtime/lib目录中的libk5crypto.so.3文件与系统/usr/lib64中的libk5crypto.so.3存在版本冲突，导致运行时符号解析失败。
+
+#解决方案
+删除jexus的runtime/lib目录中的libk5crypto.so.3文件。
+
+#来源
+https://forum.openeuler.org/t/topic/5938

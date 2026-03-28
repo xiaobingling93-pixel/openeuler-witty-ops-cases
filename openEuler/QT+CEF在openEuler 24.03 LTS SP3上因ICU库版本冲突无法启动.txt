@@ -1,0 +1,40 @@
+#标题
+QT+CEF在openEuler 24.03 LTS SP3上因ICU库版本冲突无法启动
+
+#内核版本
+24.03 LTS SP3
+
+#问题现象
+在openEuler 24.03 LTS SP3系统中，使用QT 6.10.2与CEF框架集成时无法启动，单独运行QT或CEF均可正常弹窗，但QT调用CEF时报ICU错误，具体表现为“Invalid file descriptor to ICU data received”。尝试多个CEF版本（如144、125、115）均出现相同错误。
+
+#问题根因
+QT 6.10.2在openEuler 24.03 LTS SP3上默认动态链接系统ICU库（ICU 73+），而CEF内部静态捆绑特定版本的ICU（如CEF 125对应ICU 73，CEF 115对应ICU 72），两者同时初始化时发生符号冲突及icudtl.dat数据文件版本不匹配，导致ICU初始化失败。
+
+#解决方案
+1. 下载与CEF版本匹配的ICU源码（例如CEF 125对应ICU 73）：
+   ```bash
+   wget https://github.com/unicode-org/icu/releases/download/release-73-2/icu4c-73_2-src.tgz
+   tar xzf icu4c-73_2-src.tgz
+   cd icu/source
+   ./configure --prefix=/opt/icu73 --disable-shared --enable-static
+   make -j$(nproc) && make install
+   ```
+2. 重新编译QT 6.10.2并静态链接ICU，同时禁用内置ICU支持以避免冲突：
+   ```bash
+   cd /path/to/qt6-source
+   ./configure \
+     -prefix /opt/qt6-cef \
+     -release \
+     -static \
+     -no-feature-icu \
+     -skip qtwebengine \
+     -xcb \
+     -openssl-linked \
+     -system-zlib \
+     -nomake examples \
+     -nomake tests
+   make -j$(nproc) && make install
+   ```
+
+#来源
+https://forum.openeuler.org/t/topic/19016

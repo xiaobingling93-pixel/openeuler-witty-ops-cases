@@ -1,0 +1,20 @@
+#标题
+openEuler 2203 系统不定期卡死
+
+#内核版本
+5.10.0-136.108.0.188.oe2203sp1
+
+#问题现象
+系统运行过程中不定期完全卡死：鼠标无法移动、键盘无响应、无法通过网络 ping 通，系统日志在卡死后停止输出，仅硬重启后有相关记录。
+
+#问题根因
+显卡驱动（nouveau）导致系统卡死。
+
+#解决方案
+1. 编辑 /etc/default/grub，在 GRUB_CMDLINE_LINUX 参数末尾追加：modprobe.blacklist=nouveau nouveau.modeset=0  
+2. 执行命令更新 GRUB 配置：sudo grub2-mkconfig -o /boot/efi/EFI/openEuler/grub.cfg  
+3. 更新 initramfs：sudo dracut --force  
+4. 重启系统：reboot
+
+#来源
+https://forum.openeuler.org/t/topic/8014

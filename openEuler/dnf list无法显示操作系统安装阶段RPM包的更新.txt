@@ -1,0 +1,19 @@
+#标题
+dnf list无法显示操作系统安装阶段RPM包的更新
+
+#内核版本
+5.10.0-60.18.0.50.oe2203
+
+#问题现象
+在openEuler 22.03系统中配置本地源并执行dnf clean all; dnf makecache后，使用dnf list命令无法看到操作系统安装阶段已安装RPM包（如kernel）的可用更新，但能正常显示系统安装后新增RPM包的更新。相同源在CentOS上通过yum list可正常显示所有可更新包。
+
+#问题根因
+ISO的repo源中指定了module，导致安装阶段的RPM包被标记为模块化RPM包；系统安装完成后ISO源不可用，dnf的fail-safe机制触发，阻止非模块化源对模块化RPM包进行升级。
+
+#解决方案
+1. 删除ISO源中的模块化定义，避免将RPM包定义为模块化包。
+2. 安装完操作系统后，执行`dnf module list`找到modulefailsafe模块并将其disable。
+3. 在本地源的.repo配置文件中添加`module_hotfixes=true`，然后重新执行`dnf makecache`。
+
+#来源
+https://forum.openeuler.org/t/topic/488

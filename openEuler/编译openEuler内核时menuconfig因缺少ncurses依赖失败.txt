@@ -1,0 +1,21 @@
+#标题
+编译openEuler内核时menuconfig因缺少ncurses依赖失败
+
+#内核版本
+6.6.0-90.0.0.84.oe2403
+
+#问题现象
+执行 make menuconfig 命令时提示“Unable to find the ncurses package”，并报错：  
+make[2]: *** [scripts/kconfig/Makefile:246：scripts/kconfig/mconf-libs] 错误 1  
+make[1]: *** [/usr/src/linux-6.6.0-90.0.0.84.oe2403.aarch64/Makefile:697：menuconfig] 错误 2  
+make: *** [Makefile:234：__sub-make] 错误 2
+
+#问题根因
+系统缺少编译内核 menuconfig 所需的 ncurses 开发包（ncurses-devel）及其他相关依赖。
+
+#解决方案
+安装以下依赖包：
+yum install -y asciidoc audit-libs-devel binutils-devel bison clang dwarves elfutils-devel elfutils-libelf-devel flex gcc glibc-static gtk2-devel java-1.8.0-openjdk java-1.8.0-openjdk-devel java-devel libbabeltrace-devel libcap-devel libcap-ng-devel libunwind-devel libzstd-devel llvm m4 make ncurses-devel net-tools newt-devel numactl-devel openssl-devel pciutils-devel perl-devel perl-generators python3-devel python3-docutils rsync xmlto xz-devel zlib-devel
+
+#来源
+https://forum.openeuler.org/t/topic/7768

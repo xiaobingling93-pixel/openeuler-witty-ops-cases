@@ -1,0 +1,18 @@
+#标题
+auditd日志被写入messages文件
+
+#内核版本
+未知
+
+#问题现象
+系统升级后，/var/log/messages中出现大量auditd相关的日志条目
+
+#问题根因
+欧拉系统将audit日志归类为auth设施，而rsyslog默认配置未排除auth设施，导致其日志写入/var/log/messages
+
+#解决方案
+在/etc/rsyslog.conf中修改写入messages的日志规则，添加auth.none排除项，例如：
+*.info;mail.none;authpriv.none;cron.none;auth.none                /var/log/messages
+
+#来源
+https://forum.openeuler.org/t/topic/3316

@@ -1,0 +1,18 @@
+#标题
+NVIDIA驱动因GPL符号冲突无法编译安装
+
+#内核版本
+22.03LTS-SP4
+
+#问题现象
+安装NVIDIA驱动时编译失败，报错信息为：FATAL: modpost: GPL-incompatible module nvidia.ko uses GPL-only symbol ‘rcu_read_unlock_strict’；最终提示“The nvidia kernel module was not created”并安装失败。
+
+#问题根因
+NVIDIA驱动模块（nvidia.ko）为GPL-incompatible模块，却使用了内核中GPL-only的符号‘rcu_read_unlock_strict’，导致modpost阶段校验失败。
+
+#解决方案
+1. 使用openEuler官方验证过的NVIDIA驱动包：https://repo.oepkgs.net/openEuler/rpm/openEuler-22.03-LTS/contrib/drivers/x86_64/Packages/NVIDIA-Linux-x86_64-535.54.03.run  
+2. 或使用包含CUDA和驱动的集成包：https://repo.oepkgs.net/openEuler/rpm/openEuler-22.03-LTS/contrib/drivers/x86_64/Packages/cuda_12.2.0_535.54.03_linux.run
+
+#来源
+https://forum.openeuler.org/t/topic/5732

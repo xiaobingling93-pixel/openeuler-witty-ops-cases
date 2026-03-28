@@ -1,0 +1,18 @@
+#标题
+环境变量污染导致yum调用pycurl.so报undefined symbol错误
+
+#内核版本
+未知
+
+#问题现象
+执行yum命令时报错：/usr/lib64/python2.7/site-packages/pycurl.so: undefined symbol: crypto_num_locks；使用root用户执行时复现，检查系统库/usr/lib64/pycurl.so正常。
+
+#问题根因
+root用户的.bash_profile中被写入了业务相关的环境变量，导致yum运行时加载了业务目录/root/ipcc/lib下的libcurl.so而非系统库，引发符号解析失败。
+
+#解决方案
+1. 注释或移除root用户.bash_profile中由业务写入的环境变量配置；
+2. 要求业务将环境变量配置写入到其专用业务账号下，而非root账户。
+
+#来源
+https://forum.openeuler.org/t/topic/1627

@@ -1,0 +1,22 @@
+#标题
+openEuler在WSL2中ntp服务无法自动同步时间
+
+#内核版本
+未知
+
+#问题现象
+在WSL2中安装openEuler 22.03或23.03后，即使已安装ntp、ntpdate、rdate软件，手动配置ntp服务器并启动ntpd服务，系统时间仍无法自动同步。手动将系统时间调快（如6分钟或至2099年）后，ntpd服务虽处于运行状态，但时间不会被校正。相同操作在WSL2中的Debian系统可正常同步。
+
+#问题根因
+openEuler默认的ntp配置未包含任何时间服务器，导致ntpd服务无法获取有效时间源进行同步。
+
+#解决方案
+1. 在/etc/ntp.conf中显式添加公共NTP服务器配置，例如：
+   pool 0.pool.ntp.org iburst
+   pool 1.pool.ntp.org iburst
+   pool 2.pool.ntp.org iburst
+   pool 3.pool.ntp.org iburst
+2. 或改用chrony作为时间同步客户端，因其在WSL2环境中可正常工作。
+
+#来源
+https://forum.openeuler.org/t/topic/1805

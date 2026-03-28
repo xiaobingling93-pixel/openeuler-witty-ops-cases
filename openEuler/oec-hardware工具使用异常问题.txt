@@ -1,0 +1,23 @@
+#标题
+oec-hardware工具使用异常问题
+
+#内核版本
+未知
+
+#问题现象
+1. 执行oech登录oec-hardware工具时提示python错误。  
+2. memory测试时提示"Error eatmem_test failed, please check the space of SWAP"。  
+3. 设置CPU频率为200MHz后，查询实际频率为1GHz。
+
+#问题根因
+1. 系统缺少/usr/bin/env/python软链接导致Python解释器调用失败。  
+2. SWAP空间不足（默认4G）无法满足eatmem_test内存消耗需求。  
+3. BIOS中对CPU频率设置了限制，导致设置的最低频率未生效。
+
+#解决方案
+1. 执行 ln -s /usr/bin/env/python3 /usr/bin/env/python 添加python软链接。  
+2. 将SWAP空间从4G调整为10G后重新测试。  
+3. 与BIOS相关人员确认CPU频率限制情况，并在提交测试报告时说明该限制原因。
+
+#来源
+https://forum.openeuler.org/t/topic/3697

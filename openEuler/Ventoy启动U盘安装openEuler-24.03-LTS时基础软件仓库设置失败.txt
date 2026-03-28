@@ -1,0 +1,18 @@
+#标题
+Ventoy启动U盘安装openEuler-24.03-LTS时基础软件仓库设置失败
+
+#内核版本
+未知
+
+#问题现象
+使用Ventoy制作的启动U盘加载修改后的openEuler-24.03-LTS镜像，在安装过程中“设置基础软件仓库时出错”；而使用Rufus制作的U盘无此问题。用户已修改isolinux.cfg、/EFI/BOOT/grub.cfg和ks.cfg文件。
+
+#问题根因
+ks.cfg中未正确指定安装源路径，导致安装程序无法定位软件仓库。
+
+#解决方案
+在ks.cfg中添加以下配置以明确指定安装源路径：
+url --url=file:///run/install/repo
+
+#来源
+https://forum.openeuler.org/t/topic/8187

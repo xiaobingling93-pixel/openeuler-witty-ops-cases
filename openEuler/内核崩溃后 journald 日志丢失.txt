@@ -1,0 +1,18 @@
+#标题
+内核崩溃后 journald 日志丢失
+
+#内核版本
+未知
+
+#问题现象
+在 openEuler 22.03 中，通过 sysrq-trigger 触发内核崩溃并自动重启后，journalctl 仅显示本次启动后的日志，此前的日志全部丢失；即使已配置 Storage=persistent，异常重启仍导致旧日志不可见。系统启动时发现 system.journal 文件因非正常关机被标记为损坏或不干净关闭，进而被重命名并替换为空文件。
+
+#问题根因
+非正常关机（如内核崩溃）导致 journald 未将缓冲区日志写入磁盘，且 systemd 的特定补丁（Patch9052: delete-journal-files-except-system.journal-when-jour.patch）在 hard reboot 或 crash 后会删除除 system.journal 外的日志文件，造成日志全部清空。
+
+#解决方案
+1. 避免依赖 journald 在异常崩溃场景下的日志持久化能力，改用外部日志收集机制（如远程 syslog）。
+2. 检查并移除或修改导致日志清空的 systemd 补丁 Patch9052。
+
+#来源
+https://forum.openeuler.org/t/topic/4579

@@ -1,0 +1,17 @@
+#标题
+oech工具system测试因setenforce 0导致失败
+
+#内核版本
+未知
+
+#问题现象
+使用oec-hardware工具进行system测试时，测试失败；系统检查发现SELinux未处于启用状态。
+
+#问题根因
+执行setenforce 0命令将SELinux设置为permissive模式，而system测试要求SELinux必须正常启用，导致测试失败。
+
+#解决方案
+避免在system测试前执行setenforce 0命令，确保SELinux保持启用状态。
+
+#来源
+https://forum.openeuler.org/t/topic/4384

@@ -1,0 +1,17 @@
+#标题
+openEuler embedded 24.03-LTS Docker镜像中Git 2.46版本认证失败问题
+
+#内核版本
+24.03-LTS
+
+#问题现象
+在openEuler embedded 24.03-LTS的Docker镜像中使用bitbake构建镜像时，调用/opt/buildtools/nativesdk/sysroots/x86_64-openeulersdk-linux/usr/bin/git（版本2.46.0）执行git clone操作访问需用户名密码认证的远程仓库，报错“remote: HTTP Basic: Access denied. The provided password or token is incorrect or your account has 2FA enabled and you must use a personal access token instead of a password.”；而使用/usr/bin/git（版本2.43）则可正常完成认证并拉取仓库。
+
+#问题根因
+Docker镜像中同时存在两个Git版本，其中2.46.0版本在处理HTTP Basic认证时存在兼容性问题，导致认证失败。
+
+#解决方案
+1. 在构建过程中避免使用/opt/buildtools/nativesdk/sysroots/x86_64-openeulersdk-linux/usr/bin/git（2.46版本），改用/usr/bin/git（2.43版本）执行git操作。
+
+#来源
+https://forum.openeuler.org/t/topic/7247

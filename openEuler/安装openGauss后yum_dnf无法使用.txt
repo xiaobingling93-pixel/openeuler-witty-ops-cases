@@ -1,0 +1,18 @@
+#标题
+安装openGauss后yum/dnf无法使用
+
+#内核版本
+22.03lts
+
+#问题现象
+执行yum或dnf命令时报错“ModuleNotFoundError: No module named ‘dnf.cli’; ‘dnf’ is not a package”，同时出现Python API警告；部分用户注释/etc/profile中openGauss相关环境变量后恢复，但数据库无法启动。
+
+#问题根因
+安装openGauss过程中引入了非系统lib库或修改了系统环境变量，导致Python路径被污染，覆盖或干扰了系统自带的dnf模块；另有用户因执行pip install dnf安装了PyPI上的dnf包，与系统dnf冲突。
+
+#解决方案
+1. 检查并注释/etc/profile中openGauss相关的环境变量配置。
+2. 若曾执行pip install dnf，需运行pip uninstall dnf卸载冲突包以恢复系统dnf功能。
+
+#来源
+https://forum.openeuler.org/t/topic/5642

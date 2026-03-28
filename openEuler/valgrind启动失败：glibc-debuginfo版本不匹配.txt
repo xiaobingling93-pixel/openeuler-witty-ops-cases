@@ -1,0 +1,17 @@
+#标题
+valgrind启动失败：glibc-debuginfo版本不匹配
+
+#内核版本
+22.03-LTS
+
+#问题现象
+使用valgrind时出现Fatal error at startup: a function redirection错误，即使已安装glibc-debuginfo仍报错
+
+#问题根因
+glibc-debuginfo与glibc版本不匹配，因配置了update源导致安装的glibc-debuginfo版本与系统glibc版本不一致
+
+#解决方案
+回退glibc-debuginfo版本，使其与当前系统glibc版本一致
+
+#来源
+https://forum.openeuler.org/t/topic/692

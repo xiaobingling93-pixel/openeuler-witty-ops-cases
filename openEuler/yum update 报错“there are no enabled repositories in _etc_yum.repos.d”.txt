@@ -1,0 +1,19 @@
+#标题
+yum update 报错“there are no enabled repositories in /etc/yum.repos.d”
+
+#内核版本
+24.03sp1
+
+#问题现象
+执行 yum -y update 命令时报错：“there are no enabled repositoyies in “/etc/yum.repos.d””，系统无法找到已启用的软件源。
+
+#问题根因
+/etc/yum.repos.d/ 目录下缺少有效的软件源配置文件，或已有配置文件中所有仓库的 enabled 值均未设为 1。
+
+#解决方案
+1. 确认 /etc/yum.repos.d/ 目录下是否存在 openEuler.repo 等软件源配置文件。
+2. 检查配置文件中各仓库的 enabled 参数是否设置为 1（表示启用）。
+3. 若无有效配置文件，可使用 openEuler 24.03-LTS-SP1 官方提供的默认 openEuler.repo 内容进行配置，确保各仓库的 enabled=1。
+
+#来源
+https://forum.openeuler.org/t/topic/7062

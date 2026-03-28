@@ -1,0 +1,20 @@
+#标题
+x2openEuler 升级包路径配置错误导致环境检查失败
+
+#内核版本
+未知
+
+#问题现象
+x2openEuler 在执行环境检查时，InstallPackageActor 和 CheckUpgradeNode 两个关键步骤均失败。日志显示程序尝试从 /opt/x2openEuler/ 路径拷贝 rpm 包和 json 文件，但实际文件位于 /etc/x2openEuler/rpms/ 和 /opt/x2openEuler/output/env-check/node-ip/，导致 SCP 报错“not found”并抛出“SCP File not find exception”。
+
+#问题根因
+x2openEuler 程序内部硬编码或配置错误，将待升级节点上 rpm 包的目标路径误设为 /opt/x2openEuler/，而服务端实际存放 rpm 包的路径为 /etc/x2openEuler/rpms/；同时 json 文件路径也存在类似不一致，导致文件无法正确推送。
+
+#解决方案
+1. 确保服务端 /etc/x2openEuler/rpms/ 目录下存在 x2openEuler-upgrade-3.0.0-20240818.x86_64.rpm 文件；
+2. 手动验证 scp 命令是否能成功将该 rpm 包从服务端推送到待升级节点的 /opt/x2openEuler/ 目录：
+   scp /etc/x2openEuler/rpms/x2openEuler-upgrade-3.0.0-20240818.x86_64.rpm root@${待升级节点IP}:/opt/x2openEuler/；
+3. 若手动 scp 成功但程序仍失败，需检查 x2openEuler 配置或代码中关于文件路径的逻辑，修正源路径与目标路径的映射关系。
+
+#来源
+https://forum.openeuler.org/t/topic/5900

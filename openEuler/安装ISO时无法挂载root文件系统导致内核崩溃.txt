@@ -1,0 +1,18 @@
+#标题
+安装ISO时无法挂载root文件系统导致内核崩溃
+
+#内核版本
+5.10.0-292.0.0.195.oe2203sp4
+
+#问题现象
+在H3C机架服务器上安装openEuler或从2203 LTS SP3更新至SP4后，系统启动时出现“end kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block”错误，无法挂载根文件系统。
+
+#问题根因
+从2203 LTS SP3（内核版本5.10.0-182.0.0.95）通过dnf update升级到SP4（内核版本5.10.0-292.0.0.195）后，新内核无法正确识别或挂载由LVM管理的根文件系统（/dev/mapper/openeuler-root），导致VFS层挂载失败并触发内核panic。
+
+#解决方案
+1. 避免从2203 LTS SP3直接通过dnf update升级至SP4，若已升级失败，可回退至SP3内核版本（kernel-5.10.0-182.0.0.95）以恢复系统启动。
+2. 安装时确保使用与目标硬件兼容的ISO镜像，并验证引导加载器是否正确加载LVM及对应文件系统模块。
+
+#来源
+https://forum.openeuler.org/t/topic/3276

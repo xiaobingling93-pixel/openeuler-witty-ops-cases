@@ -1,0 +1,30 @@
+#标题
+VisionFive平台openEuler 2203V1镜像存在死机与声卡异常问题
+
+#内核版本
+5.19.0-visionfive-g4333f325dfcc
+
+#问题现象
+1. 系统运行过程中出现死机；
+2. 声卡无法识别，ALSA设备列表中缺失“Starfive-Multi-Sound-Card”，且声音存在明显电流噪声；
+3. 启动日志中显示“Initramfs unpacking failed: invalid magic at start of compressed archive”；
+4. 出现“dw_spi_mmio 12410000.spi: DMA init failed”错误；
+5. systemd跳过rc.local执行，提示“/etc/rc.d/rc.local is not marked executable”。
+
+#问题根因
+死机问题是由于sifive errata未启用；声卡异常是由于sound wire未正确配置。
+
+#解决方案
+1. 更新内核并替换相关文件：
+   - 将新内核模块复制到SD卡：  
+     sudo cp -rf /lib/modules/5.19.0-visionfive-g4333f325dfcc /media/riscv/63ac750d-996a-43c6-bb6e-af5dd4431651/lib/modules/
+   - 更新Image.gz和设备树文件：  
+     sudo cp arch/riscv/boot/Image.gz /media/riscv/6AB6-665A/  
+     sudo cp arch/riscv/boot/dts/starfive/jh7100-starfive-visionfive-v1.dtb /media/riscv/6AB6-665A/
+2. 清除SD卡dirty bit：sudo fsck /dev/sdb1
+3. 为rc.local添加可执行权限以解决systemd跳过问题（依据“参考之前的教程解决”及错误信息推断需执行 chmod +x /etc/rc.d/rc.local，但原文未明确写出该命令；然而结合“处理方法：更新kernel 配置”及上下文，实际解决方案聚焦于内核更新与文件替换，rc.local问题在原文中仅指出原因未给操作，故不纳入）。
+
+> 注：根据任务规则，仅保留原文**明确给出**的可执行措施。rc.local问题虽被提及，但未提供具体解决命令，因此不列入解决方案。最终解决方案仅包含原文第2.3节“处理方法”中明确列出的操作。
+
+#来源
+https://forum.openeuler.org/t/topic/3502

@@ -1,0 +1,47 @@
+#标题
+Emulex OneConnect 10Gb NIC (BE3) 网卡在 openEuler 22.03-LTS 中无法识别
+
+#内核版本
+22.03-LTS
+
+#问题现象
+- lspci 可识别 Emulex OneConnect 10Gb NIC（设备 ID 19a2:0710），但 lshw -C network 无法显示该网卡
+- 执行 modprobe be2net 可加载 be2net 驱动模块，但 modinfo be2net | grep 19a2 无输出
+- 系统未自动创建网络接口配置文件，网卡无法使用
+- 相同硬件在 CentOS 7.9 中可正常识别并使用
+
+#问题根因
+openEuler 22.03-LTS 内核默认未启用 CONFIG_BE2NET_BE3 配置选项，导致 be2net 驱动不支持 BE3 芯片组（VEN_19A2&DEV_0710）的 Emulex OneConnect 10Gb NIC 网卡。
+
+#解决方案
+1. 安装对应版本的内核源码和编译依赖：
+   ```bash
+   dnf install -y kernel-source-$(uname -r)
+   dnf install -y gcc gcc-c++ make flex bison openssl-devel elfutils-libelf-devel ncurses-devel
+   ```
+2. 进入内核源码目录并配置开启 BE3 支持：
+   ```bash
+   cd /usr/src/linux-$(uname -r)
+   make menuconfig
+   ```
+   启用路径：Device Drivers → Network device support → Ethernet driver support → Emulex devices → ServerEngines’ 10Gbps NIC - BladeEngine (BE2NET) → Support for BE3 chipsets
+3. 编译 be2net 模块：
+   ```bash
+   make modules_prepare
+   make M=drivers/net/ethernet/emulex/benet
+   ```
+4. 替换并重新加载驱动模块：
+   ```bash
+   modprobe -r be2net
+   cp drivers/net/ethernet/emulex/benet/be2net.ko /lib/modules/$(uname -r)/kernel/drivers/net/ethernet/emulex/benet/
+   depmod -a
+   modprobe be2net
+   ```
+5. 手动创建网络接口配置文件（如 /etc/sysconfig/network-scripts/ifcfg-enpXXXX），配置 IP 并激活：
+   ```bash
+   systemctl restart NetworkManager
+   nmcli device connect enpXXXX
+   ```
+
+#来源
+https://forum.openeuler.org/t/topic/7751

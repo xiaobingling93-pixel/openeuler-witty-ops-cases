@@ -1,0 +1,18 @@
+#标题
+升级过程中因错误配置目标系统repo源导致 yum-utils 安装失败
+
+#内核版本
+未知
+
+#问题现象
+在使用 x2openEuler 工具从 CentOS 7.5 升级到 openEuler 20.03-LTS-SP1 过程中，报错 “install yum-utils failed, exit.”；用户配置了华为云或清华源作为 repo 源后仍出现该错误。
+
+#问题根因
+待升级节点在升级前已配置了 openEuler 的 repo 源，与 x2openEuler 升级工具在过程中自动下载的 repo 源发生冲突，导致 yum-utils 安装失败。
+
+#解决方案
+1. 在升级前确保 /etc/yum.repos.d/ 目录中未配置 openEuler 的 repo 源；
+2. 将 repo 源恢复为 CentOS 源后再执行升级操作。
+
+#来源
+https://forum.openeuler.org/t/topic/1078

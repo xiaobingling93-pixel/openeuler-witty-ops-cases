@@ -1,0 +1,31 @@
+#标题
+dnf和yum因Python依赖损坏导致失效的恢复
+
+#内核版本
+24.03-LTS
+
+#问题现象
+dnf和yum命令无法使用，系统包管理器失效；执行相关命令无响应或报错，且Python 3环境异常或缺失。
+
+#问题根因
+dnf和yum依赖Python 3，因Python 3被误删或损坏导致包管理器失效。
+
+#解决方案
+1. 清除已损坏的dnf、yum、python3相关依赖：  
+   sudo rpm -e --nodeps dnf python3-dnf yum  
+2. 重建仓库配置文件 /etc/yum.repos.d/openEuler.repo，内容指向官方openEuler-24.03-LTS源。  
+3. 手动下载并强制安装以下RPM包（使用--force --nodeps）：  
+   - python3-3.11.6-2.oe2403.x86_64.rpm  
+   - dnf-4.16.2-4.oe2403.noarch.rpm  
+   - python3-dnf-4.16.2-4.oe2403.noarch.rpm  
+   - libdnf-0.70.2-3.oe2403.x86_64.rpm  
+   - yum-4.16.2-4.oe2403.noarch.rpm  
+4. 若Python模块路径缺失，创建符号链接：  
+   sudo ln -s /usr/lib/python3.11/site-packages/dnf /usr/local/lib/python3.11/site-packages/  
+5. 清理并重建dnf缓存：  
+   sudo dnf clean all && sudo dnf makecache  
+6. 验证修复结果：  
+   dnf --version、yum --version 及 sudo dnf install -y tree
+
+#来源
+https://forum.openeuler.org/t/topic/7324

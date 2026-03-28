@@ -1,0 +1,17 @@
+#标题
+SPDK版本不匹配导致NVMe块设备创建失败
+
+#内核版本
+未知
+
+#问题现象
+使用openEuler-24.03系统中通过yum安装的SPDK，执行bdev_nvme_attach_controller命令创建NVMe块设备时，报错提示“TypeError: bdev_nvme_attach_controller() got an unexpected keyword argument ‘dhchap_key’”，尽管命令行未传入dhchap_key参数。
+
+#问题根因
+用户使用的SPDK 24.05版本源码与系统中已安装的SPDK版本不匹配，导致RPC接口参数不一致。
+
+#解决方案
+更换为与系统SPDK版本对应的源码。
+
+#来源
+https://forum.openeuler.org/t/topic/4616

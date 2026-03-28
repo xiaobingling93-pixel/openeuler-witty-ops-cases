@@ -1,0 +1,18 @@
+#标题
+LTS版本系统启动RabbitMQ失败需禁用网卡
+
+#内核版本
+22.03-LTS-SP1
+
+#问题现象
+在openEuler 22.03 LTS SP1（以及20.3 LTS SP3）系统中安装RabbitMQ 3.11.10及其依赖socat和erlang后，启动RabbitMQ服务失败；禁用网卡后可成功启动，再启用网卡后控制台访问正常。该问题在openEuler 22.09中未复现。
+
+#问题根因
+LTS版本系统中RabbitMQ启动时因网络配置或主机名解析问题导致服务初始化失败。
+
+#解决方案
+1. 在启动RabbitMQ前临时禁用网卡；
+2. 启动RabbitMQ服务成功后再重新启用网卡。
+
+#来源
+https://forum.openeuler.org/t/topic/876

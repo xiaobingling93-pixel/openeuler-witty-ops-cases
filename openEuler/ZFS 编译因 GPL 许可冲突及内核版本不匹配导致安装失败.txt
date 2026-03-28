@@ -1,0 +1,26 @@
+#标题
+ZFS 编译因 GPL 许可冲突及内核版本不匹配导致安装失败
+
+#内核版本
+6.6.0-96.0.0.89.oe2403
+
+#问题现象
+1. 编译 OpenZFS 时 configure 报错：__copy_from_user_inatomic() 与 CDDL 许可证不兼容，阻止模块链接。
+2. 使用 dnf 无法找到 dkms zfs 包。
+3. 手动编译安装后执行 modprobe zfs 报错：FATAL: Module zfs not found in directory /lib/modules/6.6.0-96.0.0.89.oe2403.x86_64，因 ZFS 模块是针对旧内核（6.6.0-95...）编译的。
+
+#问题根因
+__copy_from_user_inatomic() 是 GPL-only 内核函数，与 ZFS 的 CDDL 许可证冲突，导致 configure 阶段报错终止；同时 ZFS 模块未针对当前运行的 6.6.0-96 内核重新编译，造成 modprobe 无法加载模块。
+
+#解决方案
+1. 修改 config/kernel-copy-from-user-inatomic.m4 文件，将 AC_MSG_ERROR 替换为 AC_MSG_WARN，并定义 HAVE_COPY_FROM_USER_INATOMIC 为 0，以跳过 GPL 冲突检查并回退到使用 copy_from_user()：
+   - 编辑 config/kernel-copy-from-user-inatomic.m4；
+   - 替换报错逻辑为警告并设置 fallback；
+   - 保存后执行 ./autogen.sh && ./configure、make、make install。
+2. 针对内核版本不匹配问题，临时方案为重启并选择旧内核（6.6.0-95...）启动：
+   - 使用 sudo grubby --info=ALL 查看可用内核；
+   - 通过 sudo grubby --set-default-index=<旧内核索引> 设置默认启动项；
+   - 重启后执行 sudo modprobe zfs 加载模块。
+
+#来源
+https://forum.openeuler.org/t/topic/7978

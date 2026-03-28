@@ -1,0 +1,19 @@
+#标题
+bond0 网络接口升级后无法启动
+
+#内核版本
+未知
+
+#问题现象
+升级系统后，bond0 接口未出现在 ifconfig 输出中，NetworkManager 服务未自动启动。
+
+#问题根因
+bond0 及其从属接口（eth0、eth1）的配置文件中 NM_CONTROLLED 设置为 no，导致 NetworkManager 无法管理这些接口；同时 NetworkManager 服务未设置为开机自启。
+
+#解决方案
+1. 修改 /etc/sysconfig/network-scripts/ifcfg-bond0、ifcfg-eth0 和 ifcfg-eth1 文件，将 NM_CONTROLLED=no 改为 NM_CONTROLLED=yes。
+2. 执行 systemctl enable NetworkManager 和 systemctl start NetworkManager 启用并启动 NetworkManager 服务。
+3. 重启系统使配置生效。
+
+#来源
+https://forum.openeuler.org/t/topic/1151

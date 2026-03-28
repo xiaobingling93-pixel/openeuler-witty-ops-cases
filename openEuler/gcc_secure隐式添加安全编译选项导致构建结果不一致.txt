@@ -1,0 +1,19 @@
+#标题
+gcc_secure隐式添加安全编译选项导致构建结果不一致
+
+#内核版本
+未知
+
+#问题现象
+使用同一份binutils源码，本地构建与openEuler RPM构建得到的二进制不一致；用户依据spec文件中的编译选项构建，但实际RPM构建过程中引入了额外的安全编译选项，导致用户质疑构建过程存在未声明的特殊处理。部分用户在本地环境中因安装gcc_secure而出现“cat /.build.command 没有那个文件或目录”等异常报错。
+
+#问题根因
+gcc_secure是一个通过%post脚本替换/usr/bin/gcc为包装脚本的组件，会在编译时隐式添加安全编译选项，且未在RPM的BuildRequires中显式声明，导致构建环境与用户预期不一致。
+
+#解决方案
+1. 在OBS中查询软件包的构建日志，安装缺失的软件包，使本地环境与OBS环境保持一致。
+2. 若已误装gcc_secure并导致编译异常，重新安装gcc以覆盖gcc_secure。
+3. 若不希望在打包过程中使用gcc_secure，可提交PR修改gcc_secure_exclude列表（参考路径：OBS_PRJ_meta/master/prjconf-openEuler:selfbuild:function）。
+
+#来源
+https://forum.openeuler.org/t/topic/633

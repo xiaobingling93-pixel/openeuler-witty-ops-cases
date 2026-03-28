@@ -1,0 +1,17 @@
+#标题
+升级至openEuler 22.03 LTS-SP2后因LD_LIBRARY_PATH残留导致系统库加载失败
+
+#内核版本
+22.03 LTS-SP2
+
+#问题现象
+升级完成后系统重启失败，但网络可达；现场登录发现ssh服务缺失；执行reboot、ntpdate等基本命令时报错“error while loading shared libraries: libgcrypt.so.11/libcrypto.so.10: cannot open shared object file: No such file or directory”；系统已显示为openEuler 22.03 (LTS-SP2)
+
+#问题根因
+.bashrc中残留了指向x2openEuler工具lib路径的LD_LIBRARY_PATH环境变量，导致系统运行时错误加载不兼容的旧版共享库
+
+#解决方案
+删掉.bashrc文件中LD_LIBRARY_PATH指向x2openEuler的lib路径
+
+#来源
+https://forum.openeuler.org/t/topic/2135

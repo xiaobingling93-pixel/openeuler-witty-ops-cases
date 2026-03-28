@@ -1,0 +1,17 @@
+#标题
+pam_unix.so 控制标志配置导致 pam_faillock.so 无法清除认证失败记录
+
+#内核版本
+24.03 LTS-SP1
+
+#问题现象
+在 /etc/pam.d/system-auth 和 password-auth 中，当 pam_unix.so 的控制标志为 sufficient 且认证成功时，会跳过后续的 pam_faillock.so authsucc 规则，导致无法清除之前的认证失败次数记录。
+
+#问题根因
+pam_unix.so 使用 sufficient 控制标志时，认证成功会立即返回成功并跳过后续模块，致使 pam_faillock.so authsucc 未被执行，从而无法清除失败计数。
+
+#解决方案
+将 pam_unix.so 的控制标志从 sufficient 修改为 [success=2]，以确保 pam_faillock.so authsucc 能够正常执行。
+
+#来源
+https://forum.openeuler.org/t/topic/18454

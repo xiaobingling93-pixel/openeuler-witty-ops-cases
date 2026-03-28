@@ -1,0 +1,17 @@
+#标题
+鲲鹏920平台因旧版BIOS未使能MPAM导致24.03内核启动失败
+
+#内核版本
+6.6.0-33.0.0.40.oe2403.aarch64
+
+#问题现象
+在鲲鹏920桌面CPU（如2249K）及服务器平台上，使用openEuler 24.03 LTS正式版内核（6.6.0-33.0.0.40.oe2403.aarch64）启动时系统卡死；在KVM虚拟机中安装时卡在“EFI stub: Exiting boot services…”无响应；宿主机dmesg出现“Unsupported guest sys_reg access”错误；实际硬件启动过程中触发“Internal error: Oops - Undefined instruction”异常。
+
+#问题根因
+旧版本BIOS未使能MPAM功能，即MPAM3_EL3的MPAM_EN bit未置位，导致内核在__init_el2_mpam函数中访问SYS_MPAM2_EL2寄存器时发生非法指令异常。
+
+#解决方案
+将BIOS更新至1.70版本（2021年1月发布）或更高版本以使能MPAM功能。
+
+#来源
+https://forum.openeuler.org/t/topic/4932

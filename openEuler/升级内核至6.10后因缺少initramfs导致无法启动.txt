@@ -1,0 +1,19 @@
+#标题
+升级内核至6.10后因缺少initramfs导致无法启动
+
+#内核版本
+6.10.0-2
+
+#问题现象
+系统升级安装自编译的kernel-6.10.0-2内核RPM包后无法启动，启动时出现“kernel panic: VFS: can’t mount root on unknown block(0,0)”错误；检查发现/boot目录未生成对应的initramfs镜像文件。
+
+#问题根因
+使用make binrpm-pkg方式打包并安装内核RPM包时，未自动生成initramfs镜像，导致系统启动时无法挂载根文件系统。
+
+#解决方案
+1. 编译内核后不使用binrpm-pkg方式打包，改用直接执行make modules_install和make install命令安装内核。
+2. 安装完成后运行grub2-mkconfig -o /boot/grub2/grub.cfg更新引导配置。
+3. 确保/boot目录下生成了对应内核版本的initramfs镜像后再重启系统。
+
+#来源
+https://forum.openeuler.org/t/topic/5035

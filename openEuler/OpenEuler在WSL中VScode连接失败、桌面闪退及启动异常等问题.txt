@@ -1,0 +1,25 @@
+#标题
+OpenEuler在WSL中VScode连接失败、桌面闪退及启动异常等问题
+
+#内核版本
+未知
+
+#问题现象
+- VScode连接OpenEuler时报错  
+- 安装桌面环境后远程连接出现窗口闪退  
+- 多个WSL实例中仅一个能成功启动xrdp服务，其余启动失败  
+- WSL无法启动  
+- WSL与旧版VMware、VirtualBox等虚拟化软件不兼容导致其无法正常运行  
+
+#问题根因
+VScode连接失败是因为OpenEuler中未安装tar包；窗口闪退是由于系统中残留X-session；多个WSL实例远程桌面冲突是因为xrdp默认监听端口相同；WSL无法启动是因为Windows的“虚拟机平台”功能被关闭；WSL与其他虚拟化软件不兼容是因为WSL依赖Hyper-V技术，而旧版VMware和VirtualBox不支持与Hyper-V共存。
+
+#解决方案
+1. 在OpenEuler中通过命令行安装tar包以解决VScode连接失败问题。  
+2. 重启gdm服务以清除残留X-session，解决窗口闪退问题。  
+3. 修改/etc/xrdp/xrdp.ini和/etc/xrdp/sesman.ini中的监听端口，以支持多个WSL实例同时运行xrdp服务。  
+4. 在Windows“程序和功能”中启用“虚拟机平台”功能并重启电脑，解决WSL无法启动问题。  
+5. 将VMware或VirtualBox更新至支持Hyper-V的新版本，以解决与WSL的兼容性问题。
+
+#来源
+https://forum.openeuler.org/t/topic/7923

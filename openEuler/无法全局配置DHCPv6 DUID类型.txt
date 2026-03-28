@@ -1,0 +1,18 @@
+#标题
+无法全局配置DHCPv6 DUID类型
+
+#内核版本
+未知
+
+#问题现象
+在openEuler系统中，用户无法找到类似Debian中/etc/systemd/networkd.conf的配置文件来全局设置DHCPv6的DUID类型；系统默认使用NetworkManager（NM）管理网络，不支持通过全局配置文件修改DUID类型。
+
+#问题根因
+openEuler默认使用NetworkManager管理网络，而NetworkManager不提供全局配置DUID类型的机制，仅支持针对单个网卡进行配置。
+
+#解决方案
+1. 使用命令 `nmcli connection modify eth0 ipv6.dhcp-duid "llt"` 针对指定网卡（如eth0）设置DUID类型，可选值包括"llt"、"ll"、""（空）、"stable-llt"等。
+2. 执行 `nmcli connection up eth0` 使配置生效。
+
+#来源
+https://forum.openeuler.org/t/topic/7507

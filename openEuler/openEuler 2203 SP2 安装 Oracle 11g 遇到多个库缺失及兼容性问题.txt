@@ -1,0 +1,39 @@
+#标题
+openEuler 2203 SP2 安装 Oracle 11g 遇到多个库缺失及兼容性问题
+
+#内核版本
+2203sp2
+
+#问题现象
+1. 执行 ./runInstaller 无法打开 GUI 安装程序，报错提示缺少 libnsl 库。
+2. GUI 安装界面显示乱码，因系统语言为 zh_CN.UTF-8 但缺少对应字体。
+3. 安装过程中 client_sharedlib 报错，日志显示缺少 libpthread_nonshared.a。
+4. 出现 libaio 相关错误，因 openEuler 中的 libaio 版本与 Oracle 11g 不兼容。
+5. 出现 -lnsl 链接错误，因 openEuler 中 libnsl 库命名方式不同（如 libnsl-2.28.so）。
+6. agent mnhs 报错，因链接时缺少 -lnnz11 参数。
+
+#问题根因
+1. openEuler 2203 SP2 默认未安装 libnsl 兼容包，导致 Oracle 安装程序无法加载所需库。
+2. 系统语言环境为中文但未安装 Oracle 所需中文字体，造成 GUI 乱码。
+3. glibc-compat 组件缺失导致 libpthread_nonshared.a 不存在。
+4. openEuler 自带的 libaio 动态库与 Oracle 11g 编译依赖不兼容。
+5. openEuler 中 libnsl 库文件名为 libnsl-2.28.so，而 Oracle 安装脚本期望 libnsl.so。
+6. Oracle 的 ins_emagent.mk 构建脚本未包含 -lnnz11 链接参数，导致 agent 链接失败。
+
+#解决方案
+1. 安装 libnsl 包：使用 yum 或 rpm 安装 libnsl 兼容包。
+2. 临时切换语言环境：在终端执行 export LANG=en_US.UTF-8 后再运行 ./runInstaller。
+3. 安装 glibc-compat 包：通过提供的 gitee issue 中的 glibc-compat 下载链接进行安装。
+4. 从 CentOS 7 获取兼容的 libaio.so.1.0.1，复制到 Oracle 的 $ORACLE_HOME/lib 目录并创建软链接：
+   cp libaio.so.1.0.1 /u01/app/oracle/product/11.2.0/db_1/lib
+   ln -s libaio.so.1.0.1 libaio.so.1
+5. 手动创建 libnsl.so 软链接：
+   cd /usr/lib64
+   ln -s libnsl-2.28.so libnsl.so
+6. 修改 Oracle 构建脚本，在 $(MK_EMAGENT_NMECTL) 后添加 -lnnz11：
+   cp $ORACLE_HOME/sysman/lib/ins_emagent.mk $ORACLE_HOME/sysman/lib/ins_emagent.mk.bak
+   vim $ORACLE_HOME/sysman/lib/ins_emagent.mk
+   搜索 emdctl，在 $(MK_EMAGENT_NMECTL) 后追加 -lnnz11
+
+#来源
+https://forum.openeuler.org/t/topic/3723

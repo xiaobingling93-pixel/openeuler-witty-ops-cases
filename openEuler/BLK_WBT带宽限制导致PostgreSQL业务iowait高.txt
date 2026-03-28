@@ -1,0 +1,18 @@
+#标题
+BLK_WBT带宽限制导致PostgreSQL业务iowait高
+
+#内核版本
+openEuler 20.03 LTS SP3（内核4.19）
+
+#问题现象
+客户从CentOS迁移至openEuler 20.03 LTS SP3后，运行PostgreSQL业务时出现数据库查询和建表明显卡顿；sar观测显示iowait较高，iostat显示磁盘读写带宽显著降低。
+
+#问题根因
+openEuler内核启用了CONFIG_BLK_WBT编译选项，该选项对后台写回实施带宽限制以降低IO时延，在高写压力场景下导致磁盘带宽下降，进而引发数据库操作变慢。
+
+#解决方案
+1. 关闭CONFIG_BLK_WBT编译选项并重新编译内核。  
+2. 编写开机自启动脚本或服务，在系统启动后执行：echo 0 > /sys/block/sdx/queue/wbt_lat_usec（sdx为对应磁盘盘符）。
+
+#来源
+https://forum.openeuler.org/t/topic/2846

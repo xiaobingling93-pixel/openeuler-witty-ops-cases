@@ -1,0 +1,19 @@
+#标题
+openEuler 22.03 LTS 安装 MariaDB 10.11 报依赖缺失错误
+
+#内核版本
+未知
+
+#问题现象
+在 openEuler 22.03 LTS 系统上配置 MariaDB 官方 repo（el8 版本）并执行 dnf install MariaDB-server MariaDB-client 时，报错：  
+- package MariaDB-server-10.11.7-1.el8.x86_64 requires galera-4, but none of the providers can be installed  
+- nothing provides libboost_program_options.so.1.66.0()(64bit) needed by galera-4-26.4.13-1.el8.x86_64
+
+#问题根因
+openEuler 操作系统不兼容 CentOS/RHEL el8 的 MariaDB 10.11 软件包，因其依赖的 galera-4 及 libboost_program_options.so.1.66.0 在 openEuler 中无对应提供。
+
+#解决方案
+使用 wlnmp 源安装 wmariadb1011：添加 wlnmp 源后，执行 yum install wmariadb1011。
+
+#来源
+https://forum.openeuler.org/t/topic/3674

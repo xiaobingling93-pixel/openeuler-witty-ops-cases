@@ -1,0 +1,17 @@
+#标题
+SSH连接因PAM配置导致root账户被锁
+
+#内核版本
+未知
+
+#问题现象
+x2服务端多次尝试SSH连接待升级节点时失败；root账户在多次重连后被锁定，无法继续SSH登录。
+
+#问题根因
+/etc/pam.d/sshd中配置了加密认证的auth行，触发账户锁定机制，导致root账户在多次SSH连接尝试后被锁定。
+
+#解决方案
+注释掉/etc/pam.d/sshd文件中用户添加的auth认证行，即可恢复正常SSH连接并完成升级。
+
+#来源
+https://forum.openeuler.org/t/topic/2353

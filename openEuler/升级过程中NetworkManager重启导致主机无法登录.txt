@@ -1,0 +1,21 @@
+#标题
+升级过程中NetworkManager重启导致主机无法登录
+
+#内核版本
+未知
+
+#问题现象
+升级后主机偶发无法正常登录，部分网络配置文件被修改；前置脚本虽已关闭NetworkManager及其自启，但问题仍复现。
+
+#问题根因
+升级过程会重新安装相关包，导致NetworkManager及其自启在前置脚本关闭后被重新启用。
+
+#解决方案
+1. 将关闭NetworkManager的脚本由前置脚本改为后置脚本（在升级完成、重启前执行）。
+2. 通过控制台执行以下命令手动处理：  
+   systemctl stop NetworkManager  
+   systemctl disable NetworkManager  
+   systemctl restart network
+
+#来源
+https://forum.openeuler.org/t/topic/2935

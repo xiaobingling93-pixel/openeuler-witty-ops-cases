@@ -1,0 +1,18 @@
+#标题
+环境检查阶段报错“copy node data at local to remote failed”
+
+#内核版本
+未知
+
+#问题现象
+工具在环境检查阶段报错“copy node data at local to remote failed”；日志显示与scp操作相关异常。
+
+#问题根因
+目标主机缺少scp命令。
+
+#解决方案
+1. 安装openssh-client包以提供scp命令。
+2. 安装后重新测试环境检查流程。
+
+#来源
+https://forum.openeuler.org/t/topic/2510

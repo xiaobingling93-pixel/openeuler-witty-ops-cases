@@ -1,0 +1,19 @@
+#标题
+dnf安装包因SSL证书过期失败
+
+#内核版本
+未知
+
+#问题现象
+使用dnf安装软件包时失败，报错信息为“Curl error (60): SSL peer certificate or SSH remote key was not OK”，具体提示“SSL certificate problem: certificate has expired”；在浏览器中访问仓库地址 https://repo.oepkgs.net/ 也显示网站SSL证书已于昨日到期。
+
+#问题根因
+软件仓库 https://repo.oepkgs.net/ 的SSL证书已过期，导致dnf无法通过HTTPS验证并下载元数据。
+
+#解决方案
+1. 等待仓库维护方更新SSL证书；
+2. 临时使用 --nogpgcheck 和 --skip-broken 参数绕过部分验证（若适用）；
+3. 或配置dnf使用HTTP镜像源（如官方提供）以规避SSL问题。
+
+#来源
+https://forum.openeuler.org/t/topic/18763

@@ -1,0 +1,18 @@
+#标题
+RAID1+openEuler22.03安装UKUI后图形界面无法启动
+
+#内核版本
+未知
+
+#问题现象
+安装UKUI并设置从可视化桌面启动后系统无法正常进入图形界面；查看lightdm.service状态显示异常；切换至multi-user.target可正常启动命令行。
+
+#问题根因
+lightdm启动时X服务或GPU驱动尚未就绪，且lightdm配置中logind-check-graphical未启用，导致图形会话初始化失败。
+
+#解决方案
+1. 编辑lightdm.conf配置文件；
+2. 找到logind-check-graphical配置项，取消注释并将值由false改为true，即设置为：logind-check-graphical=true。
+
+#来源
+https://forum.openeuler.org/t/topic/1085

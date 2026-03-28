@@ -1,0 +1,18 @@
+#标题
+fio编译时因gettid函数重复声明报错
+
+#内核版本
+22.03 LTS
+
+#问题现象
+在openEuler release 22.03 LTS上编译fio工具时，出现编译错误：“error: static declaration of ‘gettid’ follows non-static declaration”。具体表现为os-linux.h中static inline定义的gettid函数与/usr/include/bits/unistd_ext.h中已存在的extern __pid_t gettid(void)声明冲突，导致crc/sha3.o编译失败。
+
+#问题根因
+系统glibc已在bits/unistd_ext.h中提供了gettid函数的非静态声明，而fio源码中的os-linux.h又以static inline方式重新声明了同名函数，造成重复定义冲突。
+
+#解决方案
+1. 修改fio源码中的os/os-linux.h文件，注释或移除static inline int gettid(void)的定义；
+2. 或在编译fio前添加预处理器宏定义（如-DHAVE_GETTID）以跳过本地gettid实现，使用系统提供的版本。
+
+#来源
+https://forum.openeuler.org/t/topic/1541

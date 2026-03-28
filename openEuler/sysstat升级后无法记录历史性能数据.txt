@@ -1,0 +1,18 @@
+#标题
+sysstat升级后无法记录历史性能数据
+
+#内核版本
+未知
+
+#问题现象
+系统从CentOS 7.4通过x2openeuler升级到openEuler 20.03 SP3后，/var/log/sa/目录下无新性能数据文件生成，sa命令无法读取历史数据。
+
+#问题根因
+sysstat包版本升级后，性能数据定时记录机制由/etc/cron.d/sysstat改为由systemd服务管理，但升级后的sysstat服务未随系统启动。
+
+#解决方案
+1. 将/var/log/sa/下的历史数据移走；
+2. 执行 systemctl enable sysstat && systemctl start sysstat 启用并启动sysstat服务。
+
+#来源
+https://forum.openeuler.org/t/topic/1592

@@ -1,0 +1,37 @@
+#标题
+openEuler 24.03系统编译binder驱动失败
+
+#内核版本
+6.6.0-28.0.0.34.oe2403
+
+#问题现象
+在openEuler 24.03系统上编译binder驱动时出现多个编译错误，包括：  
+- enum task_work_notify_mode类型不完全导致函数参数错误；  
+- close_fd_get_file函数声明与内核头文件中定义的返回类型和参数数量不一致；  
+- register_shrinker函数调用参数数量不足；  
+- 对vma->vm_flags只读成员进行赋值操作；  
+- struct file_operations中不存在may_pollfree成员；  
+- 编译因-Werror将警告视为错误而终止。
+
+#问题根因
+用户使用了适用于openEuler 22.03-LTS-SP2分支的binder驱动安装指导和代码，在openEuler 24.03系统（内核6.6.0）上编译，而该版本内核API已变更，导致驱动代码与当前内核接口不兼容。
+
+#解决方案
+1. 使用与openEuler 24.03-LTS匹配的binder驱动源码分支：
+   ```bash
+   git clone -b openEuler-24.03-LTS https://gitee.com/src-openeuler/communication_ipc.git
+   ```
+2. 进入目录并解压对应内核版本的驱动包：
+   ```bash
+   cd communication_ipc
+   tar zxvf binder-6.6.0.tar.gz
+   cd binder
+   ```
+3. 应用补丁并编译：
+   ```bash
+   patch -p1
+   make -j 4
+   ```
+
+#来源
+https://forum.openeuler.org/t/topic/6304

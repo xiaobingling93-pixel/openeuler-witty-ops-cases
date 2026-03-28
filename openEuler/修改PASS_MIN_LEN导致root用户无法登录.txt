@@ -1,0 +1,17 @@
+#标题
+修改PASS_MIN_LEN导致root用户无法登录
+
+#内核版本
+未知
+
+#问题现象
+修改/etc/login.defs中的PASS_MIN_LEN参数后，root账号无法登录系统
+
+#问题根因
+/etc/login.defs中PASS_MIN_LEN设置不符合系统对root用户密码长度的校验要求，导致认证失败
+
+#解决方案
+将/etc/login.defs中的PASS_MIN_LEN值恢复为符合root用户密码策略的合法值
+
+#来源
+https://forum.openeuler.org/t/topic/6452

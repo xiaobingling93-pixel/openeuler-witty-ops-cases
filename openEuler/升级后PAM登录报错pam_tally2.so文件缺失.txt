@@ -1,0 +1,20 @@
+#标题
+升级后PAM登录报错pam_tally2.so文件缺失
+
+#内核版本
+未知
+
+#问题现象
+系统升级后登录时出现错误：PAM unable to dlopen(/usr/lib64/security/pam_tally2.so): /usr/lib64/security/pam_tally2.so: cannot open shared object file: No such file or directory
+
+#问题根因
+PAM包中不再提供pam_tally2.so，已由pam_faillock.so替代。
+
+#解决方案
+1. 编辑配置文件 /etc/pam.d/system-auth  
+2. 注释掉包含 pam_tally2.so 的行，例如：
+   #auth        required    pam_tally2.so deny=6 unlock_time=600
+   #account     required    pam_tally2.so
+
+#来源
+https://forum.openeuler.org/t/topic/3005

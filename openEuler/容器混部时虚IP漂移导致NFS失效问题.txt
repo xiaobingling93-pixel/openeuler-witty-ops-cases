@@ -1,0 +1,17 @@
+#标题
+容器混部时虚IP漂移导致NFS失效问题
+
+#内核版本
+22.03-LTS
+
+#问题现象
+在由openEuler 22.03 LTS与CentOS 7.7组成的3节点高可用NFS集群中，客户端挂载openEuler节点的虚IP；当虚IP因异常迁移至CentOS节点后，客户端访问挂载目录时报错“Stale file handle”；若虚IP迁移回原openEuler节点，故障自动解除。
+
+#问题根因
+主备服务器上CephFS客户端的fsid计算方式不同，导致生成的file handle不一致；NFS服务端（即CephFS客户端）在虚IP漂移后无法识别客户端携带的旧file handle，从而返回“Stale file handle”错误。
+
+#解决方案
+在CentOS系统上合入升级fsid计算方式的内核补丁，使主备节点CephFS客户端生成一致的fsid，从而保证file handle一致性。
+
+#来源
+https://forum.openeuler.org/t/topic/2414

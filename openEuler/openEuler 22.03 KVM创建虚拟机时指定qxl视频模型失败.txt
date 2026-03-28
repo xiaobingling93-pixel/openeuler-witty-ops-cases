@@ -1,0 +1,18 @@
+#标题
+openEuler 22.03 KVM创建虚拟机时指定qxl视频模型失败
+
+#内核版本
+未知
+
+#问题现象
+使用virt-install创建虚拟机时，命令中未显式指定--video参数，系统默认尝试使用qxl视频模型，导致报错：“domain configuration does not support ‘video model’ value ‘qxl’”。
+
+#问题根因
+openEuler 22.03的KVM虚拟化环境默认不支持qxl视频模型，且virt-install在未指定--video参数时仍尝试使用该模型。
+
+#解决方案
+1. 在virt-install命令中显式添加--video virtio参数，改用virtio视频模型。
+2. 避免使用默认的qxl视频模型，确保虚拟机配置与宿主系统支持的视频设备类型一致。
+
+#来源
+https://forum.openeuler.org/t/topic/939

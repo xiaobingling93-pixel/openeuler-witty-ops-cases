@@ -1,0 +1,20 @@
+#标题
+VMware Fusion 安装 openEuler 22.03 卡死于 EFI stub 阶段
+
+#内核版本
+5.10
+
+#问题现象
+在 VMware Fusion 13 上使用 Mac M 系列芯片（如 M2、M4 Pro）安装 openEuler 22.03-LTS-SP4 aarch64 版本时，系统卡死在日志 “EFI stub: Exiting boot services and installing virtual address map…” 处，无法进入安装界面；类似问题也出现在 openEuler 20.03 的 Grub 菜单死循环。
+
+#问题根因
+openEuler 默认 GRUB 启动参数中包含 video=efifb:off，该参数在 VMware Fusion 虚拟化环境中导致 EFI Framebuffer 被禁用后无替代显示驱动接管，从而引发启动卡死。
+
+#解决方案
+1. 光盘启动后，在 GRUB 菜单中选择 “Install openEuler 22.03-LTS-SP4” 项，按 “e” 进入编辑模式。
+2. 删除内核启动参数中的 “video=efifb:off”。
+3. 按 “Ctrl-x” 或 “F10” 启动系统。
+4. 若后续安装过程中再次卡住，可进一步在 linux 行末尾添加 “ro” 参数（如将 vmliunz 行修改为 “linux /images/preboot/vmliunz ro”）以继续完成安装。
+
+#来源
+https://forum.openeuler.org/t/topic/6325

@@ -1,0 +1,24 @@
+#标题
+LizardFS在openEuler 22.03上打包编译失败问题
+
+#内核版本
+22.03
+
+#问题现象
+1. 编译时报错找不到 fmtConfig.cmake 或 fmt-config.cmake，导致 CMake 配置失败。
+2. 后续编译时报错找不到 spdlogConfig.cmake 或 spdlog-config.cmake，CMake 配置再次失败。
+3. 在 EUR 环境中使用自建 fmt 和 spdlog RPM 包时，因缺少对应 CMake 配置文件仍无法通过依赖检查。
+4. 编译过程中出现 "c++: fatal error: Killed signal terminated program cc1plus"，导致构建中断。
+
+#问题根因
+1. openEuler 22.03 官方仓库中未提供包含 fmtConfig.cmake 的 fmt-devel 包，且自行打包的 fmt-devel 未包含该 CMake 配置文件。
+2. openEuler 22.03 官方仓库中缺少 spdlog 和 spdlog-devel 包，导致 lizardfs.spec 中的 BuildRequires 无法满足。
+3. EUR 构建环境内存资源有限，lizardfs 编译默认使用的并行线程数过高，触发系统 OOM killer 终止编译进程。
+
+#解决方案
+1. 在 lizardfs.spec 中显式添加 BuildRequires: cmake(fmt)，并确保使用包含 fmtConfig.cmake 的 fmt-devel 包。
+2. 在 EUR 项目中先构建 spdlog 和 spdlog-devel 包，使其成为本项目的内部依赖源，再构建 lizardfs。
+3. 将 spec 文件中的 make %{?_smp_mflags} 修改为 make -j4，限制编译并行数以避免内存超限。
+
+#来源
+https://forum.openeuler.org/t/topic/787

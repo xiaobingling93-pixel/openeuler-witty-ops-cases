@@ -1,0 +1,25 @@
+#标题
+升级 CentOS 至 openEuler 时因混合源导致依赖冲突和包管理器失效
+
+#内核版本
+未知
+
+#问题现象
+- 升级过程中 dnf 报错：软件包（如 xmlsec1、virt-viewer、nspr 等）所需依赖（如 libnspr4.so、libspice-client-glib-2.0.so.8 等）无提供者可安装  
+- 出现冲突提示：“无法同时安装 nspr-4.32.0-5.oe2203sp4.x86_64 和 nspr-4.34.0-3.1.el7_9.x86_64”  
+- 升级后期 yum/dnf 命令失效，报错“/usr/bin/yum: 没有那个文件或目录”及“ModuleNotFoundError: No module named ‘dnf’”  
+- 升级流程最终失败，提示“failed to upgrade system”
+
+#问题根因
+待升级节点的 /etc/yum.repos.d/ 目录中同时配置了 CentOS 源和 openEuler 22.03 SP4 源，导致 dnf 在解析依赖时尝试混合安装来自不同发行版的包，引发版本冲突和依赖缺失。
+
+#解决方案
+1. 在升级前清理 /etc/yum.repos.d/ 目录，仅保留原 CentOS 系统的 repo 文件（如 CentOS-Base.repo），移除所有 openEuler 相关源文件。  
+2. 执行 `yum clean all && yum makecache` 刷新缓存。  
+3. 若已存在冲突包（如多个 kernel-devel 或 java 版本），在升级前手动移除或更新，例如：  
+   - `yum remove kernel-devel-3.10.0-862.el7.x86_64`  
+   - `yum install -y java-1.8.0-openjdk-headless.x86_64`  
+4. 如升级中途失败且 yum/dnf 已损坏，需回退系统状态，重新初始化环境后按上述步骤重试。
+
+#来源
+https://forum.openeuler.org/t/topic/4841

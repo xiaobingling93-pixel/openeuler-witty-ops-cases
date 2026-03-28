@@ -1,0 +1,21 @@
+#标题
+openEuler 22.03 LTS SP3 安装 VirtualBox 报依赖缺失
+
+#内核版本
+22.03 LTS SP3
+
+#问题现象
+使用 rpm -ivh 安装 VirtualBox-6.1 或 7.0 的 RPM 包时，报错缺少多个依赖库，包括 libcrypto.so.3、libssl.so.3、libstdc++.so.6(GLIBCXX_3.4.29)、libvpx.so.6 和 libXt.so.6 等，导致安装失败。
+
+#问题根因
+用户尝试在 openEuler 22.03 LTS SP3 上直接安装为 CentOS/RHEL 8 或 9 构建的 VirtualBox RPM 包，而该系统缺少对应版本的 OpenSSL 3.0、libXt 等运行时依赖库。
+
+#解决方案
+1. 安装所需依赖：dnf install qt5 vulkan libvpx libXt xorg-x11-xauth -y  
+2. 下载适用于 EL8 的 VirtualBox 7.0.18 RPM 包：wget https://download.virtualbox.org/virtualbox/7.0.18/VirtualBox-7.0-7.0.18_162988_el8-1.x86_64.rpm  
+3. 使用 rpm -ivh 安装该 RPM 包  
+4. （可选）配置 SSH X11 转发以支持图形界面运行：修改 /etc/ssh/sshd_config 启用 X11Forwarding 并重启 sshd  
+5. 或改用官方 .run 安装脚本方式安装 VirtualBox 7.1.2：下载 .run 文件，赋予执行权限后以 root 执行安装
+
+#来源
+https://forum.openeuler.org/t/topic/4549

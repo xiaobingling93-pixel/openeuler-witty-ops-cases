@@ -1,0 +1,19 @@
+#标题
+22.03修改密码报错：passwd: Module is unknown
+
+#内核版本
+未知
+
+#问题现象
+执行 passwd 命令修改用户密码时提示“passwd: Module is unknown”；系统日志 /var/log/messages 无相关输出；同时存在 PAM 配置中引用了不存在的 pam_cracklib.so 模块，导致 dlopen 失败。
+
+#问题根因
+系统加固后 /etc/pam.d/system-auth 中配置使用了已不存在的 pam_cracklib.so 模块，而 openEuler 22.03 默认使用 pam_pwquality.so 替代该模块。
+
+#解决方案
+1. 将 /etc/pam.d/system-auth 中 password 行的 pam_cracklib.so 替换为 pam_pwquality.so。
+2. 使用如下配置：
+   password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 difok=3 minlen=12 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1
+
+#来源
+https://forum.openeuler.org/t/topic/4686

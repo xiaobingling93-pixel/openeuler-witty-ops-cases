@@ -1,0 +1,18 @@
+#标题
+X2工具升级后sudoers文件被还原导致免密配置失效
+
+#内核版本
+未知
+
+#问题现象
+使用X2工具将CentOS主机升级至openEuler 20.03 SP3后，原有的sudoers配置（如免密设置）失效，sudoers文件被还原为默认状态。
+
+#问题根因
+升级过程中sudo版本由9.6降级至9.2，导致原sudoers文件不兼容而被覆盖。
+
+#解决方案
+1. 将系统备份的sudoers文件拷贝回/etc/目录：/bin/cp -rf /.osbak/etc/sudoers /etc/
+2. 在后置脚本run.sh中加入上述命令，于升级完成后自动恢复sudoers文件。
+
+#来源
+https://forum.openeuler.org/t/topic/1589

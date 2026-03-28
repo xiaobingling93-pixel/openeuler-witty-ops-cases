@@ -1,0 +1,19 @@
+#标题
+Docker构建RISCV版openEuler镜像缺少root用户环境及平台警告问题
+
+#内核版本
+未知
+
+#问题现象
+1. 使用 docker build 构建 RISCV64 架构的 openEuler 24.03 LTS 镜像时，出现警告：“FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value 'linux/riscv64'”。
+2. 启动生成的容器后，未显示 root 用户提示符，仅显示 “bash-5.2”。
+
+#问题根因
+容器启动后未显示 root 用户提示符是因为目标根文件系统中缺少 /root 目录及其初始化配置文件。
+
+#解决方案
+在 Dockerfile 的构建阶段添加以下命令以复制 skel 配置到 root 目录：
+cp /target/etc/skel /target/root -aT
+
+#来源
+https://forum.openeuler.org/t/topic/7315

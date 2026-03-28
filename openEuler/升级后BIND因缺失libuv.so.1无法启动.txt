@@ -1,0 +1,18 @@
+#标题
+升级后BIND因缺失libuv.so.1无法启动
+
+#内核版本
+openeuler2003sp3
+
+#问题现象
+从CentOS 7.4通过x2openeuler升级到openEuler 20.03 SP3后，启动BIND DNS服务时提示缺少libuv.so.1等文件，导致进程无法启动。
+
+#问题根因
+升级后系统中/usr/lib64/目录下的libuv.so.1等依赖库文件丢失，导致BIND二进制文件无法加载所需共享库。
+
+#解决方案
+1. 根据BIND启动报错信息，从备份文件夹中将缺失的libuv.so.1等文件拷贝至/usr/lib64/目录下，并设置文件权限为777。
+2. 或重新编译BIND以适配升级后系统中的新版本libuv库。
+
+#来源
+https://forum.openeuler.org/t/topic/1611

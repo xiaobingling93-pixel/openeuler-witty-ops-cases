@@ -1,0 +1,17 @@
+#标题
+openeuler2003sp3安装过程中NVMe设备PCI初始化失败导致anaconda引导错误
+
+#内核版本
+2003sp3
+
+#问题现象
+在华为2288H V3服务器上安装openEuler 2003sp3系统时，anaconda引导阶段报错，未进入LVM创建步骤；anaconda日志显示PCI初始化失败。
+
+#问题根因
+NVMe设备与系统安装引导过程中的PCI初始化存在兼容性问题，导致anaconda无法正常完成设备扫描和初始化。
+
+#解决方案
+在安装镜像的isolinux.cfg和grub.cfg配置文件中添加内核参数：modprobe.blacklist=c。
+
+#来源
+https://forum.openeuler.org/t/topic/1596

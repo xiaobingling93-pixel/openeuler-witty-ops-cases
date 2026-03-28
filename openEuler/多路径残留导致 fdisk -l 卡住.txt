@@ -1,0 +1,19 @@
+#标题
+多路径残留导致 fdisk -l 卡住
+
+#内核版本
+4.19.90-2112.8.0.0131.oe1.aarch64
+
+#问题现象
+执行 fdisk -l 命令时卡住；系统中存在已从存储侧取消映射的磁盘对应的多路径设备（如 /dev/mapper/mpathh）残留信息；执行 multipath -f 清除时提示 "map in use"；lsof 显示 pvdisplay 和 lvm 进程正在占用该多路径设备。
+
+#问题根因
+已取消映射的磁盘在主机侧仍保留多路径设备信息，且被 LVM 相关进程（pvdisplay、lvm）持续占用，导致无法正常清理并使 fdisk -l 卡住。
+
+#解决方案
+1. 使用 lsof /dev/mapper/mpathh 识别占用该多路径设备的进程。
+2. 终止占用该设备的 LVM 相关进程（如 pvdisplay、lvm）。
+3. 执行 multipath -f /dev/mapper/mpathh 清除残留的多路径设备。
+
+#来源
+https://forum.openeuler.org/t/topic/5752

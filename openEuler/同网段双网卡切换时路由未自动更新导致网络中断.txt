@@ -1,0 +1,32 @@
+#标题
+同网段双网卡切换时路由未自动更新导致网络中断
+
+#内核版本
+未知
+
+#问题现象
+在openEuler 22.03 LTS（及20.03系列）系统中，当两个网口配置为同一网段的不同静态IP并同时激活时，拔掉当前默认路由所用网口（如eno1）的网线后，系统无法自动切换至另一网口（如eno2）通信，表现为无法ping通网关。路由表中已断开的eno1接口路由仍保留且Metric值更低，导致流量继续尝试从已断开的接口发出。
+
+#问题根因
+操作系统在网口物理链路断开后未能及时更新路由表，导致默认路由仍指向已失效的网卡接口。
+
+#解决方案
+1. 使用bond mode 6（adaptive load balancing）实现双网卡自动切换：
+   - 创建bond6连接并配置静态IP与网关：
+     ```bash
+     nmcli connection add con-name bond6 ifname bond6 type bond mode 6 ipv4.method static ipv4.addresses 172.168.3.5/24 ipv4.gateway 172.168.3.254
+     ```
+   - 将两个物理网口（如eno1、eno2）添加为bond6的slave：
+     ```bash
+     nmcli connection add type bond-slave ifname eno1 master bond6
+     nmcli connection add type bond-slave ifname eno2 master bond6
+     ```
+   - 禁用物理网口的自动连接：
+     ```bash
+     nmcli connection modify eno1 connection.autoconnect no
+     nmcli connection modify eno2 connection.autoconnect no
+     ```
+2. 重启系统后，所有流量通过bond6接口，任意网口插拔均可保持网络连通。
+
+#来源
+https://forum.openeuler.org/t/topic/6152

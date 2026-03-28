@@ -1,0 +1,17 @@
+#标题
+5.10内核下虚拟机运行vdbench报BAD_READ_RETURN错误
+
+#内核版本
+5.10.0-2-openeuler
+
+#问题现象
+在openEuler 5.10.0-2-openeuler内核的超融合主机上，虚拟机执行vdbench测试时反复出现“BAD_READ_RETURN: 'Read was successful, but data buffer contents not changed'”错误；该错误表示read()系统调用返回成功，但读缓冲区内容未被更新。问题在多种存储类型（ssd-lvm-thin、nvme-lvm-thin、raid-lvm、zfs）下均可复现，且在RAID盘上复现概率更高。相同测试在主机本地运行或使用6.1.62-generic内核则不会出现此错误。
+
+#问题根因
+5.10.0-2-openeuler内核在虚拟化环境下存在I/O处理缺陷，导致read()系统调用虽返回成功但未实际填充缓冲区数据，破坏了vdbench对读操作可靠性的基本假设。
+
+#解决方案
+将主机内核从5.10升级至6.1.62-generic或更高版本可消除该问题。
+
+#来源
+https://forum.openeuler.org/t/topic/18893

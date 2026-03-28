@@ -1,0 +1,18 @@
+#标题
+JSch连接openEuler 22.03SP1 SSH服务失败：算法协商失败
+
+#内核版本
+22.03SP1
+
+#问题现象
+使用最新版JSch客户端连接openEuler 22.03SP1系统的SSH服务时，报错“com.jcraft.jsch.JSchException: Algorithm negotiation fail”，即使已统一客户端与服务端的加密算法仍无法建立连接。
+
+#问题根因
+openEuler 22.03SP1默认SSH配置未启用ssh-rsa公钥算法，而JSch客户端依赖该算法进行密钥交换，导致算法协商失败。
+
+#解决方案
+1. 编辑/etc/ssh/sshd_config文件，在HostKeyAlgorithms和PubkeyAcceptedKeyTypes配置项中显式添加ssh-rsa。
+2. 修改后执行systemctl restart sshd重启SSH服务。
+
+#来源
+https://forum.openeuler.org/t/topic/2636

@@ -1,0 +1,17 @@
+#标题
+升级欧拉后进程启动报libnsl.so.1库文件缺失
+
+#内核版本
+未知
+
+#问题现象
+进程启动时报错：error while loading shared libraries: libnsl.so.1: cannot open shared object file: No such file or directory
+
+#问题根因
+openEuler中libnsl.so.1由libnsl软件包提供，而升级后该软件包未安装，导致库文件缺失。
+
+#解决方案
+手动安装libnsl：yum -y install libnsl
+
+#来源
+https://forum.openeuler.org/t/topic/3318

@@ -1,0 +1,26 @@
+#标题
+vm.cache_reclaim_enable与vm.cache_reclaim_ratio参数配置无效导致PageCache无法回收
+
+#内核版本
+5.10.0-60.18.0.50.oe2203.aarch64
+
+#问题现象
+在openEuler-22.03-LTS ARM64系统上运行Kafka服务持续生产消费，PageCache占用内存达200GB（总内存256GB）。客户设置vm.cache_reclaim_enable=1和vm.cache_reclaim_ratio=50后，PageCache未被回收，仍维持高位。此外，该内核版本中存在的cache_reclaim_ratio参数在后续22.03-LTS-SPx版本中已不存在。
+
+#问题根因
+PageCache回收功能需同时配置pagecache_reclaim_enable（即cache_reclaim_enable）和pagecache_limit_ratio（即cache_limit_ratio）两个必要参数才能生效，仅设置cache_reclaim_enable与cache_reclaim_ratio不足以触发回收；且cache_reclaim_ratio参数在后期内核版本中已被移除，其功能拆分为基于cache_limit_mbytes、cache_reclaim_s和cache_reclaim_weight的周期性与上限回收机制。
+
+#解决方案
+1. 启用PageCache回收必须配置以下参数：
+   - cache_reclaim_enable=1（使能PageCache限制功能）
+   - cache_limit_ratio=N（非零值，设定PageCache回收阈值）
+   - （可选）cache_reclaim_ratio=M（激进回收水位，不建议使用）
+
+2. 在新版本系统中，应使用以下替代参数：
+   - cache_reclaim_enable=1（使能开关）
+   - cache_limit_mbytes=X（以MB为单位设置PageCache上限）
+   - cache_reclaim_s=Y（以秒为单位设置周期性回收间隔）
+   - cache_reclaim_weight=Z（设置每次回收的权值）
+
+#来源
+https://forum.openeuler.org/t/topic/4586

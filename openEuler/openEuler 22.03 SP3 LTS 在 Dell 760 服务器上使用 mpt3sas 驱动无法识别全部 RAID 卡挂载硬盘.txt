@@ -1,0 +1,22 @@
+#标题
+openEuler 22.03 SP3 LTS 在 Dell 760 服务器上使用 mpt3sas 驱动无法识别全部 RAID 卡挂载硬盘
+
+#内核版本
+22.03sp3
+
+#问题现象
+Dell 760 服务器通过 RAID 卡挂载 22 块硬盘，在 openEuler 22.03 SP3 LTS 系统中仅能识别部分硬盘：  
+- 使用系统自带的 mpt3sas 35.100 驱动时，只能识别 10 块盘；  
+- 升级至 mpt3sas 52.00 驱动后可识别全部硬盘，但出现掉盘现象；  
+- 使用 mpt3sas 43.00.02.00 驱动时，仍有一块盘无法识别。  
+而在 CentOS 8.4（内核 4.18）配合 mpt3sas 35.101 驱动时，所有硬盘均可正常识别且无掉盘。
+
+#问题根因
+openEuler 22.03 SP3 LTS 内核所集成或兼容的 mpt3sas 驱动版本存在与 Dell 760 服务器 RAID 卡在多盘拓扑结构下的兼容性缺陷，而 Red Hat 在其 mpt3sas 35.101 驱动中已通过额外补丁修复该问题。
+
+#解决方案
+1. 在 openEuler 系统上编译并安装 CentOS 8.4 所使用的 mpt3sas 35.101 驱动版本（含 Red Hat 补丁）；
+2. 或临时采用 CentOS 8.4 系统部署以规避该兼容性问题。
+
+#来源
+https://forum.openeuler.org/t/topic/7931

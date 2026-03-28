@@ -1,0 +1,18 @@
+#标题
+libguestfs 缺失 virt-tar-in 和 virt-tar-out 命令
+
+#内核版本
+2403sp2
+
+#问题现象
+在 openEuler-24.03-LTS、2403SP1 和 2403SP2 系统中安装 libguestfs-1.49.5 后，执行 `rpm -ql libguestfs | grep bin` 发现缺少 /usr/bin/virt-tar-in 和 /usr/bin/virt-tar-out 命令；而 Fedora 版本中该命令存在。
+
+#问题根因
+升级时误删了 virt-tar-in 和 virt-tar-out 命令。
+
+#解决方案
+1. 等待官方修复并更新 libguestfs 软件包。
+2. 回归测试已通过，确认修复有效（依据第3楼信息，表明修复已合入）。
+
+#来源
+https://forum.openeuler.org/t/topic/18756

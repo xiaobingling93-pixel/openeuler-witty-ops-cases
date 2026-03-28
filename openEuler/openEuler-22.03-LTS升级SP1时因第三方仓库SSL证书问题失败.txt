@@ -1,0 +1,17 @@
+#标题
+openEuler-22.03-LTS升级SP1时因第三方仓库SSL证书问题失败
+
+#内核版本
+22.03-LTS-SP1
+
+#问题现象
+执行 dnf update 升级系统时，报错无法下载 packages-microsoft-com-prod 仓库的元数据，具体错误为“Curl error (60): SSL peer certificate or SSH remote key was not OK”和“SSL certificate problem: unable to get local issuer certificate”，导致升级流程中断。
+
+#问题根因
+系统中配置了第三方仓库 packages-microsoft-com-prod，其SSL证书无法被本地信任链验证，导致dnf在获取仓库元数据时失败。
+
+#解决方案
+1. 删除或注释掉 /etc/yum.repos.d/ 目录下与 packages-microsoft-com-prod 相关的仓库配置文件，避免其干扰 openEuler 系统升级。
+
+#来源
+https://forum.openeuler.org/t/topic/3074

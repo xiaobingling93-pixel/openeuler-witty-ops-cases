@@ -1,0 +1,21 @@
+#标题
+x2openEuler升级前检查中断因yum源过期
+
+#内核版本
+未知
+
+#问题现象
+执行x2openEuler升级前检查（第二步）时检查中断，日志显示“在节点上执行矛盾检查失败”
+
+#问题根因
+使用的yum源为2021年的旧版本且长期未更新，导致repodata不一致，引发矛盾检查失败
+
+#解决方案
+1. 更换为华为云提供的最新openEuler-20.03-LTS-SP1 yum源  
+2. 配置以下repo源地址并启用：
+   - [openEuler-everything] baseurl=http://mirrors.huaweicloud.com/openeuler/openEuler-20.03-LTS-SP1/everything/x86_64/
+   - [openEuler-EPOL] baseurl=http://mirrors.huaweicloud.com/openeuler/openEuler-20.03-LTS-SP1/EPOL/x86_64/
+   - [openEuler-2003-lts-sp1-update] baseurl=http://mirrors.huaweicloud.com/openeuler/openEuler-20.03-LTS-SP1/update/x86_64/
+
+#来源
+https://forum.openeuler.org/t/topic/3826

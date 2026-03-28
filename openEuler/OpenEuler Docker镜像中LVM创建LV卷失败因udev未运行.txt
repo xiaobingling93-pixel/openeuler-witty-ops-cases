@@ -1,0 +1,18 @@
+#标题
+OpenEuler Docker镜像中LVM创建LV卷失败因udev未运行
+
+#内核版本
+未知
+
+#问题现象
+在OpenEuler Docker镜像中安装LVM后，执行 lvcreate 命令创建逻辑卷时报错：“/dev/lvmvg/test1: not found: device not cleared” 和 “Aborting. Failed to wipe start of new LV.”；启用 -vvv 选项后显示 “Udev is not running. Not using udev synchronisation code.”
+
+#问题根因
+OpenEuler Docker镜像中的LVM工具默认启用udev同步机制，但容器内未运行udev服务，导致LVM无法完成设备清理和同步操作。
+
+#解决方案
+1. 在容器中启动udev服务；或  
+2. 修改容器内 /etc/lvm/lvm.conf 配置文件，将 udev_sync 和 udev_rules 参数均设为 0。
+
+#来源
+https://forum.openeuler.org/t/topic/4227

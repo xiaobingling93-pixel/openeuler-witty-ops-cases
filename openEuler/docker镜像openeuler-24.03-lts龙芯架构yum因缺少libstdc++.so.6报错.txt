@@ -1,0 +1,20 @@
+#标题
+docker镜像openeuler-24.03-lts龙芯架构yum因缺少libstdc++.so.6报错
+
+#内核版本
+24.03-LTS
+
+#问题现象
+在openEuler 24.03-LTS的riscv64 Docker镜像中执行yum命令时报错：ImportError: libstdc++.so.6: cannot open shared object file: No such file or directory
+
+#问题根因
+容器中libstdc++.so.6位于/usr/lib/目录，而yum/dnf在/usr/lib64/目录中查找64位库，导致找不到该共享库文件。
+
+#解决方案
+1. 创建符号链接：ln -s /usr/lib/libstdc++.so.6 /usr/lib64/libstdc++.so.6  
+2. 验证链接：ls -l /usr/lib64/libstdc++.so.6  
+3. 更新库缓存：ldconfig  
+4. 重新运行yum命令
+
+#来源
+https://forum.openeuler.org/t/topic/5294

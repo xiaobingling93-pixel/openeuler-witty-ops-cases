@@ -1,0 +1,20 @@
+#标题
+openEuler 23.09 图形界面用户设置无法点击且需配置自动登录
+
+#内核版本
+23.09
+
+#问题现象
+在 openEuler 23.09 x86_64 系统中，图形界面“设置”里的用户设置选项无法使用，点击后界面转圈无响应；用户希望实现带密码的用户自动登录功能。
+
+#问题根因
+系统使用 gdm 作为显示管理器，但未在 /etc/gdm/custom.conf 中启用 AutomaticLogin 配置，导致图形界面用户设置功能异常且无法自动登录。
+
+#解决方案
+1. 编辑配置文件 /etc/gdm/custom.conf，在 [daemon] 节点下添加以下两行：
+   AutomaticLoginEnable=True
+   AutomaticLogin=root
+2. 重启主机使配置生效。
+
+#来源
+https://forum.openeuler.org/t/topic/2811

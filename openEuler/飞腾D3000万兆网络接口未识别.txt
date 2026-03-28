@@ -1,0 +1,18 @@
+#标题
+飞腾D3000万兆网络接口未识别
+
+#内核版本
+24.03-LTS-SP2
+
+#问题现象
+飞腾D3000安装OpenEuler操作系统后，系统未正确生成万兆网络接口。
+
+#问题根因
+系统缺少对飞腾D3000万兆网络接口（USXGMII）的phytium网卡驱动支持。
+
+#解决方案
+1. 从 https://gitee.com/openeuler/kernel/tree/openEuler-24.03-LTS-SP2 下载 drivers/net/ethernet/phytium 目录下的驱动源码；
+2. 编译并加载该驱动后，万兆网络接口可被正确识别。
+
+#来源
+https://forum.openeuler.org/t/topic/18814

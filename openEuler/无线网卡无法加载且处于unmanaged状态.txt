@@ -1,0 +1,19 @@
+#标题
+无线网卡无法加载且处于unmanaged状态
+
+#内核版本
+未知
+
+#问题现象
+安装openEuler 25或24后，无线网卡驱动iwlwifi-9000-pu-b0-jf-b0-46.ucode已正常加载，但nmcli dev显示网卡始终处于unmanaged状态；执行更新initramfs（sudo dracut --force）并重启后，dmesg中firmware loaded日志仍无法解决问题。
+
+#问题根因
+缺少必要的linux-firmware-iwlwifi固件包导致无线网卡虽加载驱动但无法被NetworkManager管理。
+
+#解决方案
+1. 安装完整的linux-firmware*包，特别是linux-firmware-iwlwifi-20250708-2.oe2403.noarch；
+2. 确保已安装NetworkManager-wifi、wpa_supplicant和libnl3等RPM包；
+3. 启用并启动wpa_supplicant服务。
+
+#来源
+https://forum.openeuler.org/t/topic/18580

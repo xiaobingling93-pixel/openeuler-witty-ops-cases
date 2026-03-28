@@ -1,0 +1,18 @@
+#标题
+x2openEuler迁移工具缺少openEuler22.03-LTS-SP3数据库包导致任务中断
+
+#内核版本
+未知
+
+#问题现象
+在使用x2openEuler-core-3.0.0-20240125.x86_64.rpm执行从CentOS 7.9到openEuler 22.03-LTS-SP3的迁移检查时，任务中断，日志显示上传安装包异常：“SCP File not find exception”，具体缺失文件为/etc/x2openEuler/rpms/databases/x2openEuler-database-openEuler22.03-LTS-SP3-2.0.0.630-1.noarch.rpm，该文件在服务端本地及官方仓库中均未找到。
+
+#问题根因
+openEuler 22.03 LTS SP3 对应的 x2openEuler 数据库包尚未发布至官方仓库，导致迁移工具无法获取所需依赖包。
+
+#解决方案
+1. 先升级到 openEuler 22.03 LTS，再通过 yum update 升级至 SP3；
+2. 或等待官方发布 openEuler 22.03 LTS SP3 对应的 x2openEuler 数据库包后再执行迁移。
+
+#来源
+https://forum.openeuler.org/t/topic/4102

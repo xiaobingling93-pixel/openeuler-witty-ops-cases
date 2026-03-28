@@ -1,0 +1,20 @@
+#标题
+openEuler 24.03 LTS SP2软件包校验和不匹配
+
+#内核版本
+24.03sp2
+
+#问题现象
+执行 dnf -y upgrade --refresh 时，下载 libstdc++-devel-12.3.1-98.oe2403sp2.x86_64.rpm 成功，但校验和不匹配：计算得到的 SHA256 为 a7e4cf10ab4ba1599e1a544f62d8ecde048b7a38770df471394185bf63aea766，而预期值为 bf65f533e5e7b63d9ca724f1e97072056a4649aaeeb201e2a1f7372f966dd8ce。
+
+#问题根因
+用户使用的软件源配置不正确或缓存未清理，导致下载的软件包与官方仓库中实际提供的包不一致。
+
+#解决方案
+1. 确认 repo 配置是否正确，使用官方推荐的 baseurl：
+   https://dl-cdn.openeuler.openatom.cn/openEuler-24.03-LTS-SP2/update/$basearch/
+2. 执行 dnf clean all 清理缓存后重试。
+3. 更换为正确的软件源后问题解决。
+
+#来源
+https://forum.openeuler.org/t/topic/18874

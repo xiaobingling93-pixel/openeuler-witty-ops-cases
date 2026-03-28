@@ -1,0 +1,19 @@
+#标题
+机器重启后磁盘盘符发生变更
+
+#内核版本
+5.10
+
+#问题现象
+在openEuler 22.03-LTS系统中安装两块硬盘，初始通过lsblk命令显示为sda和sdb；机器重启后，sda与sdb盘符互换。
+
+#问题根因
+4.19内核升级到5.10内核后，由于引导内在逻辑的变化，导致重启后磁盘盘符变化的概率变高。
+
+#解决方案
+1. 使用磁盘ID进行磁盘操作：ls /dev/disk/by-id -l  
+2. 使用挂载路径进行磁盘操作：ls /dev/disk/by-path -l  
+3. 使用文件系统UUID进行磁盘操作：ls /dev/disk/by-uuid -l
+
+#来源
+https://forum.openeuler.org/t/topic/687

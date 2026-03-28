@@ -1,0 +1,18 @@
+#标题
+glibc线程缓存导致业务进程内存占用过高
+
+#内核版本
+20.03-LTS-SP3
+
+#问题现象
+部署在openEuler上的业务进程相比CentOS内存占用明显偏高，64MB以下的小内存申请次数显著增多，内存碎片化严重，在业务高峰期存在OOM宕机风险。
+
+#问题根因
+openEuler使用的高版本glibc（2.26及以上）默认启用了per-thread cache（tcache）特性，导致小内存频繁申请和内存碎片化，从而引发内存占用过高。
+
+#解决方案
+1. 在启动程序前设置环境变量：在bash_profile中添加 GLIBC_TUNABLEs=glibc.malloc.tcache_count=0 以关闭线程缓存。
+2. 进程启动后通过检查 /proc/pid/environ 确认环境变量已生效。
+
+#来源
+https://forum.openeuler.org/t/topic/2473

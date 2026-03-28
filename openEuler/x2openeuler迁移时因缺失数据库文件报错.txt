@@ -1,0 +1,20 @@
+#标题
+x2openeuler迁移时因缺失数据库文件报错
+
+#内核版本
+未知
+
+#问题现象
+执行x2openeuler迁移时提示“/etc/x2openEuler/database_2.0.0.630/centos7.9/x86_64/primary not exits, please check whether the database is imported”，辅助机上缺少centos7.9相关数据库目录。
+
+#问题根因
+Redhat7.9升级至BC-Linux for Euler21.10过程中，辅助机未安装centos7.9对应的x2openeuler数据库RPM包，导致/etc/x2openEuler/database_2.0.0.630/目录下缺失centos7.9文件。
+
+#解决方案
+1. 上传以下两个RPM包至辅助机：
+   - x2openEuler-database-centos7.9-openEuler20.03-LTS-SP1-xxxxx.rpm
+   - x2openEuler-database-centos7.9-xxxxx.rpm
+2. 使用命令 rpm -ivh 完成安装。
+
+#来源
+https://forum.openeuler.org/t/topic/2572

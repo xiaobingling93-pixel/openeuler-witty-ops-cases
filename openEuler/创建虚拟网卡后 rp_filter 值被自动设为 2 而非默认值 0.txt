@@ -1,0 +1,18 @@
+#标题
+创建虚拟网卡后 rp_filter 值被自动设为 2 而非默认值 0
+
+#内核版本
+未知
+
+#问题现象
+在 openEuler-22.03-LTS 环境中，通过命令创建虚拟网卡后，其 rp_filter 值被设为 2，而非系统默认值 0；而在 openEuler-20.03-LTS-SP1 和 CentOS 8 中创建的虚拟网卡 rp_filter 值保持默认值 0。经观测，虚拟网卡刚创建时 rp_filter 为 0，随后被修改为 2。
+
+#问题根因
+openEuler-22.03-LTS 使用的 systemd 版本 ≥248，在 /usr/lib/sysctl.d/50-default.conf 文件中显式设置了 net.ipv4.conf.*.rp_filter=2，该配置优先级高于 /proc/sys/net/ipv4/conf/default/rp_filter 的默认值，导致新创建的虚拟网卡 rp_filter 被覆盖为 2。
+
+#解决方案
+1. 编辑 /usr/lib/sysctl.d/50-default.conf 文件，注释掉其中设置 rp_filter=2 的行；
+2. 手动修改 /proc/sys/net/ipv4/conf/default/rp_filter 的值为所需默认值。
+
+#来源
+https://forum.openeuler.org/t/topic/686

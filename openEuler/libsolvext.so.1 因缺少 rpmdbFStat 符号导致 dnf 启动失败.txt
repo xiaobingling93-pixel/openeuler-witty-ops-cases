@@ -1,0 +1,22 @@
+#标题
+libsolvext.so.1 因缺少 rpmdbFStat 符号导致 dnf 启动失败
+
+#内核版本
+未知
+
+#问题现象
+执行 `sudo dnf update` 时出现 ImportError，报错信息为 `/usr/lib64/libsolvext.so.1: undefined symbol: rpmdbFStat`，随后引发 `ModuleNotFoundError: No module named '_common_types'`，导致 dnf 无法启动。
+
+#问题根因
+系统中安装的 libsolvext.so.1 依赖 rpm 库中的 rpmdbFStat 符号，但当前 rpm 相关包版本不匹配或缺失，导致该符号未定义。
+
+#解决方案
+1. 从 openEuler-22.03-LTS 官方镜像站下载并强制安装以下 RPM 包（使用 `sudo rpm -Uvh --nodeps --force *.rpm`）：
+   - libsolv-*.rpm
+   - rpm-*.rpm（包括 rpm-libs、rpm-common）
+   - python3-*.rpm
+   - libffi-*.rpm
+   - lua-*.rpm（提供 liblua-5.4.so）
+
+#来源
+https://forum.openeuler.org/t/topic/18964

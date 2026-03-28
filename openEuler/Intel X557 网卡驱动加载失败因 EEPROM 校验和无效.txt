@@ -1,0 +1,18 @@
+#标题
+Intel X557 网卡驱动加载失败因 EEPROM 校验和无效
+
+#内核版本
+24.03 LTS
+
+#问题现象
+系统识别到 Intel X557-AT2 网卡设备（PCI 地址 0000:03:00.0），但加载 ixgbe 驱动时失败，dmesg 日志显示 “The EEPROM Checksum Is Not Valid” 和 “probe of 0000:03:00.0 failed with error -5”。尝试安装 i40e 驱动、手动编译 Intel 官方 ixgbe-5.21.6 驱动均无法解决。
+
+#问题根因
+网卡的 EEPROM 校验和无效，导致 ixgbe 驱动探测失败。
+
+#解决方案
+1. 使用超微（Supermicro）提供的 NVM 固件升级工具更新网卡固件。
+2. 升级后使用系统默认驱动即可正常使用。
+
+#来源
+https://forum.openeuler.org/t/topic/6419

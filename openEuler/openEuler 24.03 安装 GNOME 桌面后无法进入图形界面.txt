@@ -1,0 +1,17 @@
+#标题
+openEuler 24.03 安装 GNOME 桌面后无法进入图形界面
+
+#内核版本
+24.03
+
+#问题现象
+安装 openEuler 24.03 后，在字符界面完成系统安装，尝试安装 DDE 或 UKUI 桌面环境均无法正常启动；按照官方文档安装 GNOME 桌面并重启后，系统报错且无法进入 GNOME 图形界面。
+
+#问题根因
+GNOME 桌面环境在 openEuler 24.03 中默认显示管理器 GDM 存在兼容性问题，导致图形界面无法正常启动。
+
+#解决方案
+1. 将显示管理器从 GDM 切换为 LightDM。
+
+#来源
+https://forum.openeuler.org/t/topic/4693

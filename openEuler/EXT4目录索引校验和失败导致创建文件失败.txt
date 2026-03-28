@@ -1,0 +1,20 @@
+#标题
+EXT4目录索引校验和失败导致创建文件失败
+
+#内核版本
+20.03-LTS-SP3
+
+#问题现象
+在ARM64平台使用64KB块大小的EXT4文件系统，当目录中创建约2000万个文件时，系统日志反复报错：“EXT4-fs error: ext4_dx_csum_verify: dir seems corrupt? Run e2fsck -D”和“Directory index failed checksum”，且创建文件操作失败。错误涉及inode #686223488，设备为dm-5。
+
+#问题根因
+在64KB块大小的EXT4文件系统中，当目录索引树（dir_index tree）的dx_node填满并新增节点时，fake dentry的rec_len被设为65535（因uint16最大值限制），但在get_dx_countlimit函数中比较rec_len与块大小（65536）时因不相等而返回NULL，导致该dx_node未设置校验和，后续访问时校验失败触发错误。
+
+#解决方案
+1. 应用社区已提交的补丁，修改get_dx_countlimit中的比较逻辑，使用ext4_rec_len_from_disk()将rec_len转换回原始块大小（65536）后再进行判断。
+2. 相关补丁链接：
+   - V1: https://lore.kernel.org/lkml/20230729061357.1702891-1-zhangshida@kylinos.cn/T/
+   - V2: https://lore.kernel.org/lkml/20230730024409.1738559-1-zhangshida@kylinos.cn/t/
+
+#来源
+https://forum.openeuler.org/t/topic/2470

@@ -1,0 +1,18 @@
+#标题
+firewalld与Docker规则冲突导致容器业务异常
+
+#内核版本
+未知
+
+#问题现象
+在openEuler 22.09上开启firewalld并仅开放80端口后，原CentOS 7.9迁移的Docker容器业务报错无法正常运行；关闭firewalld后恢复正常。firewalld日志中出现警告：COMMAND_FAILED: '/usr/sbin/iptables -w10 -t filter -X DOCKER-ISOLATION' failed: iptables: No chain/target/match by that name。
+
+#问题根因
+firewalld未正确加载或维护Docker所需的iptables链（如DOCKER-ISOLATION），导致Docker容器网络规则缺失，引发业务异常。
+
+#解决方案
+1. 关闭firewalld服务。
+2. 启用iptables并手动开放80端口，使容器恢复正常运行。
+
+#来源
+https://forum.openeuler.org/t/topic/6364

@@ -1,0 +1,20 @@
+#标题
+oebuild bitbake 构建时因权限不足无法写入构建目录
+
+#内核版本
+未知
+
+#问题现象
+执行 oebuild bitbake openeuler-image 时失败，报错信息为：“Error: Cannot write to /home/openeuler/build/build_arm64, perhaps try sourcing with a writable path? i.e. . oe-init-build-env ~/my-build”。容器已正常运行，/home/openeuler 目录存在，但构建过程无写入权限。
+
+#问题根因
+构建目录 /home/openeuler/build/build_arm64 所在路径未正确设置属主为 openeuler 用户，导致以 openeuler 用户身份运行构建命令时无写权限。
+
+#解决方案
+1. 将构建目录所在路径（如 /usr1）的所属用户改为 openeuler：  
+   chown -R openeuler:users /usr1  
+2. 切换至 openeuler 用户后再执行构建命令：  
+   su openeuler
+
+#来源
+https://forum.openeuler.org/t/topic/6434

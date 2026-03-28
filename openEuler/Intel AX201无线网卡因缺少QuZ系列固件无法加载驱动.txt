@@ -1,0 +1,24 @@
+#标题
+Intel AX201无线网卡因缺少QuZ系列固件无法加载驱动
+
+#内核版本
+5.10.0-136.15.0.91.oe2203sp1
+
+#问题现象
+系统启动时iwlwifi驱动报错“Direct firmware load for iwlwifi-QuZ-a0-hr-b0-*.ucode failed with error -2”，最终提示“no suitable firmware found!”；日志显示设备需要固件版本范围为iwlwifi-QuZ-a0-hr-b0-39至59，但/lib/firmware/目录下仅存在Qu-b0系列固件（如iwlwifi-Qu-b0-hr-b0-48.ucode），导致WiFi功能不可用，系统无法检测到无线网卡。
+
+#问题根因
+系统缺少Intel AX201网卡所需的iwlwifi-QuZ-a0-hr-b0系列固件文件，已安装的Qu-b0系列固件与硬件不兼容。
+
+#解决方案
+1. 下载最新linux-firmware包：  
+   curl -OL https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-20230404.tar.gz  
+2. 解压该压缩包：  
+   tar xf linux-firmware-20230404.tar.gz  
+3. 将所需QuZ系列固件复制到系统固件目录：  
+   cp linux-firmware-20230404/iwlwifi-QuZ-* /lib/firmware/  
+4. 安装无线网络管理组件（若未安装）：  
+   sudo dnf install NetworkManager-wifi
+
+#来源
+https://forum.openeuler.org/t/topic/294

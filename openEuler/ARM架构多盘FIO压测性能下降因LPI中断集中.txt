@@ -1,0 +1,20 @@
+#标题
+ARM架构多盘FIO压测性能下降因LPI中断集中
+
+#内核版本
+4.19
+
+#问题现象
+在ARM架构（鲲鹏920）环境下使用fio对8块远端云盘进行7:3混合读写压测时，性能明显下降；中断均集中在CPU 0、32、64核心上，导致处理中断的CPU被压满，单核响应中断出现瓶颈；手动修改中断亲和性失败，报错显示LPI中断带有IRQD_AFFINITY_MANAGED标志，用户态无法设置亲和性。
+
+#问题根因
+ARM架构下ITS驱动在映射LPI中断时，从中断亲和性列表与在线CPU交集中选择第一个CPU（通常为CPU0），导致多个LPI中断集中到少数核心；而x86架构APIC中断具备负载均衡机制，未出现此问题。
+
+#解决方案
+1. 合入以下内核补丁：
+   - 2f13ff1d1d (“irqchip/gic-v3-its: Track LPI distribution on a per CPU basis”)
+   - c5d6082d3 (“irqchip/gic-v3-its: Balance initial LPI affinity across CPUs”)
+2. 重新编译内核后，LPI中断可自动散列到各CPU核心，实现负载均衡，解决中断瓶颈问题。
+
+#来源
+https://forum.openeuler.org/t/topic/1506

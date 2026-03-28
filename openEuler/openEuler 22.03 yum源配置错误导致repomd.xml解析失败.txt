@@ -1,0 +1,19 @@
+#标题
+openEuler 22.03 yum源配置错误导致repomd.xml解析失败
+
+#内核版本
+未知
+
+#问题现象
+执行yum update等命令时，报错“Error: Failed to download metadata for repo ‘os’: repomd.xml parser error: Parse error at line: 3 (EntityRef: expecting ‘;’”
+
+#问题根因
+yum源配置文件中baseurl与gpgkey路径不匹配，且gpgkey指向了everything仓库的密钥而baseurl指向OS仓库，导致元数据解析失败。
+
+#解决方案
+1. 使用系统默认提供的正确openEuler.repo配置，确保每个仓库的baseurl与gpgkey路径一致。
+2. 对于[OS]仓库，应设置baseurl为http://repo.openeuler.org/openEuler-22.03-LTS/OS/$basearch/，gpgkey为http://repo.openeuler.org/openEuler-22.03-LTS/OS/$basearch/RPM-GPG-KEY-openEuler。
+3. 启用gpgcheck=1以确保包签名验证正常。
+
+#来源
+https://forum.openeuler.org/t/topic/6793

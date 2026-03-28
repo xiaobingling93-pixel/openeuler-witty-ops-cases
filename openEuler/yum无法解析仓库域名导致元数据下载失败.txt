@@ -1,0 +1,20 @@
+#标题
+yum无法解析仓库域名导致元数据下载失败
+
+#内核版本
+22.03 LTS SP2
+
+#问题现象
+执行 yum -y install tar 命令时，报错无法解析 mirrors.openeuler.org 和 repo.openeuler.org 域名，提示 "Curl error (6): Couldn't resolve host name"，最终失败于下载 repo 'OS' 的 repomd.xml 元数据。
+
+#问题根因
+系统无法解析 openEuler 官方仓库域名，导致 yum 无法获取软件源元数据。
+
+#解决方案
+1. 更换为可用的软件源（如华为云提供的 repo 源）。
+2. 检查网络连通性（例如 ping 8.8.8.8）。
+3. 检查 DNS 配置或 /etc/hosts 文件是否正确。
+4. 检查 /etc/yum.repos.d/ 下的软件仓库配置文件。
+
+#来源
+https://forum.openeuler.org/t/topic/2763

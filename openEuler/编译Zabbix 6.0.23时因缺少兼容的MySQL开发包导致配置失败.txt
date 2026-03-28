@@ -1,0 +1,19 @@
+#标题
+编译Zabbix 6.0.23时因缺少兼容的MySQL开发包导致配置失败
+
+#内核版本
+22.03-LTS-SP2
+
+#问题现象
+执行 Zabbix 6.0.23 的 ./configure 命令（启用 MySQL 支持）时报错 “MySQL library not found”；系统已安装 MySQL Community Server 8.0.35 及相关 RPM 包，但未安装 mysql-devel；尝试通过 openEuler 官方源安装 mysql-devel-8.0.29 时因与已安装的 mysql-community-libs-8.0.35 版本冲突而失败。
+
+#问题根因
+使用 MySQL 官方提供的 8.0.35 RPM 包安装数据库后，缺少对应的 mysql-devel 开发包；而 openEuler 源中提供的 mysql-devel 包版本为 8.0.29，与已安装的 8.0.35 版本不兼容，导致依赖冲突，无法满足 Zabbix 编译所需的 MySQL 库头文件和链接库。
+
+#解决方案
+1. 卸载 MySQL 官方提供的 8.0.35 版本所有相关 RPM 包；
+2. 从 openEuler 22.03-LTS-SP2 官方源（如 https://mirrors.huaweicloud.com/openeuler/openEuler-22.03-LTS-SP2/everything/x86_64/Packages/）安装匹配的 mysql-8.0.29 及 mysql-devel-8.0.29 软件包；
+3. 重新执行 Zabbix 的 configure 和编译流程。
+
+#来源
+https://forum.openeuler.org/t/topic/2803

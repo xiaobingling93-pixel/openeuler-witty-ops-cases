@@ -1,0 +1,18 @@
+#标题
+kubectl exec -it 报 Unknown scheme: ws 错误
+
+#内核版本
+未知
+
+#问题现象
+在 openEuler 22.03-LTS-SP4 系统上使用 kubeadm 安装 Kubernetes 1.25.14 并配置 isulad 2.1.15 作为容器运行时后，执行 kubectl exec -it 命令（如 ping 集群 IP）时返回错误：error: unable to upgrade connection: error dialing backend: Unknown scheme: ws
+
+#问题根因
+isulad 容器运行时不支持 WebSocket（ws）协议，而 Kubernetes 的 exec/attach 等交互式操作依赖该协议与 kubelet 通信。
+
+#解决方案
+1. 将容器运行时从 isulad 切换为 containerd 或 Docker，以支持 WebSocket 协议。
+2. 或升级 isulad 至已修复该问题的版本（若官方已提供支持 ws 协议的版本）。
+
+#来源
+https://forum.openeuler.org/t/topic/18795

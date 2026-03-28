@@ -1,0 +1,19 @@
+#标题
+MongoDB在openEuler 22.03 SP3上因使用不兼容的Red Hat二进制包导致Illegal instruction错误
+
+#内核版本
+5.10.0-238.0.0.140.oe2203sp3
+
+#问题现象
+在openEuler 22.03 SP3系统上安装并运行从MongoDB官网下载的mongodb-linux-aarch64-rhel8-8.0.3.tgz包时，执行mongodb命令提示“Illegal instruction (core dumped)”。
+
+#问题根因
+用户使用了为Red Hat Enterprise Linux 8构建的MongoDB二进制包，该包与openEuler 22.03 SP3系统不兼容。
+
+#解决方案
+1. 使用openEuler软件中心提供的适配版本：  
+   - openEuler 22.03 SP3对应mongodb 5.0.0-1版本（链接：https://easysoftware.openeuler.org/zh/oepkg/detail?pkgId=openEuler-22.03-LTS-SP3extrasaarch64mongodb5.0.0-1aarch64）  
+   - 或尝试openEuler 22.03 SP2提供的mongodb 8.0.3-1版本（链接：https://easysoftware.openeuler.org/zh/oepkg/detail?pkgId=openEuler-22.03-LTS-SP2contribdatabaseaarch64mongodb8.0.3-1aarch64）
+
+#来源
+https://forum.openeuler.org/t/topic/7092

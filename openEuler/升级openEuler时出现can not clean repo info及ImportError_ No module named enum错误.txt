@@ -1,0 +1,20 @@
+#标题
+升级openEuler时出现can not clean repo info及ImportError: No module named enum错误
+
+#内核版本
+未知
+
+#问题现象
+- 手动在待升级节点执行 dnf clean all 命令报错  
+- 升级阶段日志报错 ImportError: No module named enum  
+- 系统升级前已安装 dnf，导致依赖冲突
+
+#问题根因
+系统升级前已安装 dnf 及 python2-dnf 包，与升级过程中的 Python 模块依赖冲突，导致无法加载 enum 模块并引发 repo 清理失败。
+
+#解决方案
+1. 在升级前卸载已安装的 dnf 和 python2-dnf 包：执行命令 yum -y remove dnf python2-dnf  
+2. 若存在手动配置的 OpenSSL 动态链接库路径干扰，需注释掉 /etc/ld.so.conf 中相关目录，并执行 ldconfig -v 重新加载动态链接库
+
+#来源
+https://forum.openeuler.org/t/topic/1820

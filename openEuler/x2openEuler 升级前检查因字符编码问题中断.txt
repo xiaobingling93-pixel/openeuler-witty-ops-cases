@@ -1,0 +1,18 @@
+#标题
+x2openEuler 升级前检查因字符编码问题中断
+
+#内核版本
+未知
+
+#问题现象
+在 CentOS 7.6 升级至 KylinSec-server-3.4-5 前执行 x2openEuler 升级检查时，任务中断并报错“软件兼容性信息收集失败”；日志 /var/log/x2openEuler-client/x2openEuler-client.log 显示因字符编码问题导致 JSON 文件生成失败；10 次尝试均复现该问题。
+
+#问题根因
+x2openEuler-client 的 utils.py 脚本中使用了 ISO-8859-1 字符编码处理含中文的数据，导致无法正确生成 JSON 结果文件。
+
+#解决方案
+1. 修改 /usr/local/x2openEuler-client/src/collect/collecttool/utils.py 脚本中的 encoding 参数为 "ISO-8859-1"。
+2. 重新打包 x2openEuler-client，将修正后的字符编码集成进安装包，以确保升级前检查能正常执行。
+
+#来源
+https://forum.openeuler.org/t/topic/857

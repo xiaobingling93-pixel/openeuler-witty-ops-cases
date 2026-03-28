@@ -1,0 +1,22 @@
+#标题
+OpenEuler 2203 SP1 离线安装 UKUI 因依赖缺失失败
+
+#内核版本
+2203SP1
+
+#问题现象
+执行 UKUI 离线安装时，yum 报错显示多个依赖包缺失，包括 pulseaudio-devel、libgnome-desktop-3.so.17()(64bit)、qt5-qtbase(x86-64) = 5.11.1、libQt5Gui.so.5(Qt_5.11.1_PRIVATE_API)(64bit)、libKF5WaylandClient.so.5()(64bit) 等，导致 ukui-settings-daemon-common、ukwm、libqtxdg、kf5-kwayland、peony 等关键组件无法安装；同时字体包如 dejavu-sans-fonts 等也无匹配。
+
+#问题根因
+UKUI 安装包在 openEuler 2203 SP1 上存在未满足的软件依赖关系，且离线环境中缺少这些依赖包。
+
+#解决方案
+1. 在可联网的同版本 openEuler 机器上执行：yum install --downloadonly --downloaddir=/root/soft ukui，提前创建 /root/soft 目录以下载所有依赖包。
+2. 将 /root/soft 目录中的 RPM 包拷贝至目标离线机器。
+3. 在离线机器上进入该目录并执行：rpm -ivh *.rpm 完成安装。
+4. 设置系统默认启动图形界面：systemctl set-default graphical.target。
+5. 重启系统：reboot。
+6. 验证重启后是否成功进入图形界面。
+
+#来源
+https://forum.openeuler.org/t/topic/4064

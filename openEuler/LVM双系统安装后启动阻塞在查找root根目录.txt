@@ -1,0 +1,18 @@
+#标题
+LVM双系统安装后启动阻塞在查找root根目录
+
+#内核版本
+6.4.0-10.1.0.20.oe2309.x86_64
+
+#问题现象
+采用LVM逻辑卷安装openEuler 23.09双系统后，系统启动时阻塞在查找root根目录的位置，无法继续启动。
+
+#问题根因
+手动通过chroot方式安装系统时未正确生成包含LVM支持的initramfs镜像，导致启动过程中无法识别LVM逻辑卷上的根文件系统。
+
+#解决方案
+执行dracut命令重新生成包含LVM模块的initramfs镜像：
+dracut -f /boot/initramfs-6.4.0-10.1.0.20.oe2309.x86_64.img 6.4.0-10.1.0.20.oe2309.x86_64
+
+#来源
+https://forum.openeuler.org/t/topic/2995

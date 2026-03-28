@@ -1,0 +1,19 @@
+#标题
+libguestfs-tools 软件包未安装导致相关命令缺失
+
+#内核版本
+6.6.0-72.0.0.76.oe2403sp1
+
+#问题现象
+在已安装 libguestfs、virt-manager 等一系列虚拟化相关软件包后，系统仍缺少 virt-format、virt-get-kernel、virt-index-validate、virt-resize、virt-ls、virt-sysprep、virt-win-reg 等命令。
+
+#问题根因
+缺失的命令属于 libguestfs-tools 软件包，该包未被安装。
+
+#解决方案
+运行以下命令确认并安装所需软件包：
+1. 执行 rpm -ql libguestfs-tools 查看该包提供的文件及命令；
+2. 若未安装，则通过包管理器安装 libguestfs-tools 软件包。
+
+#来源
+https://forum.openeuler.org/t/topic/18757

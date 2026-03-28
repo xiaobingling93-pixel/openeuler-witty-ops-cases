@@ -1,0 +1,23 @@
+#标题
+Peony文件管理器命令行无法访问未登录SMB地址及虚拟机粘贴文件报错问题
+
+#内核版本
+未知
+
+#问题现象
+1. Peony在命令行模式下无法直接访问未登录的SMB网络地址，导致无法正常打开共享目录。
+2. 从虚拟机粘贴文件到Peony时偶尔出现“不支持的操作”错误，导致粘贴失败。
+3. 编译Peony时出现大量ISO C++警告（如“forbids converting a string constant to ‘char*’”），总计6913处。
+
+#问题根因
+1. Peony主窗口初始化时若直接传入SMB URI会因窗口未完全初始化而触发空指针错误，导致无法处理未登录的网络请求。
+2. 粘贴操作中使用了非线程安全的阻塞式文件存在性检查逻辑（FileUtils::isFileExsit）并配合低效的循环删除方式，在UI线程中执行导致异常。
+3. libpeony-qt/file-info.h中将字符串字面量赋值给char*类型数组违反ISO C++标准，引发大量编译警告。
+
+#解决方案
+1. 修改MainWindow类，增加isFirstStartSmbUri标志和smbUrl成员变量，在initUI和addNewTabs中检测SMB URI后先以本地目录初始化界面，再通过paintEvent延迟调用goToUri完成跳转。
+2. 将剪贴板文件存在性检查逻辑由手动循环移除改为使用std::remove_if配合erase，避免在UI线程中使用阻塞API并提升容器操作安全性。
+3. 将office_mime_types声明由static char*[]改为extern const char*[]，并在file-info.cpp中定义为const char*数组，消除C++字符串常量类型不匹配警告。
+
+#来源
+https://forum.openeuler.org/t/topic/8178

@@ -1,0 +1,17 @@
+#标题
+openEuler22.03-LTS中top命令hi值高于CentOS7
+
+#内核版本
+未知
+
+#问题现象
+在openEuler22.03-LTS系统上运行网络相关业务时，使用top命令观察到hi（硬中断CPU占用）值为20多，而相同业务在CentOS7上hi值为0；经检查/proc/stat文件，openEuler中硬中断执行时间字段非零，而CentOS7中为零。
+
+#问题根因
+openEuler22.03-LTS内核编译时启用了CONFIG_IRQ_TIME_ACCOUNTING配置项，用于统计硬中断执行时间，而CentOS7未启用该配置，导致top命令显示的hi值存在差异。
+
+#解决方案
+1. 在CentOS7系统中启用CONFIG_IRQ_TIME_ACCOUNTING配置项并重新编译内核，可使hi值统计行为与openEuler一致。
+
+#来源
+https://forum.openeuler.org/t/topic/3451

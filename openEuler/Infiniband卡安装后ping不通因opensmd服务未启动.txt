@@ -1,0 +1,20 @@
+#标题
+Infiniband卡安装后ping不通因opensmd服务未启动
+
+#内核版本
+openEuler-22.03-LTS
+
+#问题现象
+IB卡已安装且线缆连接正常，ifconfig可识别对应网口并配置IP地址，但ping包不通，对端tcpdump抓不到任何包；使用ibstat命令查看发现IB端口Physical state为Linkup，但State非Active。
+
+#问题根因
+IB端口State未处于Active状态，原因是opensmd.service服务未启动。
+
+#解决方案
+1. 在本机和对端分别执行 systemctl status opensmd.service 检查服务状态。
+2. 若服务未启动，执行 systemctl start opensmd.service 启动服务。
+3. 或手工启动 opensm，该操作也会启动 opensmd.service。
+4. 启动服务后再次使用 ibstat 确认端口 State 变为 Active。
+
+#来源
+https://forum.openeuler.org/t/topic/2517

@@ -1,0 +1,19 @@
+#标题
+openEuler 22.03 LTS SP3 使用默认 repo 源更新时因 metalink 返回异常镜像导致 404 错误
+
+#内核版本
+未知
+
+#问题现象
+执行 yum update 或 dnf update 时，仓库 'update' 下载元数据失败，报 404 错误，错误 URL 为 https://ru-repo.openeuler.org/openEuler-22.03-LTS-SP3/update/x86_64/repodata/repomd.xml；同时出现校验和不匹配错误。
+
+#问题根因
+openEuler 22.03 LTS SP3 默认 repo 配置启用了 metalink 参数，metalink 服务返回了不可用的 ru-repo.openeuler.org 镜像站点，导致 dnf 客户端下载 repomd.xml 失败并校验不通过。
+
+#解决方案
+1. 编辑 /etc/yum.repos.d/openEuler.repo 文件，注释掉 [update] 和 [update-source] 节中的 metalink 行；
+2. 显式配置 baseurl 为官方主源地址，例如：
+   baseurl=http://repo.openeuler.org/openEuler-22.03-LTS-SP3/update/$basearch/
+
+#来源
+https://forum.openeuler.org/t/topic/4307

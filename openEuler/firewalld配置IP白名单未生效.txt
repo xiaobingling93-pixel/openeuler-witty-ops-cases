@@ -1,0 +1,19 @@
+#标题
+firewalld配置IP白名单未生效
+
+#内核版本
+22.03 LTS
+
+#问题现象
+使用firewalld配置IP白名单后，执行reload命令且规则已显示在列表中，防火墙状态为active，但未在白名单中的IP仍能正常访问服务器。
+
+#问题根因
+firewalld的rich规则默认优先级不足以使允许特定IP的规则先于隐式允许所有流量的行为生效，导致白名单策略未按预期工作。
+
+#解决方案
+1. 添加高优先级的允许规则：`firewall-cmd --zone=public --add-rich-rule='rule priority="-100" family="ipv4" source address="192.168.230.224" accept'`
+2. 添加默认拒绝规则：`firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source address="0.0.0.0/0" reject'`
+3. 重新加载防火墙配置：`firewall-cmd --reload`
+
+#来源
+https://forum.openeuler.org/t/topic/6220

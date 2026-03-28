@@ -1,0 +1,22 @@
+#标题
+openEuler 20.03 SP2 安装时无法识别硬盘（Intel RST RAID环境）
+
+#内核版本
+20.03SP2
+
+#问题现象
+在使用U盘安装openEuler 20.03 SP2时，BIOS中可识别到硬盘，但在anaconda安装界面的分区步骤中无法看到本地硬盘，仅显示U盘设备。
+
+#问题根因
+系统默认不支持主板集成的Intel RST RAID模式，导致anaconda无法识别RAID配置下的硬盘。
+
+#解决方案
+1. 在BIOS中将启动方式切换为传统模式（Legacy）。
+2. 开机时按RAID设置热键（如Ctrl+I或Ctrl+H）进入RAID配置界面。
+3. 删除现有RAID配置（注意此操作会清除磁盘数据）。
+4. 新建RAID卷。
+5. 重启后在BIOS中将启动方式切回UEFI模式。
+6. 重新启动安装程序，此时硬盘可被正常识别。
+
+#来源
+https://forum.openeuler.org/t/topic/4015

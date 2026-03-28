@@ -1,0 +1,19 @@
+#标题
+CentOS 8.4迁移至openEuler 22.03时因YUM模块筛选导致升级包下载失败
+
+#内核版本
+未知
+
+#问题现象
+执行x2openEuler-upgrade工具进行系统迁移前检查时，反复报错“the number of packages that failed to download exceeds the upper limit”，最终提示“download upgrade pkg failed”并异常退出。日志显示磁盘空间充足，但yumdownloader仅能下载部分RPM包。
+
+#问题根因
+CentOS 8的YUM启用了模块筛选功能，其中container-tools和virt模块处于启用状态，导致部分RPM包被屏蔽而无法下载。
+
+#解决方案
+1. 执行 `yum module list --enabled` 查看当前启用的YUM模块。
+2. 执行 `yum module disable container-tools virt` 禁用container-tools和virt筛选模块。
+3. 重新运行升级检查，即可正常下载所需RPM包并通过检查。
+
+#来源
+https://forum.openeuler.org/t/topic/1294

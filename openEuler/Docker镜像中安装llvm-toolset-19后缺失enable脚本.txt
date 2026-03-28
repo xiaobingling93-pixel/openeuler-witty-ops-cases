@@ -1,0 +1,18 @@
+#标题
+Docker镜像中安装llvm-toolset-19后缺失enable脚本
+
+#内核版本
+openEuler 24.03 LTS
+
+#问题现象
+在基于 openEuler 24.03 LTS 基础镜像构建的 Docker 容器中，执行 yum install -y llvm-toolset-19-* 后，/opt/openEuler/llvm-toolset-19/ 目录下缺失 enable 脚本，导致无法通过 source 配置环境变量。
+
+#问题根因
+使用通配符 llvm-toolset-19-* 安装时遗漏了包含 enable 脚本的 llvm-toolset-19 主包。
+
+#解决方案
+1. 改用 yum install -y llvm-toolset-19 安装主包以获取 enable 脚本。
+2. 或使用 yum install -y llvm-toolset-* 确保所有相关包（包括主包）被完整安装。
+
+#来源
+https://forum.openeuler.org/t/topic/19068

@@ -1,0 +1,18 @@
+#标题
+海光平台服务器ACPI CPUfreq性能模式设置失败
+
+#内核版本
+未知
+
+#问题现象
+在海光服务器上执行cpufreq测试时，系统不显示CPU频率，导致测试失败；通过cpupower frequency-info检查发现无调频信息，acpi-cpufreq模块未能成功加载。
+
+#问题根因
+BIOS中Custom Core Pstates（或P-state）设置限制了ACPI CPUfreq功能的启用，导致acpi-cpufreq模块无法加载。
+
+#解决方案
+1. 对于具备HYGON CBS选项的机型：进入BIOS，按Ctrl+F11进入高级模式，将 HYGON CBS → CPU Common Options → Custom Core Pstates 设置为 disabled（默认P0），保存并重启。
+2. 对于BIOS中无HYGON CBS选项的海光CPU（如5380）：在BIOS中将P-state设置为Auto，保存并重启。
+
+#来源
+https://forum.openeuler.org/t/topic/6756

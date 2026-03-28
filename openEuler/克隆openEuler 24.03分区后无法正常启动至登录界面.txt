@@ -1,0 +1,19 @@
+#标题
+克隆openEuler 24.03分区后无法正常启动至登录界面
+
+#内核版本
+6.6.0-82.0.0.75.oe2403.x86_64
+
+#问题现象
+使用dd或cp -a克隆openEuler 24.03分区到新硬盘后，通过Ubuntu的GRUB引导启动系统时，出现大量错误（如网络服务无法启动），系统卡死，无法进入bash登录界面。
+
+#问题根因
+克隆后的系统因SELinux上下文不匹配导致启动过程中服务初始化失败。
+
+#解决方案
+1. 在克隆后的openEuler系统根目录下创建空文件.autorelabel：  
+   touch /.autorelabel  
+2. 重启系统，SELinux将在下次启动时自动重新标记文件上下文，从而恢复正常启动流程。
+
+#来源
+https://forum.openeuler.org/t/topic/7449

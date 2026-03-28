@@ -1,0 +1,18 @@
+#标题
+RAID1/RAID10驱动忽略IO标志导致性能下降与优先级异常
+
+#内核版本
+未知
+
+#问题现象
+启用blk-wbt后，RAID写入性能显著下降；所有IO被底层磁盘的wbt机制限流；文件系统读写可能出现优先级颠倒；使用REQ_NOWAIT的IO未立即失败而是进入等待，影响系统响应性。
+
+#问题根因
+RAID1和RAID10驱动在构造新bio时未正确传递原始bio中的IO标志（包括REQ_SYNC、REQ_FUA、REQ_ATOMIC、REQ_META、REQ_NOWAIT和REQ_IDLE），导致blk-wbt错误限流、文件系统优先级异常及非阻塞IO行为失效。
+
+#解决方案
+1. 应用补丁保留主bio中的IO标志，具体修复涉及提交 f51d46d0e7cb、e34cbd307477 和 5404bc7a87b9。
+2. 修改 drivers/md/raid1.c 和 drivers/md/raid10.c，确保在创建子bio时继承原始bio的bi_opf标志位（如REQ_SYNC、REQ_FUA、REQ_ATOMIC等），不再无条件清除。
+
+#来源
+https://forum.openeuler.org/t/topic/18764

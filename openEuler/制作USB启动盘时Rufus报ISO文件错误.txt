@@ -1,0 +1,18 @@
+#标题
+制作USB启动盘时Rufus报ISO文件错误
+
+#内核版本
+24.03 LTS SP1
+
+#问题现象
+使用Rufus制作openEuler 24.03 LTS SP1 USB安装盘，在进度约84%时提示ISO安装包中存在文件错误并退出，具体报错为“Unable to create file: [0x00000052] 无法创建目录或文件”，涉及多个texlive相关RPM包提取失败。
+
+#问题根因
+Rufus软件在处理该ISO镜像时存在兼容性问题，导致无法正确写入特定文件。
+
+#解决方案
+1. 更换其他USB启动盘制作软件（如dd、balenaEtcher等）重新制作安装盘。
+2. 若图形安装界面无法启动，采用手工方式进行安装配置。
+
+#来源
+https://forum.openeuler.org/t/topic/7669

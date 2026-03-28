@@ -1,0 +1,17 @@
+#标题
+megaraid_sas驱动在complete_cmd_fusion函数中发生空指针解引用导致内核Oops
+
+#内核版本
+5.10.0-216.0.0.115.oe2203sp4
+
+#问题现象
+多台鲲鹏920服务器在运行FIO压力测试时触发内核Oops，日志显示“Unable to handle kernel NULL pointer dereference at virtual address 00000000000001b8”，错误码ESR=0x96000004，发生在CPU1上；绑定FIO到非CPU1后测试正常。kdump捕获到调用栈指向megaraid_sas驱动的complete_cmd_fusion+0x1b8函数，且该函数位于drivers/scsi/megaraid/megaraid_sas_fusion.c第3650行。
+
+#问题根因
+megaraid_sas驱动在complete_cmd_fusion函数中访问了空指针，具体是在判断threshold_reply_count时对instance结构体成员进行了未初始化或已释放的内存访问。
+
+#解决方案
+将FIO进程绑定到非CPU1的CPU核心上以规避该问题。
+
+#来源
+https://forum.openeuler.org/t/topic/4994
