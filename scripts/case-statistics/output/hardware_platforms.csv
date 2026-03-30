@@ -1,0 +1,52 @@
+﻿硬件类型,型号,案例数量
+cpu_models,920B,25
+cpu_models,920G,21
+cpu_models,鲲鹏920,17
+cpu_models,920,11
+cpu_models,920S,1
+cpu_models,Intel Turbo Boost或类似技术,1
+cpu_models,鲲鹏950,1
+cpu_models,Intel E810网卡后,1
+cpu_models,Intel E810网卡或当前内核存在兼容性问题,1
+cpu_models,920b,1
+cpu_models,920C,1
+cpu_models,Intel 8558服务器上运行openEuler 22,1
+cpu_models,intel_cpufreq驱动时出现,1
+cpu_models,intel_cpufreq驱动与Intel 8558处理器在特定配置下存在兼容性问题,1
+cpu_models,Intel网卡,1
+cpu_models,Intel E810,1
+cpu_models,Intel E810或XL710网卡的设备上可复现,1
+network_cards,hinic3,6
+network_cards,hisdk3,4
+network_cards,hiudk3,2
+network_cards,hns3,2
+network_cards,Mellanox,1
+network_cards,X710,1
+storage_devices,NVMe,7
+storage_devices,RAID,5
+storage_devices,SAS,5
+storage_devices,sas,4
+storage_devices,raid,2
+storage_devices,nvme,2
+storage_devices,XFS,1
+storage_devices,xfs,1
+server_models,HPC业务稳定性,2
+server_models,HPC环境中复现,2
+server_models,HPC环境中,2
+server_models,2P1U,1
+server_models,2P2U,1
+server_models,A3 PoD整机在AC上下电操作后,1
+server_models,A3 PoD整机AC上下电后NVMe硬盘无法建链 ,1
+server_models,A3服务器因cgroup统计触发Hard Lockup A3服务器在业务运行中出现Hard LOCKUP并触发Kernel panic,1
+server_models,HPC服务器上执行AC,1
+server_models,HPC环境中执行cpu_stl_burn_test_arm36_101,1
+server_models,HPC开发部进行GATK应用测试时,1
+server_models,HPC环境中使用hbm_memtester工具执行长时间内存压力测试时,1
+server_models,HPC平台,1
+server_models,HPC刀片host4上电无串口打印 HPC刀片服务器host4上电后串口无任何打印信息,1
+server_models,HPC现网GRUB阶段卡死问题 设备在启动安装过程中卡在GRUB引导阶段,1
+server_models,HPC环境中直接执行ib_write_bw命令,1
+server_models,HPC环境中可稳定复现,1
+server_models,HPC环境中执行kunpeng,1
+server_models,HPC环境后监控网络接口配置复现,1
+server_models,HPC平台使用Cache NUMA模式运行算力应用后,1
