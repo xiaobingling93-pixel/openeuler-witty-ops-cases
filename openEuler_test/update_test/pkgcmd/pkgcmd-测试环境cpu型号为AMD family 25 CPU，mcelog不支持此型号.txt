@@ -4,6 +4,8 @@ pkgcmd “cpu型号为AMD family 25 CPU，mcelog不支持此型号”
 # 基本信息
 - 测试用例: oe_test_mcelog_02
 - 系统版本: openEuler-24.03-LTS-SP3(x86_64)
+- 是否问题: 否
+- 关联issue: 无
 
 # 问题现象
  mcelog --cpumhz 50命令执行失败

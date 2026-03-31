@@ -1,0 +1,37 @@
+# 标题
+pkgcmd “Module xfs default uninstallation”
+
+# 基本信息
+- 测试用例: oe_test_xfs
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+Module xfs default installed
+
+# 错误日志
+```
++ lsmod
++ grep xfs
+xfs                  1761280  0
+libcrc32c              12288  5 nf_conntrack,nf_nat,btrfs,nf_tables,xfs
++ CHECK_RESULT 0 0 1 'Default uninstallation'
++ actual_result=0
++ expect_result=0
++ mode=1
++ error_log='Default uninstallation'
++ exit_mode=0
++ '[' -z '0 0 1 Default uninstallation' ']'
++ '[' 1 -eq 0 ']'
++ test 0x == 0x
++ test -n 'Default uninstallation'
++ LOG_ERROR 'Default uninstallation'
++ message='Default uninstallation'
+```
+
+# 问题根因
+1、疑似环境被污染导致，干净环境xfs默认不加载。
+
+# 解决方案
+1、执行前先检查环境，如果xfs模块加载，需要先卸载xfs模块；注意只有当xfs模块不被其他模块或进程正在使用时，模块才能正常移除。

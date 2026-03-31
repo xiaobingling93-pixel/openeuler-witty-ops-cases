@@ -4,6 +4,8 @@ pkgcmd “缺少 Ruby 的开发环境依赖，需要安装依赖ruby-devel”
 # 基本信息
 - 测试用例: oe_test_zentest_autotest
 - 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+- 是否问题: 是
+- 关联issue: 无
 
 # 问题现象
 multigem命令执行失败

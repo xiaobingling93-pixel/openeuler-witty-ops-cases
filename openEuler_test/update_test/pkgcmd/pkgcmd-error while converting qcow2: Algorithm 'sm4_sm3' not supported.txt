@@ -1,0 +1,25 @@
+# 标题
+pkgcmd “error while converting qcow2: Algorithm 'sm4' not supported”
+
+# 基本信息
+- 测试用例: oe_test_crypto_qcow2_sm4_sm3
+- 系统版本: openEuler-24.03-LTS-SP3(x86_64)
+- 是否问题: 否
+- 关联issue: https://atomgit.com/src-openeuler/qemu/issues/295
+
+# 问题现象
+grep -iE "Algorithm 'sm4' not supported|Parameter 'hash-alg' does not accept value 'sm3'|qcow2: Invalid parameter 'sm4'" testlog  存在
+
+# 错误日志
+```
++ qemu-img convert -O qcow2 --object secret,id=sec0,data=b57034c6-ade3-4e2c-94f4-49d8896fde57 -o encrypt.format=luks,encrypt.key-secret=sec0,encrypt.cipher-alg=sm4,encrypt.cipher-mode=xts,encrypt.ivgen-alg=plain64,encrypt.hash-alg=sm3 /root/mugen/testcases/cli-test/qemu/openEuler-22.03-LTS-SP3-x86_64.qcow2 /root/mugen/testcases/cli-test/qemu/openEuler-22.03-LTS-SP3-x86_64_sm4_sm3.qcow2
++ grep -iE 'Algorithm '\''sm4'\'' not supported|Parameter '\''hash-alg'\'' does not accept value '\''sm3'\''|qcow2: Invalid parameter '\''sm4'\''' testlog
+qemu-img: /root/mugen/testcases/cli-test/qemu/openEuler-22.03-LTS-SP3-x86_64_sm4_sm3.qcow2: error while converting qcow2: Algorithm 'sm4' not supported
++ exit 255
+```
+
+# 问题根因
+1、error while converting qcow2: Algorithm 'sm4' not supported，用例跳过。
+
+# 解决方案
+1、非问题，跳过 oe_test_crypto_qcow2_sm4_sm3 用例。

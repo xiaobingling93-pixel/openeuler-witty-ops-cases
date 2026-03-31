@@ -1,0 +1,25 @@
+# 标题
+pkgcmd “error while converting qcow2: PBKDF does not support hash algorithm sm3”
+
+# 基本信息
+- 测试用例: oe_test_crypto_qcow2_aes_sm3
+- 系统版本: openEuler-24.03-LTS-SP3(x86_64)
+- 是否问题: 否
+- 关联issue: https://atomgit.com/src-openeuler/qemu/issues/295
+
+# 问题现象
+grep -iE "PBKDF does not support hash algorithm sm3|Parameter 'hash-alg' does not accept value 'sm3'|qcow2: Invalid parameter 'sm3'" testlog  存在
+
+# 错误日志
+```
++ qemu-img convert -O qcow2 --object secret,id=sec0,data=735eb1d9-6e83-4a36-a291-287aec05a9a6 -o encrypt.format=luks,encrypt.key-secret=sec0,encrypt.cipher-alg=aes-256,encrypt.cipher-mode=xts,encrypt.ivgen-alg=plain64,encrypt.hash-alg=sm3 /root/mugen/testcases/cli-test/qemu/openEuler-22.03-LTS-SP3-x86_64.qcow2 openEuler-22.03-LTS-SP3-x86_64_aes_sm3.qcow2
++ grep -iE 'PBKDF does not support hash algorithm sm3|Parameter '\''hash-alg'\'' does not accept value '\''sm3'\''|qcow2: Invalid parameter '\''sm3'\''' testlog
+qemu-img: openEuler-22.03-LTS-SP3-x86_64_aes_sm3.qcow2: error while converting qcow2: PBKDF does not support hash algorithm sm3: Function not implemented
++ exit 255
+```
+
+# 问题根因
+1、PBKDF does not support hash algorithm sm3: Function not implemented，用例跳过。
+
+# 解决方案
+1、非问题，跳过 oe_test_crypto_qcow2_aes_sm3 用例。
