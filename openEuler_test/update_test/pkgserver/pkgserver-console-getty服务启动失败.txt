@@ -1,0 +1,32 @@
+# 标题
+pkgserver “console-getty服务启动失败”
+
+# 基本信息
+- 测试用例: oe_test_service_console-getty
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: https://atomgit.com/src-openeuler/systemd/issues/100
+
+# 问题现象
+测试执行过程中，检查到console-getty.service服务启动日志中存在报错信息
+
+# 错误日志
+```
++ journalctl --since '2026-01-14 10:00:05' -u console-getty.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Jan 14 10:00:07 mugen20260112arm-systemd systemd[1]: console-getty.service: Failed with result 'start-limit-hit'.
+Jan 14 10:00:07 mugen20260112arm-systemd systemd[1]: Failed to start Console Getty.
+```
+
+# 问题根因
+1. console-getty.service根据手册描述本身是给容器使用的服务，无需手动启动它：
+https://www.freedesktop.org/software/systemd/man/latest/systemd-getty-generator.html
+
+If execution in a container environment is detected, it will instead enable console-getty.service for /dev/console, and container-getty@.service instances for additional container pseudo TTYs as requested by the container manager (see Container Interface). 
+
+2. 虚拟机上开始时本身已经有一个agetty在运行，虚拟机上默认使用getty\@tty1.service启动agetty。再启动console-getty.service时会因为存在agetty程序存在冲突而失败。
+
+# 解决方案
+1. 启动前需要先关闭getty服务
+systemctl stop getty@tty1

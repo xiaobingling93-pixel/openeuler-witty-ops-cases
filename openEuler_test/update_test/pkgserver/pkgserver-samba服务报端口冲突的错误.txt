@@ -1,0 +1,41 @@
+# 标题
+pkgserver “samba服务报端口冲突的错误”
+
+# 基本信息
+- 测试用例: oe_test_service_samba
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: https://gitee.com/src-openeuler/samba/issues/I6VTA2?from=project-issue
+
+# 问题现象
+测试执行过程中，检查到服务执行过程中报错绑定TCP 53端口失败
+
+# 错误日志
+```
++ journalctl --since '2026-03-26 11:24:43' -u samba.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING\|Failed with result'
+3月 26 11:24:44 OE-TESTD samba[99099]:   stream_setup_socket: Failed to listen on 0.0.0.0:53 - NT_STATUS_ADDRESS_ALREADY_ASSOCIATED
+3月 26 11:24:44 OE-TESTD samba[99099]:   Failed to bind to 0.0.0.0:53 TCP - NT_STATUS_ADDRESS_ALREADY_ASSOCIATED
+3月 26 11:24:55 OE-TESTD samba[99170]:   stream_setup_socket: Failed to listen on 0.0.0.0:53 - NT_STATUS_ADDRESS_ALREADY_ASSOCIATED
+3月 26 11:24:55 OE-TESTD samba[99170]:   Failed to bind to 0.0.0.0:53 TCP - NT_STATUS_ADDRESS_ALREADY_ASSOCIATED
++ CHECK_RESULT 0 0 1 'There is an error message for the log of samba.service'
++ actual_result=0
++ expect_result=0
++ mode=1
++ error_log='There is an error message for the log of samba.service'
++ exit_mode=0
++ '[' -z '0 0 1 There is an error message for the log of samba.service' ']'
++ '[' 1 -eq 0 ']'
++ test 0x == 0x
++ test -n 'There is an error message for the log of samba.service'
+```
+
+# 问题根因
+1. 53端口默认由DNS服务（如named、dnsmasq）占用。Samba尝试绑定TCP 53端口失败。
+
+# 解决方案
+1. 检查53端口占用
+netstat -tulnp | grep :53
+2.杀死占用53端口的进程（假设PID为1234）
+sudo kill -9 1234

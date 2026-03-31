@@ -1,0 +1,59 @@
+# 标题
+pkgserver “ub服务启动失败”
+
+# 基本信息
+- 测试用例: oe_test_service_restart
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+- 是否问题: 否
+- 关联issue: https://atomgit.com/src-openeuler/ub-pkg-manager/issues/2
+
+# 问题现象
+测试执行过程中，检查到服务启动日志中存在报错信息
+
+# 错误日志
+```
++ journalctl --since '2026-03-27 09:56:37' -u ub-pkg-manager.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Mar 27 09:56:37 localhost.localdomain systemd[1]: Dependency failed for The full function of UB OS Component.
+Mar 27 09:56:37 localhost.localdomain systemd[1]: ub-pkg-manager.service: Job ub-pkg-manager.service/start failed with result 'dependency'.
++ CHECK_RESULT 0 0 1 'There is an error message for the log of ub-pkg-manager.service'
+```
+```
++ journalctl --since '2026-03-27 09:56:38' -u ub-pkg-mem.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Mar 27 09:56:38 localhost.localdomain systemd[1]: Dependency failed for The UnifiedBus Pooled Memory function of UB OS Component.
+Mar 27 09:56:38 localhost.localdomain systemd[1]: ub-pkg-mem.service: Job ub-pkg-mem.service/start failed with result 'dependency'.
++ CHECK_RESULT 0 0 1 'There is an error message for the log of ub-pkg-mem.service'
+```
+```
++ systemctl status ub-pkg-urma.service
++ grep Active
++ grep -v 'inactive (dead)'
+     Active: failed (Result: exit-code) since Fri 2026-03-27 09:56:39 CST; 22ms ago
++ CHECK_RESULT 0 0 1 'There is an error for the status of ub-pkg-urma.service'
+```
+```
++ journalctl --since '2026-03-27 09:56:39' -u ub-pkg-urma.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Mar 27 09:56:39 localhost.localdomain systemd[1]: ub-pkg-urma.service: Main process exited, code=exited, status=1/FAILURE
+Mar 27 09:56:39 localhost.localdomain systemd[1]: ub-pkg-urma.service: Failed with result 'exit-code'.
+Mar 27 09:56:39 localhost.localdomain systemd[1]: Failed to start The UnifiedBus Communication function of UB OS Component.
++ CHECK_RESULT 0 0 1 'There is an error message for the log of ub-pkg-urma.service'
+```
+```
++ journalctl --since '2026-03-27 09:56:40' -u ub-pkg-virt.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Mar 27 09:56:40 localhost.localdomain systemd[1]: Dependency failed for The UnifiedBus Device Virtualization function of UB OS Component.
+Mar 27 09:56:40 localhost.localdomain systemd[1]: ub-pkg-virt.service: Job ub-pkg-virt.service/start failed with result 'dependency'.
++ CHECK_RESULT 0 0 1 'There is an error message for the log of ub-pkg-virt.service'
+```
+
+# 问题根因
+1. UB组件能力同时依赖物理机提供相关的能力，目前在鲲鹏950提供
+
+# 解决方案
+1. 非问题，机型不支持
