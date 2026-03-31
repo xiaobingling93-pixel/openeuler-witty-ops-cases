@@ -1,0 +1,34 @@
+# 标题
+kernel “ltp执行file_attr01失败”
+
+# 基本信息
+- 测试用例: file_attr01
+- 系统版本: openEuler-24.03-LTS-SP3、openEuler-24.03-LTS-SP2、openEuler-24.03-LTS-SP1、openEuler-24.03-LTS(aarch64、x86_64)
+
+# 问题现象
+ltp测试执行过程中，报错：file_attr01.c:120: TFAIL: Invalid file descriptor expected EBADF: EINVAL (22)
+
+# 错误日志
+```
+tst_test.c:1956: TINFO: === Testing on ext2 ===
+tst_test.c:1280: TINFO: Formatting /dev/loop0 with ext2 opts='' extra opts=''
+mke2fs 1.47.0 (5-Feb-2023)
+tst_test.c:1292: TINFO: Mounting /dev/loop0 to /tmp/ltp-0xuHjuPrwD/LTP_filRbjSsu/mntpoint fstyp=ext2 flags=0
+../../../../include/lapi/fs.h:134: TCONF: syscall(469) __NR_file_setattr not supported on your arch
+
+file_attr01.c:120: TFAIL: Invalid file descriptor expected EBADF: EINVAL (22)
+file_attr01.c:120: TFAIL: File doesn't exist succeeded
+file_attr01.c:120: TFAIL: Filename is NULL expected EFAULT: EINVAL (22)
+file_attr01.c:120: TFAIL: File attributes is NULL succeeded
+file_attr01.c:120: TFAIL: File attributes size is zero succeeded
+file_attr01.c:120: TFAIL: File attributes size is too small succeeded
+file_attr01.c:120: TFAIL: File attributes size is too big succeeded
+file_attr01.c:120: TFAIL: Invalid AT flags succeeded
+
+```
+
+# 问题根因
+1. 内核不支持 file_setattr 系统调用
+
+# 解决方案
+1. 非问题

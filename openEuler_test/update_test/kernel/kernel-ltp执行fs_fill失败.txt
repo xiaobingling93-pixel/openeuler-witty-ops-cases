@@ -1,0 +1,38 @@
+# 标题
+kernel “ltp执行fs_fill失败”
+
+# 基本信息
+- 测试用例: fs_fill
+- 系统版本: openEuler-24.03-LTS-SP3、openEuler-24.03-LTS-SP2、openEuler-24.03-LTS-SP1、openEuler-24.03-LTS(aarch64)
+
+# 问题现象
+ltp测试执行过程中，报错：tst_test.c:1949: TBROK: Test killed! (timeout?)
+
+# 错误日志
+```
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread94/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread9/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread128/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread116/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread105/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread120/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread19/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread95/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread103/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread73/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread38/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread12/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread20/file0
+fs_fill.c:55: TINFO: Unlinking mntpoint/subdir/thread64/file0
+Test timeouted, sending SIGKILL!
+tst_test.c:1947: TINFO: If you are running on slow machine, try exporting LTP_TIMEOUT_MUL > 1
+tst_test.c:1949: TBROK: Test killed! (timeout?)
+
+
+```
+
+# 问题根因
+1. fs_fill 是一个压力测试，它通过多线程并发在文件系统中创建大量文件，用于测试文件系统的稳定性、并发能力和资源限制。测试已经进入清理阶段（正在执行 unlink 删除文件），但在清理过程中触发了超时，测试框架强制发送 SIGKILL 终止了测试
+
+# 解决方案
+1. 增加超时时间， export LTP_TIMEOUT_MUL=5
