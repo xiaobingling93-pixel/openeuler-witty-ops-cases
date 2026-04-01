@@ -1,0 +1,37 @@
+# 标题
+pkgserver “libvirtd服务报ub服务链接失败”
+# 基本信息
+- 测试用例: oe_test_service_libvirtd
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+在环境中安装了ub-pkg-manager软件包后，测试该用例，检查到libvirtd服务启动日志中存在报错信息
+
+# 错误日志
+```
++ journalctl --since '2026-03-27 09:58:29' -u libvirtd.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Mar 27 09:58:34 localhost.localdomain libvirtd[27247]: 2026-03-27 09:58:29.543 ERROR [ubse_uds_client.cpp:ConnectToServer:108] Failed to connect: No such file or directory
+Mar 27 09:58:34 localhost.localdomain libvirtd[27247]: 2026-03-27 09:58:29.543 ERROR [ubse_ipc_client.cpp:ubse_invoke_call:91] Failed to connect, error code: 20
++ CHECK_RESULT 0 0 1 'There is an error message for the log of libvirtd.service'
++ actual_result=0
++ expect_result=0
++ mode=1
++ error_log='There is an error message for the log of libvirtd.service'
++ exit_mode=0
++ '[' -z '0 0 1 There is an error message for the log of libvirtd.service' ']'
++ '[' 1 -eq 0 ']'
++ test 0x == 0x
++ test -n 'There is an error message for the log of libvirtd.service'
+```
+
+# 问题根因
+1. 在鲲鹏920的虚拟机环境中安装了ub-pkg-manager软件包，ub相关服务启动失败，导致libvirtd服务执行日志有报错信息，
+2. UB组件能力同时依赖物理机提供相关的能力，目前在鲲鹏950提供
+
+# 解决方案
+1. 非问题，机型不支持
+2. 可卸载ub-pkg-manager软件包后，再重启服务，无此报错

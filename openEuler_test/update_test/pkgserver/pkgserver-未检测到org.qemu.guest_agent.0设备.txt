@@ -1,0 +1,29 @@
+# 标题
+pkgserver “未检测到org.qemu.guest_agent.0设备”
+
+# 基本信息
+- 测试用例: oe_test_service_qemu-guest-agent
+- 系统版本: openEuler-24.03-LTS-SP3(x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，检查到环境中不存在org.qemu.guest_agent.0设备
+
+# 错误日志
+```
++ '[' '!' -e /dev/virtio-ports/org.qemu.guest_agent.0 ']'
++ LOG_WARN 'org.qemu.guest_agent.0 device not detected.'
++ message='org.qemu.guest_agent.0 device not detected.'
+```
+
+# 问题根因
+1. 虚拟机环境缺少org.qemu.guest_agent.0设备
+
+# 解决方案
+1. 关闭虚拟机后，修改虚拟机的.xml文件，添加以下内容
+<channel type='unix'>
+  <source mode='bind' path='/var/lib/libvirt/qemu/org.qemu.guest_agent.0' />
+  <target type='virtio' name='org.qemu.guest_agent.0' />
+  <address type='virtio-serial' controller='0' bus='0' port='2' />
+</channel>

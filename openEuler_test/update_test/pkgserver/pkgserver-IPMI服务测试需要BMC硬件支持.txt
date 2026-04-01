@@ -1,0 +1,55 @@
+# 标题
+pkgserver “IPMI服务测试需要BMC硬件支持”
+
+# 基本信息
+- 测试用例: oe_test_service_bmc-watchdog、oe_test_service_ipmiseld
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+- oe_test_service_bmc-watchdog、oe_test_service_ipmiseld等测试用例执行失败
+- 错误：ipmi_msghandler.ko.xz模块文件不存在
+- 错误：Could not open device at /dev/ipmi0: No such file or directory
+- 测试脚本输出：System has not bmc device.The environment does not support testing
+
+# 错误日志
+```
++ modprobe ipmi_watchdog
+modprobe: ERROR: ctx=0xaaaac82062a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: ctx=0xaaaac82062a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: could not insert 'ipmi_watchdog': Unknown symbol in module, or unknown parameter (see dmesg)
++ modprobe ipmi_poweroff
+modprobe: ERROR: ctx=0xaaaad86b42a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: ctx=0xaaaad86b42a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: could not insert 'ipmi_poweroff': Unknown symbol in module, or unknown parameter (see dmesg)
++ modprobe ipmi_devintf
+modprobe: ERROR: ctx=0xaaaaccc9f2a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: ctx=0xaaaaccc9f2a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: could not insert 'ipmi_devintf': Unknown symbol in module, or unknown parameter (see dmesg)
++ modprobe ipmi_msghandler
+modprobe: ERROR: ctx=0xaaaaadf9b2a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: ctx=0xaaaaadf9b2a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: could not insert 'ipmi_msghandler': Unknown symbol in module, or unknown parameter (see dmesg)
++ modprobe ipmi_si
+modprobe: ERROR: ctx=0xaaab02e242a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: ctx=0xaaab02e242a0 path=/lib/modules/6.6.0-28.0.0.34.oe2403.aarch64/kernel/drivers/char/ipmi/ipmi_msghandler.ko.xz error=No such file or directory
+modprobe: ERROR: could not insert 'ipmi_si': Unknown symbol in module, or unknown parameter (see dmesg)
++ ipmitool lan print
++ grep -i 'Address.*:'
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
++ ret=1
++ '[' 1 -ne 0 ']'
++ LOG_WARN 'System has not bmc device.The environment does not support testing'
++ message='System has not bmc device.The environment does not support testing'
++ python3 /tmp/mugen/libs/locallibs/mugen_log.py --level warn --message 'System has not bmc device.The environment does not support testing'
+Fri Mar 27 18:29:50 2026 - WARN  - System has not bmc device.The environment does not support testing
++ exit 255
+```
+
+# 问题根因
+1. 测试环境为虚拟机（qemu/kvm），无BMC（Baseboard Management Controller）硬件
+2. BMC设备仅存在于物理服务器，虚拟机无法模拟
+
+# 解决方案
+1. 非问题，虚拟机不支持

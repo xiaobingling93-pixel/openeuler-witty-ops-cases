@@ -1,0 +1,40 @@
+# 标题
+pkgserver “sysSentry日志中存在失败信息”
+
+# 基本信息
+- 测试用例: oe_test_service_sysSentry
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，检查到服务在启动过程中存在报错日志，提示服务尝试向不存在的进程发送信号
+
+# 错误日志
+```
++ systemctl stop sysSentry.service
+Stopping 'sysSentry.service', but its triggering units are still active:
+sysSentry.socket
+```
+```
++ journalctl --since '2026-03-19 18:04:59' -u sysSentry.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Mar 19 18:05:04 localhost.localdomain python3[22151]: kill: sending signal to 22141 failed: No such process
++ CHECK_RESULT 0 0 1 'There is an error message for the log of sysSentry.service'
++ actual_result=0
++ expect_result=0
++ mode=1
++ error_log='There is an error message for the log of sysSentry.service'
++ exit_mode=0
++ '[' -z '0 0 1 There is an error message for the log of sysSentry.service' ']'
++ '[' 1 -eq 0 ']'
++ test 0x == 0x
++ test -n 'There is an error message for the log of sysSentry.service'
+```
+
+# 问题根因
+1. sysSentry.service服务关闭时，sysSentry.socket仍在运行
+
+# 解决方案
+1. 先关闭sysSentry.socket，后关闭sysSentry.service

@@ -1,9 +1,11 @@
 # 标题
-pkgserver “Adapted testcase execution failed”
+pkgserver “部分测试用例执行失败”
 
 # 基本信息
 - 测试用例: oe_test_service_restart
-- 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
 
 # 问题现象
 pkgserver测试执行过程中，检查到有测试用例执行失败。

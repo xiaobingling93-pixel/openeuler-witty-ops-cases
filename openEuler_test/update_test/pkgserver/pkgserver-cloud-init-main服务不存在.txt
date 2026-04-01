@@ -1,0 +1,24 @@
+# 标题
+pkgserver “cloud-init-main服务不存在”
+
+# 基本信息
+- 测试用例: oe_test_service_cloud-init-main
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，检查到cloud-init-main服务不存在
+
+# 错误日志
+```
++ rpm -ql cloud-init
++ grep -q cloud-init-main.service
++ LOG_INFO 'cloud-init-main.service is not exist'
+```
+
+# 问题根因
+1. cloud-init-main.service服务不存在，用例跳过不执行
+
+# 解决方案
+1. 非问题，服务不存在

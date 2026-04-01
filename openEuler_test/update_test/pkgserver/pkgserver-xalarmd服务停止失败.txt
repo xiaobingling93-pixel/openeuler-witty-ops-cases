@@ -1,0 +1,40 @@
+# 标题
+pkgserver “xalarmd服务停止失败”
+
+# 基本信息
+- 测试用例: oe_test_service_xalarmd
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，检查到xalarmd服务操作日志中存在报错信息
+
+# 错误日志
+```
++ systemctl stop xalarmd.service
+Stopping 'xalarmd.service', but its triggering units are still active:
+xalarmd.socket
+```
+```
++ journalctl --since '2026-03-27 11:43:31' -u xalarmd.service
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Mar 27 11:45:06 localhost.localdomain systemd[1]: xalarmd.service: Failed with result 'timeout'.
++ CHECK_RESULT 0 0 1 'There is an error message for the log of xalarmd.service'
++ actual_result=0
++ expect_result=0
++ mode=1
++ error_log='There is an error message for the log of xalarmd.service'
++ exit_mode=0
++ '[' -z '0 0 1 There is an error message for the log of xalarmd.service' ']'
++ '[' 1 -eq 0 ']'
++ test 0x == 0x
++ test -n 'There is an error message for the log of xalarmd.service'
+```
+
+# 问题根因
+1. xalarmd.service服务关闭时，xalarmd.socket仍在运行
+
+# 解决方案
+1. 先关闭xalarmd.socket，后关闭xalarmd.service
