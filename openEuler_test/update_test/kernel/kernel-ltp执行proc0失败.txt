@@ -4,6 +4,8 @@ kernel “ltp执行proc0失败”
 # 基本信息
 - 测试用例: proc0
 - 系统版本: openEuler-24.03-LTS-SP3、openEuler-24.03-LTS-SP2、openEuler-24.03-LTS-SP1、openEuler-24.03-LTS(aarch64、x86_64)
+- 是否问题：否
+- 关联issue: https://gitee.com/src-openeuler/kernel/issues/I3A6FU
 
 # 问题现象
 ltp测试执行过程中，报错：proc01.c:355: /proc/dirty/dirty_list: open failed: errno=ENOMEM(12): Cannot allocate memory

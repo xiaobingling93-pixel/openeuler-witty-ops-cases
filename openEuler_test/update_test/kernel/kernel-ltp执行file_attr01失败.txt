@@ -4,6 +4,8 @@ kernel “ltp执行file_attr01失败”
 # 基本信息
 - 测试用例: file_attr01
 - 系统版本: openEuler-24.03-LTS-SP3、openEuler-24.03-LTS-SP2、openEuler-24.03-LTS-SP1、openEuler-24.03-LTS(aarch64、x86_64)
+- 是否问题：否
+- 关联issue: https://atomgit.com/src-openeuler/kernel/issues/13465
 
 # 问题现象
 ltp测试执行过程中，报错：file_attr01.c:120: TFAIL: Invalid file descriptor expected EBADF: EINVAL (22)
@@ -28,7 +30,7 @@ file_attr01.c:120: TFAIL: Invalid AT flags succeeded
 ```
 
 # 问题根因
-1. 内核不支持 file_setattr 系统调用
+1. 内核暂不支持file_setattr系统调用，原因为上游已支持这个特性，ltp20250930版本增加了用例，但OLK6.6还未引入这个特性
 
 # 解决方案
 1. 非问题

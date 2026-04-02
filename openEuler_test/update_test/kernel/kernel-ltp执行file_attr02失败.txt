@@ -4,6 +4,8 @@ kernel “ltp执行file_attr02失败”
 # 基本信息
 - 测试用例: file_attr02
 - 系统版本: openEuler-24.03-LTS-SP3、openEuler-24.03-LTS-SP2、openEuler-24.03-LTS-SP1、openEuler-24.03-LTS(aarch64、x86_64)
+- 是否问题：否
+- 关联issue: https://atomgit.com/src-openeuler/kernel/issues/13466
 
 # 问题现象
 ltp测试执行过程中，报错：file_attr02.c:30: TFAIL: file_getattr( dfd, FILENAME, attr, FILE_ATTR_SIZE_LATEST, 0) failed: EFAULT (14)
@@ -21,7 +23,7 @@ file_attr02.c:40: TFAIL: attr->fa_projid (0) != xattr.fsx_projid (16)
 ```
 
 # 问题根因
-1. 内核不支持 file_getattr 系统调用
+1. 内核暂不支持file_getattr系统调用，原因为上游已支持这个特性，ltp20250930版本增加了对应用例，但OLK6.6还未引入这个特性
 
 # 解决方案
 1. 非问题
