@@ -1,0 +1,37 @@
+# 标题
+pkgcmd “Module snd-aloop not found”
+
+# 基本信息
+- 测试用例: oe_test_snd_aloop
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+Module snd-aloop not found
+
+# 错误日志
+```
++ modinfo snd-aloop
++ grep name
+modinfo: ERROR: Module snd-aloop not found.
++ CHECK_RESULT 1 0 0 'Failed to view module information'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='Failed to view module information'
++ exit_mode=0
++ '[' -z '1 0 0 Failed to view module information' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'Failed to view module information'
++ LOG_ERROR 'Failed to view module information'
++ message='Failed to view module information'
+```
+
+# 问题根因
+1、系统中不存在snd-aloop模块，所有针对snd-aloop模块的操作都无效。
+
+# 解决方案
+1、用例执行前增加判断，检查snd-aloop模块是否存在；
+2、如果存在，继续后续操作；否则退出用例，给出提示信息：snd-aloop模块不存在。

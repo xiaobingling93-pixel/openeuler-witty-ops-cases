@@ -1,0 +1,37 @@
+# 标题
+pkgcmd “Module libfc uninstall failed”
+
+# 基本信息
+- 测试用例: oe_test_libfc
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+Module libfc uninstall failed
+
+# 错误日志
+```
++ rmmod libfc
+rmmod: ERROR: Module libfc is in use by: libfcoe
++ CHECK_RESULT 1 0 0 'Module uninstall failed'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='Module uninstall failed'
++ exit_mode=0
++ '[' -z '1 0 0 Module uninstall failed' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'Module uninstall failed'
++ LOG_ERROR 'Module uninstall failed'
++ message='Module uninstall failed'
+```
+
+# 问题根因
+1、rmmod: ERROR: Module libfc is in use by: libfcoe，疑似环境被污染导致，干净环境无报错。
+
+# 解决方案
+1、先卸载依赖模块libfcoe，执行 rmmod libfcoe 命令来移除 libfcoe 模块；
+2、再卸载目标模块libfc，rmmod libfcoe;
+3、只有当libfc模块不被其他模块或进程正在使用时，libfc模块才能正常移除。

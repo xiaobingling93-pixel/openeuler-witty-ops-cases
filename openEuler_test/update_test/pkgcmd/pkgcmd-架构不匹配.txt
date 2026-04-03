@@ -4,6 +4,8 @@ pkgcmd “Testing cannot be performed if NODE1_FRAME not x86_64.”
 # 基本信息
 - 测试用例: oe_test_tboot_txt-stat
 - 系统版本: openEuler-24.03-LTS-SP3(aarch64)
+- 是否问题: 否
+- 关联issue: 无
 
 # 问题现象
 测试执行过程中，检测到测试环境不满足要求，非x86架构，用例跳过。

@@ -4,6 +4,8 @@ pkgcmd “axel does not exist”
 # 基本信息
 - 测试用例: oe_test_axel_01
 - 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
 
 # 问题现象
 测试环境中，axel软件包不存在，用例跳过。

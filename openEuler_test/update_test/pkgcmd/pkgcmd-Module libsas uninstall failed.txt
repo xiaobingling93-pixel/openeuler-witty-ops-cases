@@ -1,0 +1,37 @@
+# 标题
+pkgcmd “Module libsas uninstall failed”
+
+# 基本信息
+- 测试用例: oe_test_libsas
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+Module libsas uninstall failed
+
+# 错误日志
+```
++ rmmod libsas
+rmmod: ERROR: Module libsas is in use by: hisi_sas_v3_hw hisi_sas_main
++ CHECK_RESULT 1 0 0 'Module uninstall failed'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='Module uninstall failed'
++ exit_mode=0
++ '[' -z '1 0 0 Module uninstall failed' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'Module uninstall failed'
++ LOG_ERROR 'Module uninstall failed'
++ message='Module uninstall failed'
+```
+
+# 问题根因
+1、rmmod: ERROR: Module libsas is in use by: hisi_sas_v3_hw hisi_sas_main，疑似环境被污染导致，干净环境无报错。
+
+# 解决方案
+1、先卸载依赖模块hisi_sas_v3_hw、hisi_sas_main，执行 rmmod hisi_sas_v3_hw、rmmod hisi_sas_main 命令来移除依赖模块；
+2、再卸载目标模块libsas，rmmod libsas;
+3、只有当libsas模块不被其他模块或进程正在使用时，libsas模块才能正常移除。
