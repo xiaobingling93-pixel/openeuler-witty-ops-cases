@@ -4,6 +4,8 @@ kernel “ltp执行starvation失败”
 # 基本信息
 - 测试用例: starvation
 - 系统版本: openEuler-24.03-LTS-SP3/openEuler-24.03-LTS-SP2/openEuler-24.03-LTS-SP1/openEuler-24.03-LTS(aarch64、x86_64)
+- 是否问题：是
+- 关联issue：https://atomgit.com/openeuler/kernel/issues/2541
 
 # 问题现象
 ltp测试执行过程中，报错：tst_test.c:1630: TBROK: Test killed! (timeout?)

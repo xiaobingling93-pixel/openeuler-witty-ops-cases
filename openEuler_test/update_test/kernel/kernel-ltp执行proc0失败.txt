@@ -1,0 +1,42 @@
+# 标题
+kernel “ltp执行proc0失败”
+
+# 基本信息
+- 测试用例: proc0
+- 系统版本: openEuler-24.03-LTS-SP3、openEuler-24.03-LTS-SP2、openEuler-24.03-LTS-SP1、openEuler-24.03-LTS(aarch64、x86_64)
+- 是否问题：否
+- 关联issue: https://gitee.com/src-openeuler/kernel/issues/I3A6FU
+
+# 问题现象
+ltp测试执行过程中，报错：proc01.c:355: /proc/dirty/dirty_list: open failed: errno=ENOMEM(12): Cannot allocate memory
+
+# 错误日志
+```
+proc01      1  TFAIL  :  proc01.c:355: /proc/dirty/dirty_list: open failed: errno=ENOMEM(12): Cannot allocate memory
+proc01      0  TINFO  :  /proc/kpagecount: reached maxmbytes (-m)
+proc01      0  TINFO  :  /proc/kpageflags: reached maxmbytes (-m)
+proc01      0  TINFO  :  /proc/kpagecgroup: reached maxmbytes (-m)
+proc01      0  TINFO  :  /proc/sysrq-trigger: is write-only.
+proc01      0  TINFO  :  /proc/self/task/188374/mem: known issue: errno=EIO(5): Input/output error
+proc01      0  TINFO  :  /proc/self/task/188374/clear_refs: is write-only.
+proc01      0  TINFO  :  /proc/self/task/188374/pagemap: reached maxmbytes (-m)
+proc01      0  TINFO  :  /proc/self/task/188374/swap_pages: is write-only.
+proc01      0  TINFO  :  /proc/self/task/188374/attr/apparmor/current: known issue: errno=EINVAL(22): Invalid argument
+proc01      0  TINFO  :  /proc/self/task/188374/attr/apparmor/prev: known issue: errno=EINVAL(22): Invalid argument
+proc01      0  TINFO  :  /proc/self/task/188374/attr/apparmor/exec: known issue: errno=EINVAL(22): Invalid argument
+proc01      0  TINFO  :  /proc/self/mem: known issue: errno=EIO(5): Input/output error
+proc01      0  TINFO  :  /proc/self/clear_refs: is write-only.
+proc01      0  TINFO  :  /proc/self/pagemap: reached maxmbytes (-m)
+proc01      0  TINFO  :  /proc/self/swap_pages: is write-only.
+proc01      0  TINFO  :  /proc/self/attr/apparmor/current: known issue: errno=EINVAL(22): Invalid argument
+proc01      0  TINFO  :  /proc/self/attr/apparmor/prev: known issue: errno=EINVAL(22): Invalid argument
+proc01      0  TINFO  :  /proc/self/attr/apparmor/exec: known issue: errno=EINVAL(22): Invalid argument
+proc01      2  TFAIL  :  proc01.c:470: readproc() failed with 1 errors.
+
+```
+
+# 问题根因
+1. /proc/dirty/dirty为自研特性，开源ltp用例中没有对此进行特殊处理
+
+# 解决方案
+1. 执行echo 1024 > /proc/dirty/buffer_size，然后执行proc01用例可通过

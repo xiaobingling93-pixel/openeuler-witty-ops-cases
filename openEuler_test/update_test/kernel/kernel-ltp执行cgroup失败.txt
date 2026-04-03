@@ -1,0 +1,26 @@
+# 标题
+kernel “ltp执行cgroup失败”
+
+# 基本信息
+- 测试用例: cgroup
+- 系统版本: openEuler-24.03-LTS-SP3、openEuler-24.03-LTS-SP2、openEuler-24.03-LTS-SP1、openEuler-24.03-LTS、openEuler-22.03-LTS-SP4(aarch64、x86)
+- 是否问题：是
+- 关联issue: https://gitee.com/openeuler/kernel/issues/I7WHJL
+
+# 问题现象
+ltp测试执行过程中，报错：cgroup_regression_test 8 TFAIL: failed to mount cgroup filesystem
+
+# 错误日志
+```
+mount:/tmp/ltp-iQHktOXoLk/LTP_cgroup_regression_test.I5p3dPZB9Y/cgroup:cgroup already mounted on /sys/fs/cgroup/systemd.
+dmesg(1) may have more information after failed mount system call.
+cgroup_regression_test 8 TFAIL: failed to mount cgroup filesystem
+cgroup_regression test 9 TPASS: no kernel bug was found
+
+```
+
+# 问题根因
+1. util-linux新版本2.39.1更改了mount系统的调用，使用了fsconfig。util-linux侧如果调用fsconfig失败后发生restart_syscall，就会触发当前问题
+
+# 解决方案
+1. 已知问题，issue状态是“已挂起”

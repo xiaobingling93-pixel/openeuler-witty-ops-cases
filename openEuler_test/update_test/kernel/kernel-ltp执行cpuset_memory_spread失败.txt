@@ -1,0 +1,38 @@
+# 标题
+kernel “ltp执行cpuset_memory_spread失败”
+
+# 基本信息
+- 测试用例: cpuset_memory_spread
+- 系统版本: openEuler-24.03-LTS-SP3、openEuler-24.03-LTS-SP2、openEuler-24.03-LTS-SP1、openEuler-24.03-LTS、openEuler-22.03-LTS-SP4、openEuler-20.03-LTS-SP4(aarch64、x86)
+
+# 问题现象
+ltp测试执行过程中，报错：cpuset memory_spread 5 TFAIL: hog the memory on the unexpected node(FilePages_For_Nodes(KB): _0: 32361: 102412, Expect Nodes: 1).
+
+# 错误日志
+```
+<<<test_output>>>
+incrementing stop
+cpuset memory spread 1 TINFO: CPUs are numbered continuously starting at 0 (0-87)
+cpuset memory spread 1 TINFO: Nodes are numbered continuously starting at 0 (0-1)
+100+0 records in
+100+0 records out
+104857600 bytes (105 MB, 100 MiB) copied, 0.0613928 s, 1.7 GB/s
+cpuset memory_spread 1 TPASS: Cpuset memory spread page test succeeded.
+cpuset_memory_spread 3 TPASS: Cpuset memory spread page test succeeded.
+cpuset memory_spread 5 TFAIL: hog the memory on the unexpected node(FilePages_For_Nodes(KB): _0: 32361: 102412, Expect Nodes: 1).
+cpuset memory spread 7 TFAIL: hog the memory on the unexpected node(FilePages For Nodes(KB): 0:3244
+_1: 102420, Expect Nodes: 1).
+cpuset_memory_spread 9 TPASS: Cpuset memory spread page test succeeded.
+cpuset_memory_spread 11 TPASS: Cpuset memory spread page test succeeded.
+cpuset memory_spread 13 TFAIL: hog the memory on the unexpected node(FilePages_For Nodes(KB): 0: 2968
+_1: 102404, Expect Nodes: 1).
+
+```
+
+# 问题根因
+1. 概率性失败，测试用例设计不严谨：用例判断进程执行前后各个node上的page cache差值，PASS的范围是在2000-10000之间，但是 memory_spread 的配置只能设置分配的倾向性，不能保证具体在哪个node上分配多少，不能保证各个 node 之前page cache 的数量上的差值。
+
+
+# 解决方案
+1. 当前社区已经在讨论修改这个用例
+2. 可单独执行此用例，大概率会成功，进入/opt/ltp，执行./runltp -s cpuset_memory_spread
