@@ -1,0 +1,27 @@
+# 标题
+pkgmanage-remove-cups-warnig
+
+# 基本信息
+- 测试用例: oe_test_pkg_manager01
+- 系统版本: openEuler-24.03-LTS
+- 是否问题：否
+- 关联issue：https://atomgit.com/src-openeuler/cups-filters/issues/5仅记录
+
+# 问题现象
+pkgmanage测试执行oe_test_pkg_manager01用例过程中，卸载软件包cups有warning信息，用例捕捉到warning字段提示用例失败。
+
+# 错误日志
+
+```
+Warning: The unit file, source configuration file or drop-ins of cups.path changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of cups.socket changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of cups.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+```
+
+# 问题根因
+
+systemd发现单元文件被修改替换了，但systemd（系统管家）还在读旧的缓存内容，所以提示 systemd 重新读文件
+
+# 解决方案
+1）确保软件包已被成功卸载，确认方法（rpm -qa | grep cups，执行结果应该是搜不到）
+2）非问题该告警属于systemd机制

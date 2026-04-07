@@ -1,0 +1,26 @@
+# 标题
+pkgmanage-install-gala-anteater-pip-command-not-found.md
+
+# 基本信息
+- 测试用例: oe_test_pkg_manager01
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题：是
+- 关联issue：https://atomgit.com/src-openeuler/gala-anteater/issues/27 https://atomgit.com/src-openeuler/gala-anteater/issues/28
+
+# 问题现象
+pkgmanage测试执行oe_test_pkg_manager01用例过程中，安装软件包gala-anteater有提示pip ：command not found信息。用例是执行失败。
+
+# 错误日志
+
+```
+pip：command not found
+```
+
+# 问题根因
+
+gala-anteater软件包在安装时候执行安装脚本的过程中%post写的pip 安装了四个软件包，但是pip命令涉及的软件包python3-pip又未被写入安装依赖，从而执行时候存在找不到pip命令
+
+# 解决方案
+1、确保软件包gala-anteater已被安装，方法（rpm -qa | grep gala-anteater；或者 yum list installed | grep gala-anteater）
+1、提issue给开发，让其使用requires rpm的方式去安装对应的软件包（https://atomgit.com/src-openeuler/gala-anteater/issues/28）
+2、临时解决需要spec中加对应命令涉及的软件包作为安装依赖涉及的pr【https://atomgit.com/src-openeuler/gala-anteater/pull/72/】

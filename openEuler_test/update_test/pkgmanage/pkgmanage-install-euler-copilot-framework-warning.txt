@@ -1,0 +1,32 @@
+# 标题
+pkgmanage-install-warning-euler-copilot-framework
+
+# 基本信息
+- 测试用例: oe_test_pkg_manager01
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题：是
+- 关联issue：https://atomgit.com/src-openeuler/euler-copilot-framework/issues/18
+
+# 问题现象
+pkgmanage测试执行oe_test_pkg_manager01用例过程中，安装软件包copilot-framework执行安装脚本时候有WARNING信息，用例捕捉到warning字段提示用例失败。
+
+# 错误日志
+
+```
+Installing collected packages: httpx
+  WARNING: The script httpx is installed in '/usr/local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed httpx-0.28.1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+```
+
+# 问题根因
+
+euler-copilot-framework软件包在安装脚本时用了pip命令进行安装部分指定版本的软件包详细如下：
+
+warning1：pip 默认会安装到 `/usr/local/bin`，这个路径不在系统可执行路径（PATH）里，所以出现了warning1.
+warning2：由于pytho3升级后也有说明root搭配pip使用时候会存在和系统默认安装的软件包有冲突，会存在dnf/yum/rpm工作异常的情况，所以不建议这么用,建议在虚拟环境中安装
+
+# 解决方案
+1）确认euler-copilot-framework被成功安装到环境中，确认方法（rpm -qa | grep euler-copilot-framework 或者 yum list installed | grep euler-copilot-framework）
+2）提issue告知开发引入到openeuler环境中，使用requires rpm的形式进行安装

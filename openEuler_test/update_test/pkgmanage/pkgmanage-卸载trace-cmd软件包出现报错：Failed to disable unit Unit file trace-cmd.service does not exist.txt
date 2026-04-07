@@ -1,0 +1,23 @@
+# 标题
+pkgmanage-卸载trace-cmd软件包出现报错：Failed to disable unit Unit file trace-cmd.service does not exist.
+
+# 基本信息
+- 测试用例: oe_test_pkg_manager01
+- 系统版本: openEuler-24.03-LTS-SP1
+- 是否问题：是
+- 关联issue：https://atomgit.com/src-openeuler/trace-cmd/issues/17
+
+# 问题现象
+用例执行卸载过程中报Failed，用例捕捉到Failed字段，提示用例失败
+
+# 错误日志
+
+Failed to disable unit: Unit file trace-cmd.service does not exist.
+
+# 问题根因
+
+因为 trace-cmd.service 打包到trace-cmd-help子包中，但是在spec阶段安装前执行的脚本服务是是在主包执行的（%preun
+%systemd_preun %{name}.service），所以在卸载主包的时候要禁用并清理服务找不到service文件
+
+# 解决方案
+整改spec将service及其他文件移动到主包中，help包仅打包man文件见https://atomgit.com/src-openeuler/trace-cmd/pull/79
