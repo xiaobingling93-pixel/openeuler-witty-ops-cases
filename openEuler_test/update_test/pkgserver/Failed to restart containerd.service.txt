@@ -1,0 +1,37 @@
+# 标题
+pkgcmd “Failed to restart containerd.service”
+
+# 基本信息
+- 测试用例: oe_test_service_containerd
+- 系统版本: openEuler-20.03-LTS-SP4
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+Failed to restart containerd.service
+
+# 错误日志
+```
++ test_restart containerd.service
++ service=containerd.service
++ systemctl restart containerd.service
+Failed to restart containerd.service: Unit containerd.service not found.
++ CHECK_RESULT 5 0 0 'containerd.service restart failed'
++ actual_result=5
++ expect_result=0
++ mode=0
++ error_log='containerd.service restart failed'
++ exit_mode=0
++ '[' -z '5 0 0 containerd.service restart failed' ']'
++ '[' 0 -eq 0 ']'
++ test 5x '!=' 0x
++ test -n 'containerd.service restart failed'
++ LOG_ERROR 'containerd.service restart failed'
++ message='containerd.service restart failed'
+```
+
+# 问题根因
+1、20.03-LTS-SP4版本中，Unit containerd.service not found，故而启动失败。
+
+# 解决方案
+1、非问题，对containerd.service服务操作前增加判断，查看服务是否存在。修改用例：https://atomgit.com/openeuler/mugen/pull/4859
