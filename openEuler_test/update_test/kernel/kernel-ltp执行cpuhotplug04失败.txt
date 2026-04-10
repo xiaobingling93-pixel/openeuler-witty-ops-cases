@@ -1,0 +1,42 @@
+# 标题
+kernel “ltp执行cpuhotplug04失败”
+
+# 基本信息
+- 测试用例: cpuhotplug04
+- 系统版本: openEuler-24.03-LTS-SP1/openEuler-24.03-LTS(x86_64)
+- 是否问题：否
+- 关联issue：https://gitee.com/openeuler/kernel/issues/I3Q7WG
+
+# 问题现象
+ltp测试执行过程中，报错：/opt/ltp/testcases/bin/cpuhotplug_hotplug.sh: line 99: echo: write error: No space left on device
+cpuhotplug04 1 TFAIL: Could not offline cpu47
+
+# 错误日志
+```
+<<<test_start>>>
+tag=cpuhotplug04 stime=1776023163
+cmdline="cpuhotplug04.sh -l 1"
+contacts=""
+analysis=exit
+<<<test_output>>>
+incrementing stop
+Name:   cpuhotplug04
+Date:   Mon Apr 13 03:46:03 AM CST 2026
+Desc:   Does it prevent us from offlining the last CPU?
+
+/opt/ltp/testcases/bin/cpuhotplug_hotplug.sh: line 99: echo: write error: No space left on device
+cpuhotplug04 1 TFAIL: Could not offline cpu47
+<<<execution_status>>>
+initiation_status="ok"
+duration=2 termination_type=exited termination_id=1 corefile=no
+cutime=20 cstime=32
+<<<test_end>>>
+
+```
+
+# 问题根因
+1. 查看内核日志发现关键信息：dmesg | grep "Cannot disable CPU",返回CPU 47 has 107 vectors, 93 available. Cannot disable CPU
+2. x86架构的中断向量限制：每个CPU的中断描述符表最多有256个条目，其中0-31号向量保留给CPU异常使用，实际可用于设备中断的向量有180-200个，当离线CPU时，需要将其上的所有中断迁移到其他CPU,如果目标CPU没有足够的空闲向量槽位，内核会拒绝离线操作
+3. 当前用例失败是因为CPU47当前有107个中断向量，其他CPU的可用向量槽位不足（仅93个），无法完成中断迁移。
+# 解决方案
+1. 非问题
