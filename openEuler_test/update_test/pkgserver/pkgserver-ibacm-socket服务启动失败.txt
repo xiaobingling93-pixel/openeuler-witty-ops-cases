@@ -1,0 +1,51 @@
+# 标题
+pkgserver “ibacm.socket服务启动失败”
+
+# 基本信息
+- 测试用例: oe_test_socket_ibacm
+- 系统版本: openEuler-22.03-LTS-SP4(x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，检查到ibacm.socket服务启动失败，日志中存在报错信息
+
+# 错误日志
+```
++ journalctl --since '2026-04-20 08:08:54' -u ibacm.socket
++ grep -i 'fail\|error'
++ grep -v -i 'DEBUG\|INFO\|WARNING'
+Apr 20 08:08:54 localhost.localdomain systemd[1]: ibacm.socket: Failed to create listening socket (rdma 4): Protocol not supported
+Apr 20 08:08:54 localhost.localdomain systemd[1]: ibacm.socket: Failed to listen on sockets: Protocol not supported
+Apr 20 08:08:54 localhost.localdomain systemd[1]: ibacm.socket: Failed with result 'resources'.
+Apr 20 08:08:54 localhost.localdomain systemd[1]: Failed to listen on Socket for InfiniBand Address Cache Manager Daemon.
+Apr 20 08:09:05 localhost.localdomain systemd[1]: ibacm.socket: Failed to create listening socket (rdma 4): Protocol not supported
+Apr 20 08:09:05 localhost.localdomain systemd[1]: ibacm.socket: Failed to listen on sockets: Protocol not supported
+Apr 20 08:09:05 localhost.localdomain systemd[1]: ibacm.socket: Failed with result 'resources'.
+Apr 20 08:09:05 localhost.localdomain systemd[1]: Failed to listen on Socket for InfiniBand Address Cache Manager Daemon.
++ CHECK_RESULT 0 0 1 'There is an error message for the log of ibacm.socket'
++ actual_result=0
++ expect_result=0
++ mode=1
++ error_log='There is an error message for the log of ibacm.socket'
++ exit_mode=0
++ '[' -z '0 0 1 There is an error message for the log of ibacm.socket' ']'
++ '[' 1 -eq 0 ']'
++ test 0x == 0x
++ test -n 'There is an error message for the log of ibacm.socket'
+```
+
+# 问题根因
+1. 系统在尝试创建RDMA Netlink socket（rdma 4）时，提示不支持该协议，原因是环境中不存在RDMA的设备
+
+# 解决方案
+1. 非问题，修改用例，检查环境是否存在RDMA设备
+lspci | grep -i -E "infiniband|rdma|mellanox|connectx|iwarp"
+修复pr:https://atomgit.com/openeuler/mugen/pull/4942
+2.如果环境中不存在RDMA设备，则为非问题，用例跳过不执行
+3.解释为何选用infiniband，rdma，mellanox，connectx，iwarp几个关键词
+Mellanox (迈络思)：是一家网络设备公司，他们生产的网卡都集成了RDMA功能，市面上见到的 RDMA 物理网卡，一大半都印着这个牌子
+ConnectX：这是 Mellanox 旗下最著名、最畅销的网卡芯片系列代号（比如 ConnectX-4, ConnectX-5, ConnectX-6 直至最新的 ConnectX-7）
+InfiniBand：这是一种独立于传统以太网的高性能网络通信技术。它从诞生之初，就是为了实现极低的延迟和极高的吞吐量，而 RDMA 正是 InfiniBand 协议栈中的核心灵魂技术。如果一张网卡在 lspci里标明自己支持 InfiniBand，那就等于它自带了 RDMA 功能。
+iWARP：这是 RDMA 技术在传统的 TCP/IP 网络（以太网）上实现的一种标准协议。它允许 RDMA 跑在普通的网线上，而不必非得用昂贵的 InfiniBand 专用线缆。
+RDMA：这就是我们要找的终极目标技术本身。有些网卡厂商比较实在，直接在硬件描述里写上“RDMA”。

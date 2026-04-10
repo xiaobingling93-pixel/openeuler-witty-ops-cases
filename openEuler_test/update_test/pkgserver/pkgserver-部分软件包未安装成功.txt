@@ -1,0 +1,56 @@
+# 标题
+pkgserver “部分软件包未安装成功”
+
+# 基本信息
+- 测试用例: oe_test_service_restart
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 是
+- 关联issue: 
+https://atomgit.com/src-openeuler/kata-containers/issues/125
+https://atomgit.com/src-openeuler/docker/issues/197
+
+# 问题现象
+pkgserver测试执行过程中，检查到有部分update软件包未安装成功。
+
+# 错误日志
+```
++ rpm -ql docker-engine
+package docker-engine is not installed
+```
+```
++ rpm -ql kata-containers-go
+package kata-containers-go is not installed
+```
+```
+[root@localhost mugen]# cat ./testcases/system-test/service-test/failed_install
+docker-engine
+kata-containers-go
+```
+# 问题根因
+1.docker-engine和containerd安装有文件冲突
+2.kata-containers和kata-containers-go安装时候有文件显示冲突
+
+# 解决方案
+1.安装docker-engine和containerd，kata-containers和kata-containers-go提示文件冲突，且软件包的spec文件中未添加conflict关键词，需要提交issue，联系软件包相关开发人员，解决问题
+2.docker-engine和containerd，kata-containers和kata-containers-go的spec文件中如果已经添加了conflict关键词，表示互相冲突，且已有issue记录冲突属于非问题，则需要手动安装docker-engine和kata-containers-go进行测试
+3.在环境中卸载掉containerd和kata-containers软件包，执行以下命令测试docker服务
+bash mugen.sh -f docker-engine -r oe_test_service_docker -x 
+手动安装kata-containers-go，查看该软件包包含的服务名
+rpm -ql kata-containers-go | grep -v "@" | grep "service\|socket\|target"
+不存在服务则不需要继续执行以下步骤，存在则手动进行测试,例如：
+service=$service_name
+systemctl start $service
+sleep 5
+systemctl status $service
+systemctl stop $service
+sleep 5
+systemctl status $service
+systemctl restart $service
+sleep 5
+systemctl status $service
+systemctl reload $service
+systemctl status $service
+systemctl enable $service;查看命令执行成功，symlink file 被创建
+systemctl disable $service；查看命令执行成功，symlink file 被移除
+查看服务测试过程中有无报错信息
+journalctl -u $service | grep -i "fail\|error" | grep -v -i "DEBUG\|INFO\|WARNING"

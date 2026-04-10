@@ -1,0 +1,43 @@
+# 标题
+pkgcmd “iso下载超时”
+
+# 基本信息
+- 测试用例: oe_test_osinfo-detect
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64、x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，检测到下载openeuler标准镜像超时。
+
+# 错误日志
+```
++ wget https://repo.openeuler.org/openEuler-20.03-LTS/ISO/aarch64/openEuler-20.03-LTS-aarch64-dvd.iso
+--2026-03-25 17:39:03--  https://repo.openeuler.org/openEuler-20.03-LTS/ISO/aarch64/openEuler-20.03-LTS-aarch64-dvd.iso
+Resolving repo.openeuler.org (repo.openeuler.org)... 49.0.229.41
+Connecting to repo.openeuler.org (repo.openeuler.org)|49.0.229.41|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 4657477632 (4.3G) [application/octet-stream]
+Saving to: ‘openEuler-20.03-LTS-aarch64-dvd.iso’
+
+     0K .......... .......... .......... .......... ..........  0%  343K 3h41m
+    50K .......... .......... .......... .......... ..........  0%  453K 3h14m
+   100K .......... .......... .......... .......... ..........  0%  672K 2h47m
+   150K .......... .......... .......... .......... ..........  0%  449K 2h47m
+   200K .......... .......... .......... .......... ..........  0%  670K 2h36m
+   250K .......... .......... .......... .......... ..........  0%  665K 2h29m
+   300K .......... .......... .......... .......... ..........  0% 1.28M 2h16m
+   350K .......... .......... .......... .......... ..........  0%  678K 2h13m
+...
+2165700K .......... .......... .......... .......... .......... 47% 2.05M 32m55s
+2165750K ........Wed Mar 25 18:08:59 2026 - ERROR - Timeout : Command 'bash -x oe_test_osinfo-detect.sh' timed out after 1799.999985019 seconds
+.. .......... .......... .......... .......... 47% 1.93M 32m55s
+2165800K .......... .......... ..
+```
+
+# 问题根因
+1、openEuler官方发布的iso镜像大小为3G，下载慢，mugen框架设置用例执行超时时间为30分钟，在30分钟内，iso镜像未下载成功
+
+# 解决方案
+1、非问题，修改测试用例，将测试的标准ISO镜像替换成大小为680M左右的netinst ISO镜像，如果仍然下载超时，建议检查网络，或者手动下载
+修复pr：https://atomgit.com/openeuler/mugen/pull/4954
