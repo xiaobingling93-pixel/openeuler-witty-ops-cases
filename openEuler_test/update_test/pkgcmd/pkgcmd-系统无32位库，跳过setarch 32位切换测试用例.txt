@@ -1,0 +1,38 @@
+# 标题
+pkgcmd “系统无32位库，跳过setarch 32位切换测试用例”
+
+# 基本信息
+- 测试用例: oe_test_setarch
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+系统无32位库，跳过setarch 32位切换测试用例。
+
+# 错误日志
+```
+Wed Apr  8 10:15:19 2026 - INFO  - Start to prepare the test environment.
++ DNF_INSTALL util-linux
++ pkgs=util-linux
++ node=1
++ '[' -z '' ']'
++ tmpfile=
+++ python3 /root/mugen/libs/locallibs/rpm_manage.py install --pkgs util-linux --node 1 --tempfile ''
+Wed Apr  8 10:15:20 2026 - INFO  - pkgs:(util-linux) is already installed
++ tmpfile2=
++ '[' -z '' ']'
++ tmpfile=
++ grep -q 32-bit
++ LOG_INFO '系统无32位库，跳过setarch 32位切换测试用例'
++ message='系统无32位库，跳过setarch 32位切换测试用例'
++ python3 /root/mugen/libs/locallibs/mugen_log.py --level info --message '系统无32位库，跳过setarch 32位切换测试用例'
+Wed Apr  8 10:15:20 2026 - INFO  - 系统无32位库，跳过setarch 32位切换测试用例
++ exit 255
+```
+
+# 问题根因
+1、测试执行前，检测到测试环境不满足要求，(find /lib /usr/lib -name "*.so" -exec file {} +) 2>/dev/null | grep -q "32-bit" 为空，导致用例跳过。
+
+# 解决方案
+1、非问题，用例跳过。

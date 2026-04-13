@@ -1,0 +1,51 @@
+# 标题
+pkgcmd “执行机器默认语言是中文，无法检索到英文信息”
+
+# 基本信息
+- 测试用例: oe_test_util-linux_chcpu
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+chcpu --help failed to show Usage
+chcpu -V failed to display version information
+
+# 错误日志
+```
++ grep -qi Usage:
++ chcpu --help
++ CHECK_RESULT 1 0 0 'chcpu --help failed to show Usage'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='chcpu --help failed to show Usage'
++ exit_mode=0
++ '[' -z '1 0 0 chcpu --help failed to show Usage' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'chcpu --help failed to show Usage'
++ LOG_ERROR 'chcpu --help failed to show Usage'
++ message='chcpu --help failed to show Usage'
+
++ chcpu -V
++ grep -q 'chcpu from util-linux'
++ CHECK_RESULT 1 0 0 'chcpu -V failed to display version information'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='chcpu -V failed to display version information'
++ exit_mode=0
++ '[' -z '1 0 0 chcpu -V failed to display version information' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'chcpu -V failed to display version information'
++ LOG_ERROR 'chcpu -V failed to display version information'
++ message='chcpu -V failed to display version information'
+```
+
+# 问题根因
+1、执行机器默认语言是中文，无法检索到英文信息，故而chcpu --help | grep -qi "Usage:"、chcpu -V | grep -q "chcpu from util-linux" 执行失败
+
+# 解决方案
+1、用例问题，执行前设置机器默认语言，执行后恢复环境。修改用例：https://atomgit.com/openeuler/mugen/pull/4944

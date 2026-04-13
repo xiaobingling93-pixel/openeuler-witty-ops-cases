@@ -1,0 +1,63 @@
+# 标题
+pkgcmd “httpd服务启动失败”
+
+# 基本信息
+- 测试用例: oe_test_openssl_Implements_https
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+systemctl restart httpd 执行失败，httpd服务启动报错。
+
+# 错误日志
+```
++ systemctl restart httpd
+Job for httpd.service failed because the control process exited with error code.
+See "systemctl status httpd.service" and "journalctl -xeu httpd.service" for details.
++ CHECK_RESULT 1 0 0 'error:OPENSSL and HTTPD configuration failed.'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='error:OPENSSL and HTTPD configuration failed.'
++ exit_mode=0
++ '[' -z '1 0 0 error:OPENSSL and HTTPD configuration failed.' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'error:OPENSSL and HTTPD configuration failed.'
++ LOG_ERROR 'error:OPENSSL and HTTPD configuration failed.'
++ message='error:OPENSSL and HTTPD configuration failed.'
++ python3 /opt/mugen/libs/locallibs/mugen_log.py --level error --message 'error:OPENSSL and HTTPD configuration failed.'
+Thu Apr  9 10:44:39 2026 - ERROR - error:OPENSSL and HTTPD configuration failed.
++ (( exec_result++ ))
++ LOG_ERROR 'oe_test_openssl_Implements_https.sh line 40'
++ message='oe_test_openssl_Implements_https.sh line 40'
++ python3 /opt/mugen/libs/locallibs/mugen_log.py --level error --message 'oe_test_openssl_Implements_https.sh line 40'
+Thu Apr  9 10:44:39 2026 - ERROR - oe_test_openssl_Implements_https.sh line 40
++ '[' 0 -eq 1 ']'
++ return 0
++ systemctl status httpd
++ grep 'active (running)'
++ CHECK_RESULT 1
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 1 ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n ''
++ (( exec_result++ ))
++ LOG_ERROR 'oe_test_openssl_Implements_https.sh line 42'
++ message='oe_test_openssl_Implements_https.sh line 42'
+```
+
+# 问题根因
+1、httpd试图监听的 80 端口被系统中的另一个进程占用了。
+Apr 09 10:58:29 localhost.localdomain httpd[23269]: (98)Address already in use: AH00072: make_sock: could not bind to address [::]:80
+Apr 09 10:58:29 localhost.localdomain httpd[23269]: (98)Address already in use: AH00072: make_sock: could not bind to address 0.0.0.0:80
+
+# 解决方案
+1、非问题，使用netstat -nltp | grep ":80" 查找占用80端口的进程，停止占用端口的进程。
+2、重启httpd服务即可。
