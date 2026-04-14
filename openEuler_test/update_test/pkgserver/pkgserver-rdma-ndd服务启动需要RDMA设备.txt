@@ -1,0 +1,25 @@
+# 标题
+pkgserver “rdma-ndd服务启动需要RDMA设备”
+
+# 基本信息
+- 测试用例: oe_test_service_rdma-ndd
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，检查到测试用例判断环境中不存在RDMA相关设备，用例跳过
+
+# 错误日志
+```
++ grep -i -E 'infiniband|rdma|mellanox|connectx|iwarp'
++ lspci
++ exit 255
+
+```
+
+# 问题根因
+1. 环境中不存在RDMA相关设备
+
+# 解决方案
+1. 非问题，用例跳过不执行

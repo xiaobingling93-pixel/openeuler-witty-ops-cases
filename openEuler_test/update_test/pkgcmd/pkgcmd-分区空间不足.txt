@@ -1,0 +1,65 @@
+# 标题
+pkgcmd “分区空间不足”
+
+# 基本信息
+- 测试用例: oe_test_high_nbde
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，检测到测试环境获取的磁盘分区失败，提示空间不足
+
+# 错误日志
+```
++ echo -e 'n\n\np\n\n\n+100M\nw'
++ fdisk /dev/sda
+
+Welcome to fdisk (util-linux 2.39.1).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+This disk is currently in use - repartitioning is probably a bad idea.
+It's recommended to umount all file systems, and swapoff all swap
+partitions on this disk.
+
+
+Command (m for help): Partition number (4-128, default 4): No enough free sectors available.
+
+Command (m for help):
+Disk /dev/sda: 200 GiB, 214748364800 bytes, 419430400 sectors
+Disk model: QEMU HARDDISK
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: C797D950-5C8D-4B7E-9683-3F837B338BAD
+
+Device       Start       End   Sectors   Size Type
+/dev/sda1     2048   1230847   1228800   600M EFI System
+/dev/sda2  1230848   3327999   2097152     1G Linux filesystem
+/dev/sda3  3328000 419430366 416102367 198.4G Linux LVM
+
+Command (m for help):
+
+Command (m for help):
+
+Command (m for help): +: unknown command
+
+Command (m for help):
+The partition table has been altered.
+Syncing disks.
+```
+```
++ echo -e 'openEuler12#$\nopenEuler12#$\n'
++ cryptsetup luksFormat /dev/sda1
+Cannot exclusively open /dev/sda1, device in use.
+WARNING: Device /dev/sda1 already contains a 'vfat' superblock signature.
++ CHECK_RESULT 1 0 0 'Disk encryption failed'
+```
+# 问题根因
+1、测试用例获取空闲磁盘的方式不正确，导致获取到了系统盘，系统盘已无可用的分区空间
+
+# 解决方案
+1、非问题，修改测试用例，在测试用例中使用mugen测试框架的TEST_DISK方法获取空闲测试磁盘
+修复PR：https://atomgit.com/openeuler/mugen/pull/4946
