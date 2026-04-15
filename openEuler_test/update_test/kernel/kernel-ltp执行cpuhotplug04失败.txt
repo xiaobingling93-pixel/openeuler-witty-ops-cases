@@ -35,8 +35,107 @@ cutime=20 cstime=32
 ```
 
 # 问题根因
-1. 查看内核日志发现关键信息：dmesg | grep "Cannot disable CPU",返回CPU 47 has 107 vectors, 93 available. Cannot disable CPU
-2. x86架构的中断向量限制：每个CPU的中断描述符表最多有256个条目，其中0-31号向量保留给CPU异常使用，实际可用于设备中断的向量有180-200个，当离线CPU时，需要将其上的所有中断迁移到其他CPU,如果目标CPU没有足够的空闲向量槽位，内核会拒绝离线操作
-3. 当前用例失败是因为CPU47当前有107个中断向量，其他CPU的可用向量槽位不足（仅93个），无法完成中断迁移。
+1. 测试目的：CPU热插拔测试，验证内核阻止下线最后一个CPU的安全机制。
+2. 测试步骤：
+[438880.531437] LTP: starting cpuhotplug04 (cpuhotplug04.sh -l 1)
+[438880.643551] smpboot: Booting Node 1 Processor 47 APIC 0x3b
+[438880.700081] smpboot: CPU 1 is now offline
+[438880.730234] smpboot: CPU 2 is now offline
+[438880.764224] smpboot: CPU 3 is now offline
+[438880.798159] smpboot: CPU 4 is now offline
+[438880.832062] smpboot: CPU 5 is now offline
+[438880.866023] smpboot: CPU 6 is now offline
+[438880.899965] smpboot: CPU 7 is now offline
+[438880.931959] smpboot: CPU 8 is now offline
+[438880.965907] smpboot: CPU 9 is now offline
+[438880.999837] smpboot: CPU 10 is now offline
+[438881.035778] smpboot: CPU 11 is now offline
+[438881.068309] smpboot: CPU 12 is now offline
+[438881.102364] smpboot: CPU 13 is now offline
+[438881.132548] smpboot: CPU 14 is now offline
+[438881.162537] smpboot: CPU 15 is now offline
+[438881.198088] smpboot: CPU 16 is now offline
+[438881.226400] smpboot: CPU 17 is now offline
+[438881.256371] smpboot: CPU 18 is now offline
+[438881.292044] smpboot: CPU 19 is now offline
+[438881.320405] smpboot: CPU 20 is now offline
+[438881.356182] smpboot: CPU 21 is now offline
+[438881.385257] smpboot: CPU 22 is now offline
+[438881.416094] smpboot: CPU 23 is now offline
+[438881.452959] smpboot: CPU 24 is now offline
+[438881.480025] smpboot: CPU 25 is now offline
+[438881.511033] smpboot: CPU 26 is now offline
+[438881.545422] smpboot: CPU 27 is now offline
+[438881.570959] smpboot: CPU 28 is now offline
+[438881.599934] smpboot: CPU 29 is now offline
+[438881.626902] smpboot: CPU 30 is now offline
+[438881.653861] smpboot: CPU 31 is now offline
+[438881.690872] smpboot: CPU 32 is now offline
+[438881.720816] smpboot: CPU 33 is now offline
+[438881.754800] smpboot: CPU 34 is now offline
+[438881.782781] smpboot: CPU 35 is now offline
+[438881.809727] smpboot: CPU 36 is now offline
+[438881.837641] smpboot: CPU 37 is now offline
+[438881.868607] smpboot: CPU 38 is now offline
+[438881.899585] smpboot: CPU 39 is now offline
+[438881.933569] smpboot: CPU 40 is now offline
+[438881.964943] smpboot: CPU 41 is now offline
+[438881.995512] smpboot: CPU 42 is now offline
+[438882.025531] smpboot: CPU 43 is now offline
+[438882.051495] smpboot: CPU 44 is now offline
+[438882.076482] smpboot: CPU 45 is now offline
+[438882.098058] smpboot: CPU 46 is now offline
+[438882.125140] CPU 47 has 117 vectors, 103 available. Cannot disable CPU
+[438882.138913] intel_rapl_common: Found RAPL domain package
+[438882.140670] intel_rapl_common: Found RAPL domain dram
+[438882.162558] smpboot: Booting Node 0 Processor 10 APIC 0x18
+[438882.200533] smpboot: Booting Node 0 Processor 11 APIC 0x1a
+[438882.239551] smpboot: Booting Node 1 Processor 12 APIC 0x20
+[438882.282530] smpboot: Booting Node 1 Processor 13 APIC 0x22
+[438882.325525] smpboot: Booting Node 1 Processor 14 APIC 0x24
+[438882.365514] smpboot: Booting Node 1 Processor 15 APIC 0x26
+[438882.409520] smpboot: Booting Node 1 Processor 16 APIC 0x28
+[438882.453526] smpboot: Booting Node 1 Processor 17 APIC 0x2a
+[438882.497516] smpboot: Booting Node 1 Processor 18 APIC 0x30
+[438882.539518] smpboot: Booting Node 1 Processor 19 APIC 0x32
+[438882.581536] smpboot: Booting Node 0 Processor 1 APIC 0x2
+[438882.626548] smpboot: Booting Node 1 Processor 20 APIC 0x34
+[438882.668521] smpboot: Booting Node 1 Processor 21 APIC 0x36
+[438882.709523] smpboot: Booting Node 1 Processor 22 APIC 0x38
+[438882.756522] smpboot: Booting Node 1 Processor 23 APIC 0x3a
+[438882.803538] smpboot: Booting Node 0 Processor 24 APIC 0x1
+[438882.845541] smpboot: Booting Node 0 Processor 25 APIC 0x3
+[438882.887521] smpboot: Booting Node 0 Processor 26 APIC 0x5
+[438882.932521] smpboot: Booting Node 0 Processor 27 APIC 0x7
+[438882.974519] smpboot: Booting Node 0 Processor 28 APIC 0x9
+[438883.019521] smpboot: Booting Node 0 Processor 29 APIC 0xb
+[438883.065524] smpboot: Booting Node 0 Processor 2 APIC 0x4
+[438883.107524] smpboot: Booting Node 0 Processor 30 APIC 0x11
+[438883.155550] smpboot: Booting Node 0 Processor 31 APIC 0x13
+[438883.198531] smpboot: Booting Node 0 Processor 32 APIC 0x15
+[438883.243530] smpboot: Booting Node 0 Processor 33 APIC 0x17
+[438883.289533] smpboot: Booting Node 0 Processor 34 APIC 0x19
+[438883.334531] smpboot: Booting Node 0 Processor 35 APIC 0x1b
+[438883.382551] smpboot: Booting Node 1 Processor 36 APIC 0x21
+[438883.424516] smpboot: Booting Node 1 Processor 37 APIC 0x23
+[438883.466510] smpboot: Booting Node 1 Processor 38 APIC 0x25
+[438883.516512] smpboot: Booting Node 1 Processor 39 APIC 0x27
+[438883.560533] smpboot: Booting Node 0 Processor 3 APIC 0x6
+[438883.602539] smpboot: Booting Node 1 Processor 40 APIC 0x29
+[438883.650550] smpboot: Booting Node 1 Processor 41 APIC 0x2b
+[438883.692514] smpboot: Booting Node 1 Processor 42 APIC 0x31
+[438883.736519] smpboot: Booting Node 1 Processor 43 APIC 0x33
+[438883.785519] smpboot: Booting Node 1 Processor 44 APIC 0x35
+[438883.829515] smpboot: Booting Node 1 Processor 45 APIC 0x37
+[438883.872520] smpboot: Booting Node 1 Processor 46 APIC 0x39
+[438883.910815] smpboot: CPU 47 is now offline
+[438883.950573] smpboot: Booting Node 0 Processor 4 APIC 0x8
+[438883.995528] smpboot: Booting Node 0 Processor 5 APIC 0xa
+[438884.041529] smpboot: Booting Node 0 Processor 6 APIC 0x10
+[438884.088525] smpboot: Booting Node 0 Processor 7 APIC 0x12
+[438884.136527] smpboot: Booting Node 0 Processor 8 APIC 0x14
+[438884.185554] smpboot: Booting Node 0 Processor 9 APIC 0x16
+3. 查看内核日志发现关键信息：dmesg | grep "Cannot disable CPU",返回CPU 47 has 117 vectors, 103 available. Cannot disable CPU。当前用例失败是因为CPU47当前有117个中断向量，其他CPU的可用向量槽位不足（仅103个），无法完成中断迁移。
+4. x86架构的中断向量限制：每个CPU的中断描述符表最多有256个条目，其中0-31号向量保留给CPU异常使用，实际可用于设备中断的向量有180-200个，当离线CPU时，需要将其上的所有中断迁移到其他CPU,如果目标CPU没有足够的空闲向量槽位，内核会拒绝离线操作。
 # 解决方案
-1. 非问题
+1. 非问题，更换其他机器可测试成功。

@@ -1,0 +1,43 @@
+# 标题
+kernel “升级kernel重启失败.txt”
+
+# 基本信息
+- 测试用例: update测试环境准备
+- 系统版本: openEuler-22.03-LTS-SP4/openEuler-20.03-LTS-SP4/openEuler-24.03-LTS-SP1/openEuler-24.03-LTS-SP2/openEuler-24.03-LTS-SP3/openEuler-24.03-LTS(aarch64、x86_64)
+- 是否问题：是
+- 关联issue：https://atomgit.com/src-openeuler/kernel/issues/14144
+
+# 问题现象
+升级kernel，重启机器失败
+
+# 错误日志
+
+[37.8986701I T2033]---[ end trace 0000000000000000 1---
+[39.682499]I C381 sd 0:0:4:0: Isdj] tag#563 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=4s
+[39.903208][ T2033] RIP: 0010:nft_setelem_remove+0x1f/0xb0 [nf_tables]
+39.909554][ C38] sd 0:0:4:0: [sdj] tag#563 Sense Key: Medium Error [current] [descriptorl
+[
+39.91759511 T20331 Code: 90 90 90 90 90 90 90 90 90 90 90 Of if 44 00 00 4c 8b 86 c0 00 00 00 48 8b 8a c0 00 00 00 41 8b 80a0 00 00 00 48 01 c8 74 11 <44> 0f b6 48 04 45 84 c9 74 07 42 f6 04 08 02 75 09 49 8b 40 38 e9
+39.9257721D C381 sd 0:0:4:0: Isdjl tag#563 Add. Sense: Unrecovered read error
+39.92577510 C381 sd 0:0:4:0:[sdj] tag#563 CDB: Read(16) 88 00 00 00 00 00 00 12 c7 f8 00 00 00 08 00 00
+39.9425261I T20331 RSP:0018:ffffc9000f12f830 EFLAGS:00010202
+39.950919][
+C381 critical medium error, dev sdj, sector 1230847 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 2
+39.9593691
+T20331
+39.95937011
+T20331 RAX: 0000000000000010 RBX: ffff88a0873a8d90 RCX: 0000000000000000
+39.99424011
+T20331 RDX: ffff88a0a8c51660 RSI: ffff88a0a8c52200 RDI:ffffffff9ec6484039.994242JI T20331 RBP: ffffc9000f12f858 R08: ffffffffc0ca2300 R09:000000000000094739.9942431I T20331 R10: 0000000000000000 R11: fefefefefefefeff R12: ffff88a0a8c51c0039.9942441I T20331 R13: ffff88a0873a8d80 R14: ffff88a0a8c51600 R15:000000000ffffff5
+39.9942451I T20331 FS: 0000713794e11740(0000) GS:ffff88c07f280000(0000) knIGS:0000000000000000
+40.03871711 T20331 CS: 0010 DS: 0000 ES: 0000 CRO: 0000000080050033
+[40.0387191I T20331 CR2: 0000000000000014 CR3: 000000021005e001 CR4: 00000000001706e0
+[40.038721]I T20331 Kernel panic - not syncing: Fatal exception
+[40.0477901I T2033] Kernel Offset: disabled
+[41.0364381[ T20331--I end Kernel panic - not syncing: Fatal exception ]--
+
+# 问题根因
+1. nft添加set时未初始化elem导致
+
+# 解决方案
+1. 在kernel-6.6.0-145.0.2.133.oe2403sp3.x86_64和kernel-6.6.0-145.0.2.133.oe2403sp3.aarch64已修复
