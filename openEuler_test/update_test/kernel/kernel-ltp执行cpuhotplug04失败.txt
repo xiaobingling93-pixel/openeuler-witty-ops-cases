@@ -1,0 +1,94 @@
+# 标题
+kernel “ltp执行cpuhotplug04失败”
+
+# 基本信息
+- 测试用例: cpuhotplug04
+- 系统版本: openEuler-24.03-LTS-SP1/openEuler-24.03-LTS(x86_64)
+- 是否问题：否
+- 关联issue：https://gitee.com/openeuler/kernel/issues/I3Q7WG
+
+# 问题现象
+ltp测试执行过程中，报错：/opt/ltp/testcases/bin/cpuhotplug_hotplug.sh: line 99: echo: write error: No space left on device
+cpuhotplug04 1 TFAIL: Could not offline cpu47
+
+# 错误日志
+```
+<<<test_start>>>
+tag=cpuhotplug04 stime=1776023163
+cmdline="cpuhotplug04.sh -l 1"
+contacts=""
+analysis=exit
+<<<test_output>>>
+incrementing stop
+Name:   cpuhotplug04
+Date:   Mon Apr 13 03:46:03 AM CST 2026
+Desc:   Does it prevent us from offlining the last CPU?
+
+/opt/ltp/testcases/bin/cpuhotplug_hotplug.sh: line 99: echo: write error: No space left on device
+cpuhotplug04 1 TFAIL: Could not offline cpu47
+<<<execution_status>>>
+initiation_status="ok"
+duration=2 termination_type=exited termination_id=1 corefile=no
+cutime=20 cstime=32
+<<<test_end>>>
+
+```
+
+# 问题根因
+1. 测试目的：CPU热插拔测试，验证内核阻止下线最后一个CPU的安全机制。
+2. 测试步骤：
+[438880.531437] LTP: starting cpuhotplug04 (cpuhotplug04.sh -l 1)
+[438880.643551] smpboot: Booting Node 1 Processor 47 APIC 0x3b
+[438880.700081] smpboot: CPU 1 is now offline
+[438880.730234] smpboot: CPU 2 is now offline
+[438880.764224] smpboot: CPU 3 is now offline
+[438880.798159] smpboot: CPU 4 is now offline
+[438880.832062] smpboot: CPU 5 is now offline
+[438880.866023] smpboot: CPU 6 is now offline
+[438880.899965] smpboot: CPU 7 is now offline
+[438880.931959] smpboot: CPU 8 is now offline
+[438880.965907] smpboot: CPU 9 is now offline
+[438880.999837] smpboot: CPU 10 is now offline
+[438881.035778] smpboot: CPU 11 is now offline
+[438881.068309] smpboot: CPU 12 is now offline
+[438881.102364] smpboot: CPU 13 is now offline
+[438881.132548] smpboot: CPU 14 is now offline
+[438881.162537] smpboot: CPU 15 is now offline
+[438881.198088] smpboot: CPU 16 is now offline
+[438881.226400] smpboot: CPU 17 is now offline
+[438881.256371] smpboot: CPU 18 is now offline
+[438881.292044] smpboot: CPU 19 is now offline
+[438881.320405] smpboot: CPU 20 is now offline
+[438881.356182] smpboot: CPU 21 is now offline
+[438881.385257] smpboot: CPU 22 is now offline
+[438881.416094] smpboot: CPU 23 is now offline
+[438881.452959] smpboot: CPU 24 is now offline
+[438881.480025] smpboot: CPU 25 is now offline
+[438881.511033] smpboot: CPU 26 is now offline
+[438881.545422] smpboot: CPU 27 is now offline
+[438881.570959] smpboot: CPU 28 is now offline
+[438881.599934] smpboot: CPU 29 is now offline
+[438881.626902] smpboot: CPU 30 is now offline
+[438881.653861] smpboot: CPU 31 is now offline
+[438881.690872] smpboot: CPU 32 is now offline
+[438881.720816] smpboot: CPU 33 is now offline
+[438881.754800] smpboot: CPU 34 is now offline
+[438881.782781] smpboot: CPU 35 is now offline
+[438881.809727] smpboot: CPU 36 is now offline
+[438881.837641] smpboot: CPU 37 is now offline
+[438881.868607] smpboot: CPU 38 is now offline
+[438881.899585] smpboot: CPU 39 is now offline
+[438881.933569] smpboot: CPU 40 is now offline
+[438881.964943] smpboot: CPU 41 is now offline
+[438881.995512] smpboot: CPU 42 is now offline
+[438882.025531] smpboot: CPU 43 is now offline
+[438882.051495] smpboot: CPU 44 is now offline
+[438882.076482] smpboot: CPU 45 is now offline
+[438882.098058] smpboot: CPU 46 is now offline
+[438882.125140] CPU 47 has 117 vectors, 103 available. Cannot disable CPU
+[438882.138913] intel_rapl_common: Found RAPL domain package
+[438882.140670] intel_rapl_common: Found RAPL domain dram
+3. 查看内核日志发现关键信息：dmesg | grep "Cannot disable CPU",返回CPU 47 has 117 vectors, 103 available. Cannot disable CPU。当前用例失败是因为CPU47当前有117个中断向量，其他CPU的可用向量槽位不足（仅103个），无法完成中断迁移。
+4. x86架构的中断向量限制：每个CPU的中断描述符表最多有256个条目，其中0-31号向量保留给CPU异常使用，实际可用于设备中断的向量有180-200个，当离线CPU时，需要将其上的所有中断迁移到其他CPU,如果目标CPU没有足够的空闲向量槽位，内核会拒绝离线操作。
+# 解决方案
+1. 非问题
