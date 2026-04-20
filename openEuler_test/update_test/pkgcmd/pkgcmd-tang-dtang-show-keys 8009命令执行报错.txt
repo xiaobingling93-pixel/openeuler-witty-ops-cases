@@ -1,0 +1,24 @@
+# 标题
+pkgcmd-tang-dtang-show-keys 8009命令执行报错
+
+# 基本信息
+- 测试用例: oe_test_tang_encrypt
+- 系统版本: openEuler-24.03-LTS-SP1
+- 是否问题：是
+- 关联issue：https://atomgit.com/src-openeuler/tang/issues/2
+
+# 问题现象
+用例执行过程中，tang-show-keys 8009命令报错
+
+# 错误日志
+
+curl： （22） The requested URL returned error: 500
+
+# 问题根因
+
+上游有人提出https://github.com/latchset/tang/issues/23 使用文件监视来更新 /var/cache/tang 是不可靠的，所以上游对 Tang 来说，获取最新的密钥信息至关重要。移除对外部脚本（如 tangd-update）的依赖，并将这部分计算逻辑直接移入 Tang自身。从而合入了https://github.com/latchset/tang/commit/6090505和https://github.com/latchset/tang/commit/7119454移除了/var/cache/tang，让服务直接独占地读取 /var/db/tang从而也一起修改了/var/db/tang的权限，从之前的2570变更为了0700，从以前的多人协作管理密钥变更为单一服务独占访问，最小化权限。
+因此我们之前打包这个`/var/db/tang` 存密钥的目录权限是2570，也需要同步整改
+
+# 解决方案
+打包这个目录的时候使用0700权限进行打包，所有者可读写执行。
+pr：https://atomgit.com/src-openeuler/tang/pull/14/
