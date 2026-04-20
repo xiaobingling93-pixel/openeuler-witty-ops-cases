@@ -1,0 +1,27 @@
+# 标题
+pkgserver “systemd-binfmt服务状态为exited”
+
+# 基本信息
+- 测试用例: oe_test_service_systemd-binfmt
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+用例测试执行过程中，检查到服务状态为active (exited)
+
+# 错误日志
+```
++ systemctl status systemd-binfmt.service
++ grep Active
++ grep -v 'inactive (dead)'
+     Active: active (exited) since Fri 2026-04-17 09:38:44 CST; 8min ago
++ CHECK_RESULT 0 0 1 'There is an error for the status of systemd-binfmt.service'
+```
+
+# 问题根因
+1. 该服务的启动条件是/lib/binfmt.d、/usr/lib/binfmt.d、/usr/local/lib/binfmt.d、/etc/binfmt.d、/run/binfmt.d这几个目录至少有一个非空。当环境中有一个目录非空，服务启动后，由于服务类型为oneshot，所以状态是active (exited)
+
+# 解决方案
+1. 非问题，修改用例，判断环境中binfmt.d的几个目录是否非空
+修复PR:https://atomgit.com/openeuler/mugen/pull/5090

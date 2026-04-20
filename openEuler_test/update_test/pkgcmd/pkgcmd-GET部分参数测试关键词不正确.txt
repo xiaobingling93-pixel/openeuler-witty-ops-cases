@@ -1,0 +1,69 @@
+# 标题
+pkgcmd “GET部分参数测试关键词匹配不正确”
+
+# 基本信息
+- 测试用例: oe_test_perl-libwww-perl_GET_02/oe_test_perl-libwww-perl_POST_02
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行失败，CHECK_RESULT检测到实际输出与预期不符：
+GET -S 尝试匹配关键词 response失败。
+GET -E 尝试匹配关键词 headers失败。
+POST -m GET -e 尝试匹配关键词 response失败。
+
+# 错误日志
+```
++ GET -S http://www.baidu.com
++ grep response
++ CHECK_RESULT 1 0 0 'Check GET -S failed'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='Check GET -S failed'
++ exit_mode=0
++ '[' -z '1 0 0 Check GET -S failed' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'Check GET -S failed'
+
+```
+```
++ GET -E http://www.baidu.com
++ grep headers
++ CHECK_RESULT 1 0 0 'Check GET -E failed'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='Check GET -E failed'
++ exit_mode=0
++ '[' -z '1 0 0 Check GET -E failed' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'Check GET -E failed'
+```
+```
++ POST -m GET http://www.baidu.com -e
++ grep response
++ CHECK_RESULT 1 0 0 'Check POST -e failed'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='Check POST -e failed'
++ exit_mode=0
++ '[' -z '1 0 0 Check POST -e failed' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'Check POST -e failed'
+```
+# 问题根因
+1、GET命令的-S参数的意义是显示响应状态行及重定向链，（如200 OK），但是用例判断的关键词response是通用词，有可能会不存在，匹配不准确
+2、GET命令的-E参数的意义是显示Headers(响应头)的完整链路，用例判断的关键词headers没有意义，通常不作为字段名出现，应匹配特定的Headers字段（如 Content-type）或请求行
+3、POST -m GET命令的-e参数的意义是仅显示响应头，但是用例判断的关键词response是通用词，有可能会不存在，匹配不准确，应匹配特定的Headers字段（如 Content-type）
+
+# 解决方案
+1、非问题，修改测试用例，response关键词修改为“200 OK”
+2、非问题，修改测试用例，headers关键词修改为“Content-Type”和“GET http”
+3、非问题，修改测试用例，response关键词修改为“Content-Type”
+修复PR：https://atomgit.com/openeuler/mugen/pull/5039

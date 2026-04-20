@@ -1,0 +1,27 @@
+# 标题
+pkgserver “systemd-fsck-root服务状态为inactive”
+
+# 基本信息
+- 测试用例: oe_test_service_systemd-fsck-root
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+用例测试执行过程中，检查到服务状态为inactive (dead)
+
+# 错误日志
+```
++ systemctl status systemd-fsck-root.service
++ grep Active
++ grep -v 'active (exited)'
+     Active: inactive (dead) since Fri 2026-04-17 09:32:08 CST; 19min ago
++ CHECK_RESULT 0 0 1 'There is an error for the status of systemd-fsck-root.service'
+```
+
+# 问题根因
+1. systemd-fsck-root.service专门用来给根文件系统做检查（fsck），在系统刚开机时，根文件系统是以“只读”方式挂载的。这时候系统会运行这个服务，检查一下磁盘有没有坏块。服务Type=oneshot，这是个“一次性”任务，执行完就退出，所以服务状态是active (exited)，部分环境在系统启动后，关闭了该服务，服务状态就会改变为inactive (dead)，系统正常运行时，根目录 /处于可读写状态，所以这个磁盘检查服务就不可执行了，这是完全正常的保护机制，所以服务执行start后，状态仍为inactive (dead)。
+
+# 解决方案
+1. 非问题，修改用例,增加判断环境中服务的初始状态，根据初始状态去测试服务启动后的状态，服务启动后的状态应该和初始状态一样
+修复PR:https://atomgit.com/openeuler/mugen/pull/5090
