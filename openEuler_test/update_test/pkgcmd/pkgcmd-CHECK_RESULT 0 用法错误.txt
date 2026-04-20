@@ -1,0 +1,215 @@
+# 标题
+pkgcmd "CHECK_RESULT 0 用法错误"
+
+# 基本信息
+- 测试用例: oe_test_nginx_cli
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+CHECK_RESULT 0 用法错误，只传递了一个固定参数0，不是获取上一条命令是否执行成功。
+
+# 错误日志
+```
++ python3 /root/mugen/libs/locallibs/mugen_log.py --level info --message 'Start to run test.'
+Thu Apr  9 22:41:29 2026 - INFO  - Start to run test.
++ systemctl start nginx
++ systemctl status nginx
++ grep running
+     Active: active (running) since Thu 2026-04-09 22:40:18 CST; 1min 10s ago
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
++ nginx '-?'
++ grep -i usage
+Usage: nginx [-?hvVtTq] [-s signal] [-p prefix]
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
++ nginx -h
++ grep -i usage
+Usage: nginx [-?hvVtTq] [-s signal] [-p prefix]
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
+++ nginx -v
+++ grep -Eo '[0-9]*\.[0-9]*\.[0-9]*'
+++ rpm -qi nginx
+++ grep Version
+++ awk '{print$3}'
++ test 1.24.0 == 1.24.0
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
+++ nginx -V
+++ grep version
+++ grep -Eo '[0-9]*\.[0-9]*\.[0-9]*'
+++ rpm -qi nginx
+++ grep Version
+++ awk '{print$3}'
++ test 1.24.0 == 1.24.0
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
+++ nginx -V
+++ grep GCC
+++ grep -oE '[0-9]+\.[0-9]+\.[0-9]+[a-z]*'
+++ rpm -qi gcc
+++ grep Version
+++ awk '{print$3}'
++ test '12.3.1
+12.3.1' == 12.3.1
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
+++ nginx -V
+++ grep GCC
+++ grep -oE '[0-9]+\.[0-9]+\.[0-9]+[a-z]*'
+++ rpm -qi gcc
+++ grep Version
+++ awk '{print$3}'
++ test '12.3.1
+12.3.1' == 12.3.1
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
+++ nginx -V
+++ grep OpenSSL
+++ grep -oE '[0-9]+\.[0-9]+\.[0-9]+[a-z]*'
+++ rpm -qi openssl
+++ grep Version
+++ awk '{print$3}'
++ test 3.0.12 == 3.0.12
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
++ nginx -t
++ grep ok
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
++ nginx -T
++ grep successful
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
++ nginx -t -q
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
++ cp -pv /usr/share/nginx/html/index.html /tmp/oe_test_nginx_cli_index.html.bak
+'/usr/share/nginx/html/index.html' -> '/tmp/oe_test_nginx_cli_index.html.bak'
++ echo 'hello world1'
++ curl localhost
++ grep hello
+hello world1
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
++ nginx -s stop
++ CHECK_RESULT 0
++ actual_result=0
++ expect_result=0
++ mode=0
++ error_log=
++ exit_mode=0
++ '[' -z 0 ']'
++ '[' 0 -eq 0 ']'
++ test 0x '!=' 0x
++ return 0
+```
+
+# 问题根因
+1、CHECK_RESULT 方法使用问题，最少需要一个参数，即获取上一条命令是否执行成功，而不是固定参数0。只传递参数0的话，校验结果恒成立，无意义。
+
+# 解决方案
+1、非问题，用例有误。修改用例：https://atomgit.com/openeuler/mugen/pull/5034
