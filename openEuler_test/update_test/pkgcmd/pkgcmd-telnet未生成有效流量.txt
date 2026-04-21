@@ -1,0 +1,42 @@
+# 标题
+pkgcmd “telnet未生成有效流量”
+
+# 基本信息
+- 测试用例: oe_test_trafgen_02
+- 系统版本: openEuler-24.03-LTS-SP3(aarch64/x86_64)
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+测试执行过程中，telnet生成流量无效，trafgen命令测试失败
+
+# 错误日志
+```
++ timeout 20 telnet 8.8.8.8 53
++ netsniff-ng --in eth0 --out tcpsyn.pcap -n 2
+Trying 8.8.8.8...^M
+Connected to 8.8.8.8.^M
+Escape character is '^]'.^M
+Connection closed by foreign host.^M
++ netsniff-ng --in tcpsyn.pcap --out tcpsyn.cfg -n 2
+Cannot open file tcpsyn.pcap! No such file or directory.
++ trafgen --dev eth0 --conf tcpsyn.cfg -s 127.0.0.1 -n 2
++ grep 'packets outgoing'
+Cannot access tcpsyn.cfg: No such file or directory!
++ CHECK_RESULT 1 0 0 'Check trafgen -s failed'
++ actual_result=1
++ expect_result=0
++ mode=0
++ error_log='Check trafgen -s failed'
++ exit_mode=0
++ '[' -z '1 0 0 Check trafgen -s failed' ']'
++ '[' 0 -eq 0 ']'
++ test 1x '!=' 0x
++ test -n 'Check trafgen -s failed'
+```
+# 问题根因
+1、DNS服务器期望收到的是遵循严格格式的DNS查询报文，当DNS服务器收到telnet发送来的无效指令时，会直接丢弃或者强行断开，所以telnet 8.8.8.8 53命令执行会立即失败，不会产生trafgen命令测试需要的有效流量，导致trafgen命令获取的是空文件
+
+# 解决方案
+1、非问题，修改测试用例，将telnet 8.8.8.8 53修改为curl -s http://example.com >/dev/null，用标准HTTP客户端工具curl向合法测试服务器发起规范的HTTP请求，从而触发完整、合规的网络交互，生成有效流量
+修复PR：https://atomgit.com/openeuler/mugen/pull/4991
