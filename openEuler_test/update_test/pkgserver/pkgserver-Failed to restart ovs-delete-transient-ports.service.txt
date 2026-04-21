@@ -1,0 +1,41 @@
+# 标题
+pkgcmd "Failed to restart ovs-delete-transient-ports.service"
+
+# 基本信息
+- 测试用例: oe_test_service_ovs-delete-transient-ports
+- 系统版本: openEuler-22.03-LTS-SP4
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+Failed to restart ovs-delete-transient-ports.service: Unit ovs-delete-transient-ports.service not found.
+
+# 错误日志
+```
++ test_execution ovs-delete-transient-ports.service
++ service=ovs-delete-transient-ports.service
+++ date '+%Y-%m-%d %T'
++ log_time='2026-04-09 17:09:48'
++ test_restart ovs-delete-transient-ports.service
++ service=ovs-delete-transient-ports.service
++ systemctl restart ovs-delete-transient-ports.service
+Failed to restart ovs-delete-transient-ports.service: Unit ovs-delete-transient-ports.service not found.
++ CHECK_RESULT 5 0 0 'ovs-delete-transient-ports.service restart failed'
++ actual_result=5
++ expect_result=0
++ mode=0
++ error_log='ovs-delete-transient-ports.service restart failed'
++ exit_mode=0
++ '[' -z '5 0 0 ovs-delete-transient-ports.service restart failed' ']'
++ '[' 0 -eq 0 ']'
++ test 5x '!=' 0x
++ test -n 'ovs-delete-transient-ports.service restart failed'
++ LOG_ERROR 'ovs-delete-transient-ports.service restart failed'
++ message='ovs-delete-transient-ports.service restart failed'
+```
+
+# 问题根因
+1、openEuler-22.03-LTS-SP4版本中，Unit ovs-delete-transient-ports.service not found.
+
+# 解决方案
+1、非问题。对 ovs-delete-transient-ports.service 服务操作前增加判断，查看服务是否存在。不存在，跳过该用例；存在，执行用例。修改用例：https://atomgit.com/openeuler/mugen/pull/4987

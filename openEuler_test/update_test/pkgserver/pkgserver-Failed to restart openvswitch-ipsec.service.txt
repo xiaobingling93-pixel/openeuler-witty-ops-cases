@@ -1,0 +1,72 @@
+# 标题
+pkgcmd "Failed to restart openvswitch-ipsec.service"
+
+# 基本信息
+- 测试用例: oe_test_service_openvswitch-ipsec
+- 系统版本: openEuler-22.03-LTS-SP4
+- 是否问题: 否
+- 关联issue: 无
+
+# 问题现象
+Failed to restart openvswitch-ipsec.service: Unit openvswitch-ipsec.service not found.
+
+# 错误日志
+```
++ DNF_INSTALL openvswitch-ipsec
++ pkgs=openvswitch-ipsec
++ node=1
++ '[' -z '' ']'
++ tmpfile=
+++ python3 /root/mugen/libs/locallibs/rpm_manage.py install --pkgs openvswitch-ipsec --node 1 --tempfile ''
++ tmpfile2='Last metadata expiration check: 0:25:31 ago on Thu 09 Apr 2026 04:44:06 PM CST.
+No match for argument: openvswitch-ipsec
+Error: Unable to find a match: openvswitch-ipsec'
++ '[' -z '' ']'
++ tmpfile='Last metadata expiration check: 0:25:31 ago on Thu 09 Apr 2026 04:44:06 PM CST.
+No match for argument: openvswitch-ipsec
+Error: Unable to find a match: openvswitch-ipsec'
++ service=openvswitch-ipsec.service
+++ date '+%Y-%m-%d %T'
++ log_time='2026-04-09 17:09:38'
++ flag=false
+++ getenforce
+++ grep Enforcing
++ '[' Enforcing ']'
++ setenforce 0
++ flag=true
++ LOG_INFO 'End of environmental preparation!'
++ message='End of environmental preparation!'
++ python3 /root/mugen/libs/locallibs/mugen_log.py --level info --message 'End of environmental preparation!'
+Thu Apr  9 17:09:38 2026 - INFO  - End of environmental preparation!
+++ type -t run_test
++ '[' -n function ']'
++ run_test
++ LOG_INFO 'Start testing...'
++ message='Start testing...'
++ python3 /root/mugen/libs/locallibs/mugen_log.py --level info --message 'Start testing...'
+Thu Apr  9 17:09:38 2026 - INFO  - Start testing...
++ service openvswitch-ipsec.service restart
+Redirecting to /bin/systemctl restart openvswitch-ipsec.service
+Failed to restart openvswitch-ipsec.service: Unit openvswitch-ipsec.service not found.
++ CHECK_RESULT 5 0 0 'openvswitch-ipsec.service restart failed'
++ actual_result=5
++ expect_result=0
++ mode=0
++ error_log='openvswitch-ipsec.service restart failed'
++ exit_mode=0
++ '[' -z '5 0 0 openvswitch-ipsec.service restart failed' ']'
++ '[' 0 -eq 0 ']'
++ test 5x '!=' 0x
++ test -n 'openvswitch-ipsec.service restart failed'
++ LOG_ERROR 'openvswitch-ipsec.service restart failed'
++ message='openvswitch-ipsec.service restart failed'
+```
+
+# 问题根因
+1、openEuler-22.03-LTS-SP4版本中，openvswitch-ipsec包不存在，Unit openvswitch-ipsec.service not found.
+
+# 解决方案
+1、非问题。优化mugen框架，完善软件包安装 rpm_manage.py 代码处理逻辑。https://atomgit.com/openeuler/mugen/pull/4963
+①增加软件包不存在，导致安装失败的问题（比如软件包衰退\单架构包、新特性引入的包……）
+②增加软件包安装冲突，导致安装失败的问题。
+针对以上两种软件包安装失败的异常情形，直接退出，用例后续步骤不需要继续执行。
