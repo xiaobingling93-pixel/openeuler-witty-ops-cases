@@ -1,0 +1,27 @@
+# 标题
+pkgmanage-upgrade-thunderbird-debuginfo-needs more space on the  filesystem
+
+# 基本信息
+- 测试用例: oe_test_pkg_manager02
+- 系统版本: openEuler-24.03-LTS-SP3
+- 是否问题：否
+- 关联issue：无
+
+# 问题现象
+用例执行升级软件包thunderbird-debuginfo时候抛出Error: Transaction test error:
+  installing package thunderbird-debuginfo-140.9.1-1.oe2403sp3.x86_64 needs 1650MB more space on the / filesystem
+，被用例识别到关键字error，判定用例失败
+
+# 错误日志
+
+```
+Error: Transaction test error:
+  installing package thunderbird-debuginfo-140.9.1-1.oe2403sp3.x86_64 needs 1650MB more space on the / filesystem
+```
+
+# 问题根因
+
+该软件包的debuginfo包比较大，设置的测试机器内存无法满足，导致安装时候报需要更多内存
+
+# 解决方案
+非问题。需要重新用新环境去验证，该软件包升级是否有异常

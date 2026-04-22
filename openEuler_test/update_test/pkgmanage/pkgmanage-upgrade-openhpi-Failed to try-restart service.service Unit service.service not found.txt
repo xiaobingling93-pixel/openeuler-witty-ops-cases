@@ -1,0 +1,28 @@
+# 标题
+pkgmanage-upgrade-openhpi-Failed to try-restart service.service Unit service.service not found
+
+# 基本信息
+- 测试用例: oe_test_pkg_manager02
+- 系统版本: openEuler-24.03-LTS-SP1
+- 是否问题：是
+- 关联issue：https://atomgit.com/src-openeuler/openhpi/issues/8
+
+# 问题现象
+2403-lts往2403-lts-sp1升级过程中，升级软件包openhpi执行升级脚本时候报错：Failed to try-restart service.service: Unit service.service not found.
+
+# 错误日志
+
+```
+Failed to try-restart service.service: Unit service.service not found.
+```
+
+# 问题根因
+
+软件包在spec中未写明具体的服务名，导致升级过程中需要重启该服务，找不到service文件.
+
+# 解决方案
+在spec中升级过程执行脚本时候写清具体的服务名称
+```
+%postun
+%systemd_postun_with_restart openhpid.service
+```

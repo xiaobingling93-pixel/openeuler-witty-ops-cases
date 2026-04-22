@@ -1,0 +1,26 @@
+# 标题
+pkgcmd-wsmancli-d-国内docker镜像访问受限导致命令失败
+
+# 基本信息
+- 测试用例: oe_test_wsmancli_wseventmgr_01 oe_test_wsmancli_wseventmgr_02
+- 系统版本: openEuler-24.03-LTS-SP1
+- 是否问题：否
+- 关联issue：https://atomgit.com/src-openeuler/wsmancli/issues/3
+
+# 问题现象
+用例执行过程中，docker 下载镜像失败
+
+# 错误日志
+
+Unable to find image 'kschopmeyer/openpegasus-server:0.1.1' locally
+docker: Error response from daemon: Get "https://registry-1.docker.io/v2/": net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers).
+See 'docker run --help'.
+
+# 问题根因
+
+国内docker镜像访问阻塞导致
+
+# 解决方案
+在拉取时在docker镜像地址前配置加速地址，如： dockerpull.org，用例需要整改
+
+目前国内可以用的docker镜像源地址参见：https://www.coderjia.cn/archives/dba3f94c-a021-468a-8ac6-e840f85867ea
